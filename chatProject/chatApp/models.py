@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
-
+import uuid
+import base64
 
 class ChatUser(AbstractUser):
     '''聊天用户模型'''
@@ -58,3 +59,20 @@ class Message(models.Model):
     class Meta:
         verbose_name = "消息"
         verbose_name_plural = verbose_name
+
+def generate_short_uuid():
+    u = uuid.uuid4()
+    b64 = base64.urlsafe_b64encode(u.bytes).rstrip(b'=').decode('ascii')
+    return b64
+
+class Anchor(models.Model):
+    uid = models.CharField(primary_key=True, max_length=22, default=generate_short_uuid, editable=False)
+    username = models.CharField(max_length=150, unique=True)
+    handle = models.CharField(max_length=150, unique=True)
+    password = models.CharField(max_length=128)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'chatApp_anchor'
+
+

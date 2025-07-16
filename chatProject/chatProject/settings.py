@@ -38,10 +38,12 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'channels',        # 添加通道应用
-    'chatApp', # 添加聊天应用 
+    'chatApp', # 添加聊天应用
+    'corsheaders',#添加跨域
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -69,6 +71,8 @@ TEMPLATES = [
     },
 ]
 
+CORS_ALLOW_ALL_ORIGINS = True
+
 WSGI_APPLICATION = 'chatProject.wsgi.application'
 ASGI_APPLICATION = 'chatProject.asgi.application'  # 添加异步应用支持
 
@@ -76,13 +80,33 @@ ASGI_APPLICATION = 'chatProject.asgi.application'  # 添加异步应用支持
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',  # MySQL 引擎
+        'NAME': 'Pecktra',                        # 数据库名称
+        'USER': 'root',                      # 用户名
+        'PASSWORD': 'Tura1050493761@',              # 密码
+        'HOST': 'localhost',                   # 主机地址
+        'PORT': '3306',                        # 端口号
+        'OPTIONS': {
+            'charset': 'utf8mb4',              # 推荐使用 utf8mb4 以支持表情符号
+            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
+        }
     }
 }
 
+REDIS_HOST = 'localhost'
+REDIS_PORT = 6379
+REDIS_DB = 0
+
+MONGO_URI = "mongodb://admin:Tura1050493761%40@127.0.0.1:27017/chat_db?authSource=admin"
+MONGO_DB_NAME = "chat_db"
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators

@@ -17,7 +17,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from chatApp.views import home,user_login,user_signup,user_logout
-
+from chatApp.anchor import login , chat_data ,live
 # 导入静态文件模块，为了显示上传图片
 from django.conf.urls.static import static
 from . import settings
@@ -31,6 +31,19 @@ urlpatterns = [
     path('signup/', user_signup, name='signup'), # 注册
     path('logout/', user_logout, name='logout'), # 退出
     path('chat/<str:room_name>/', views.room_view, name='chatroom'), # 聊天室
+
+
+    #主播端
+    path('api/users/register/',  login.register),  # 注册
+
+
+    #主播端聊天数据
+    path('api/chat/chat_data/', chat_data.chat_data),  # 聊天数据
+
+
+    #主播端直播状态
+    path('api/live/get_live_status', live.get_live_status),
+    path('api/live/change_live_status', live.change_live_status),
 ]
 
 urlpatterns += static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)

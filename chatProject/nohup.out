@@ -1,0 +1,809 @@
+/usr/local/lib/python3.6/site-packages/OpenSSL/_util.py:6: CryptographyDeprecationWarning: Python 3.6 is no longer supported by the Python core team. Therefore, support for it is deprecated in cryptography. The next release of cryptography will remove support for Python 3.6.
+  from cryptography.hazmat.bindings.openssl.binding import Binding
+Watching for file changes with StatReloader
+HTTP GET /api/live/get_live_status?uid=1&username=pride 200 [0.01, 183.191.43.43:65074]
+Internal Server Error: /api/live/get_live_status
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.6/site-packages/asgiref/sync.py", line 482, in thread_handler
+    raise exc_info[1]
+  File "/usr/local/lib/python3.6/site-packages/django/core/handlers/exception.py", line 38, in inner
+    response = await get_response(request)
+  File "/usr/local/lib/python3.6/site-packages/django/core/handlers/base.py", line 263, in _get_response_async
+    response = await sync_to_async(response.render, thread_sensitive=True)()
+  File "/usr/local/lib/python3.6/site-packages/asgiref/sync.py", line 444, in __call__
+    ret = await asyncio.wait_for(future, timeout=None)
+  File "/usr/lib64/python3.6/asyncio/tasks.py", line 339, in wait_for
+    return (yield from fut)
+  File "/usr/lib64/python3.6/concurrent/futures/thread.py", line 56, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "/usr/local/lib/python3.6/site-packages/asgiref/sync.py", line 486, in thread_handler
+    return func(*args, **kwargs)
+  File "/usr/local/lib/python3.6/site-packages/django/template/response.py", line 105, in render
+    self.content = self.rendered_content
+  File "/usr/local/lib/python3.6/site-packages/rest_framework/response.py", line 74, in rendered_content
+    ret = renderer.render(self.data, accepted_media_type, context)
+  File "/usr/local/lib/python3.6/site-packages/rest_framework/renderers.py", line 725, in render
+    template = loader.get_template(self.template)
+  File "/usr/local/lib/python3.6/site-packages/django/template/loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: rest_framework/api.html
+HTTP GET /api/live/get_live_status 500 [0.12, 124.64.17.235:65477]
+HTTP GET / 302 [0.01, 193.34.212.110:41196]
+HTTP GET / 302 [0.01, 149.86.227.49:55008]
+HTTP GET / 302 [0.01, 193.34.212.110:46936]
+HTTP GET / 302 [0.01, 149.86.227.49:52396]
+HTTP GET / 302 [0.01, 103.203.57.20:35412]
+HTTP GET / 302 [0.01, 193.34.212.110:52894]
+HTTP GET / 302 [0.01, 149.86.227.49:48232]
+HTTP GET / 302 [0.01, 64.62.156.66:7240]
+HTTP GET / 302 [0.01, 64.62.156.76:9733]
+HTTP GET /login/?next=/ 200 [0.03, 64.62.156.76:9733]
+Not Found: /favicon.ico
+HTTP GET /favicon.ico 404 [0.01, 64.62.156.72:49123]
+Not Found: http://api.ipify.org/
+HTTP GET http://api.ipify.org/?format=json 404 [0.01, 64.62.156.71:61703]
+Not Found: www.shadowserver.org:443
+HTTP CONNECT www.shadowserver.org:443 404 [0.01, 64.62.156.78:16193]
+HTTP GET / 302 [0.01, 193.34.212.110:51080]
+Not Found: http://passport.baidu.com/
+HTTP GET http://passport.baidu.com/ 404 [0.01, 8.219.209.185:55642]
+HTTP GET / 302 [0.01, 149.86.227.49:47412]
+HTTP GET / 302 [0.01, 193.34.212.110:39696]
+HTTP GET / 302 [0.01, 149.86.227.49:56000]
+HTTP GET / 302 [0.01, 159.89.122.111:44966]
+HTTP GET /login/?next=/ 200 [0.01, 159.89.122.111:44966]
+HTTP GET /login 301 [0.00, 159.89.122.111:44972]
+HTTP GET /login/ 200 [0.01, 159.89.122.111:44972]
+HTTP GET / 302 [0.01, 193.34.212.110:44866]
+HTTP GET / 302 [0.01, 149.86.227.49:44092]
+HTTP GET / 302 [0.01, 220.196.160.73:40956]
+HTTP GET /login/?next=/ 200 [0.01, 220.196.160.76:49464]
+HTTP GET / 302 [0.01, 59.83.208.104:31192]
+HTTP GET /login/?next=/ 200 [0.01, 59.83.208.104:31192]
+Not Found: http://passport.baidu.com/
+HTTP GET http://passport.baidu.com/ 404 [0.01, 47.237.177.222:50866]
+HTTP GET / 302 [0.01, 193.34.212.110:57770]
+HTTP GET / 302 [0.01, 149.86.227.49:33534]
+HTTP GET / 302 [0.01, 193.34.212.110:54858]
+HTTP GET / 302 [0.01, 149.86.227.49:35490]
+HTTP GET / 302 [0.02, 162.142.125.223:33864]
+HTTP GET / 302 [0.01, 162.142.125.223:54424]
+Not Found: *
+HTTP PRI * 404 [0.02, 162.142.125.223:54438]
+HTTP GET /login/ 200 [0.01, 162.142.125.223:54480]
+Not Found: /favicon.ico
+HTTP GET /favicon.ico 404 [0.02, 162.142.125.223:54484]
+Not Found: *
+HTTP PRI * 404 [0.01, 162.142.125.223:54498]
+Not Found: /robots.txt
+HTTP GET /robots.txt 404 [0.01, 162.142.125.223:55394]
+HTTP GET / 302 [0.01, 193.34.212.110:49080]
+HTTP GET / 302 [0.01, 156.229.21.54:60158]
+HTTP GET /login/?next=/ 200 [0.01, 156.229.21.54:40742]
+Not Found: /favicon.ico
+HTTP GET /favicon.ico 404 [0.02, 156.229.21.54:40754]
+Not Found: /robots.txt
+HTTP GET /robots.txt 404 [0.01, 156.229.21.54:40768]
+Not Found: /sitemap.xml
+HTTP GET /sitemap.xml 404 [0.01, 156.229.21.54:40784]
+Not Found: /config.json
+HTTP GET /config.json 404 [0.02, 156.229.21.54:40800]
+HTTP GET / 302 [0.01, 149.86.227.49:44420]
+HTTP GET / 302 [0.01, 193.34.212.110:33038]
+HTTP GET / 302 [0.01, 198.235.24.214:63920]
+HTTP GET /login/?next=/ 200 [0.01, 198.235.24.214:63922]
+HTTP GET / 302 [0.01, 149.86.227.49:53822]
+HTTP GET / 302 [0.02, 193.34.212.110:36552]
+HTTP GET / 302 [0.01, 149.86.227.49:56202]
+HTTP GET / 302 [0.01, 141.98.11.174:57744]
+HTTP GET /login/?next=/ 200 [0.01, 141.98.11.174:57744]
+Not Found: /api/contents
+HTTP GET /api/contents?type=directory 404 [0.02, 141.98.11.174:57752]
+HTTP GET / 302 [0.01, 193.34.212.110:42126]
+HTTP GET / 302 [0.01, 3.134.148.59:48498]
+HTTP GET /login/?next=/ 200 [0.01, 3.134.148.59:48498]
+HTTP GET / 302 [0.01, 3.134.148.59:48508]
+HTTP GET / 302 [0.01, 34.214.56.247:32916]
+HTTP GET / 302 [0.01, 149.86.227.49:41688]
+HTTP GET / 302 [0.01, 164.90.139.15:53416]
+HTTP GET /login/?next=/ 200 [0.01, 164.90.139.15:53422]
+Not Found: /login/favicon.ico
+HTTP GET /login/favicon.ico 404 [0.02, 164.90.139.15:53434]
+HTTP GET / 302 [0.01, 193.34.212.110:40010]
+WebSocket HANDSHAKING /websockify [141.98.11.174:42156]
+Exception inside application: No route found for path 'websockify'.
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.6/site-packages/channels/staticfiles.py", line 44, in __call__
+    return await self.application(scope, receive, send)
+  File "/usr/local/lib/python3.6/site-packages/channels/routing.py", line 71, in __call__
+    return await application(scope, receive, send)
+  File "/usr/local/lib/python3.6/site-packages/channels/sessions.py", line 47, in __call__
+    return await self.inner(dict(scope, cookies=cookies), receive, send)
+  File "/usr/local/lib/python3.6/site-packages/channels/sessions.py", line 263, in __call__
+    return await self.inner(wrapper.scope, receive, wrapper.send)
+  File "/usr/local/lib/python3.6/site-packages/channels/auth.py", line 185, in __call__
+    return await super().__call__(scope, receive, send)
+  File "/usr/local/lib/python3.6/site-packages/channels/middleware.py", line 26, in __call__
+    return await self.inner(scope, receive, send)
+  File "/usr/local/lib/python3.6/site-packages/channels/routing.py", line 168, in __call__
+    raise ValueError("No route found for path %r." % path)
+ValueError: No route found for path 'websockify'.
+WebSocket DISCONNECT /websockify [141.98.11.174:42156]
+HTTP GET / 302 [0.01, 149.86.227.49:39076]
+HTTP GET / 302 [0.01, 149.86.227.49:41694]
+HTTP GET / 302 [0.01, 193.34.212.110:52216]
+HTTP GET / 302 [0.01, 193.34.212.110:38218]
+HTTP GET / 302 [0.01, 149.86.227.49:57708]
+HTTP GET / 302 [0.09, 193.34.212.110:60278]
+HTTP GET / 302 [0.01, 64.62.156.132:49734]
+HTTP GET / 302 [0.01, 64.62.156.135:46687]
+HTTP GET /login/?next=/ 200 [0.01, 64.62.156.135:46687]
+Not Found: /favicon.ico
+HTTP GET /favicon.ico 404 [0.01, 64.62.156.132:6789]
+Not Found: http://api.ipify.org/
+HTTP GET http://api.ipify.org/?format=json 404 [0.01, 64.62.156.139:13101]
+Not Found: www.shadowserver.org:443
+HTTP CONNECT www.shadowserver.org:443 404 [0.01, 64.62.156.133:35947]
+Not Found: www.sogou.com:443
+HTTP CONNECT www.sogou.com:443 404 [0.01, 43.139.151.30:60338]
+HTTP GET / 302 [0.01, 149.86.227.49:55940]
+Method Not Allowed: /api/live/get_live_status
+HTTP POST /api/live/get_live_status 405 [0.01, 36.110.197.18:5883]
+Bad Request: /api/live/get_live_status
+HTTP GET /api/live/get_live_status?uid=11&usernmae=22 400 [0.01, 36.110.197.18:5883]
+Internal Server Error: /api/users/register
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.6/site-packages/asgiref/sync.py", line 482, in thread_handler
+    raise exc_info[1]
+  File "/usr/local/lib/python3.6/site-packages/django/core/handlers/exception.py", line 38, in inner
+    response = await get_response(request)
+  File "/usr/local/lib/python3.6/site-packages/django/utils/deprecation.py", line 132, in __acall__
+    )(request)
+  File "/usr/local/lib/python3.6/site-packages/asgiref/sync.py", line 444, in __call__
+    ret = await asyncio.wait_for(future, timeout=None)
+  File "/usr/lib64/python3.6/asyncio/tasks.py", line 339, in wait_for
+    return (yield from fut)
+  File "/usr/lib64/python3.6/concurrent/futures/thread.py", line 56, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "/usr/local/lib/python3.6/site-packages/asgiref/sync.py", line 486, in thread_handler
+    return func(*args, **kwargs)
+  File "/usr/local/lib/python3.6/site-packages/django/middleware/common.py", line 54, in process_request
+    path = self.get_full_path_with_slash(request)
+  File "/usr/local/lib/python3.6/site-packages/django/middleware/common.py", line 95, in get_full_path_with_slash
+    'url': request.get_host() + new_path,
+RuntimeError: You called this URL via POST, but the URL doesn't end in a slash and you have APPEND_SLASH set. Django can't redirect to the slash URL while maintaining POST data. Change your form to point to 43.162.120.233:8000/api/users/register/ (note the trailing slash), or set APPEND_SLASH=False in your Django settings.
+HTTP POST /api/users/register 500 [0.05, 36.110.197.18:6519]
+Internal Server Error: /api/users/register
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.6/site-packages/asgiref/sync.py", line 482, in thread_handler
+    raise exc_info[1]
+  File "/usr/local/lib/python3.6/site-packages/django/core/handlers/exception.py", line 38, in inner
+    response = await get_response(request)
+  File "/usr/local/lib/python3.6/site-packages/django/utils/deprecation.py", line 132, in __acall__
+    )(request)
+  File "/usr/local/lib/python3.6/site-packages/asgiref/sync.py", line 444, in __call__
+    ret = await asyncio.wait_for(future, timeout=None)
+  File "/usr/lib64/python3.6/asyncio/tasks.py", line 339, in wait_for
+    return (yield from fut)
+  File "/usr/lib64/python3.6/concurrent/futures/thread.py", line 56, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "/usr/local/lib/python3.6/site-packages/asgiref/sync.py", line 486, in thread_handler
+    return func(*args, **kwargs)
+  File "/usr/local/lib/python3.6/site-packages/django/middleware/common.py", line 54, in process_request
+    path = self.get_full_path_with_slash(request)
+  File "/usr/local/lib/python3.6/site-packages/django/middleware/common.py", line 95, in get_full_path_with_slash
+    'url': request.get_host() + new_path,
+RuntimeError: You called this URL via POST, but the URL doesn't end in a slash and you have APPEND_SLASH set. Django can't redirect to the slash URL while maintaining POST data. Change your form to point to 43.162.120.233:8000/api/users/register/ (note the trailing slash), or set APPEND_SLASH=False in your Django settings.
+HTTP POST /api/users/register 500 [0.05, 36.110.197.18:6605]
+HTTP POST /api/users/register/ 200 [0.29, 36.110.197.18:6605]
+Internal Server Error: /api/users/register
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.6/site-packages/asgiref/sync.py", line 482, in thread_handler
+    raise exc_info[1]
+  File "/usr/local/lib/python3.6/site-packages/django/core/handlers/exception.py", line 38, in inner
+    response = await get_response(request)
+  File "/usr/local/lib/python3.6/site-packages/django/utils/deprecation.py", line 132, in __acall__
+    )(request)
+  File "/usr/local/lib/python3.6/site-packages/asgiref/sync.py", line 444, in __call__
+    ret = await asyncio.wait_for(future, timeout=None)
+  File "/usr/lib64/python3.6/asyncio/tasks.py", line 339, in wait_for
+    return (yield from fut)
+  File "/usr/lib64/python3.6/concurrent/futures/thread.py", line 56, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "/usr/local/lib/python3.6/site-packages/asgiref/sync.py", line 486, in thread_handler
+    return func(*args, **kwargs)
+  File "/usr/local/lib/python3.6/site-packages/django/middleware/common.py", line 54, in process_request
+    path = self.get_full_path_with_slash(request)
+  File "/usr/local/lib/python3.6/site-packages/django/middleware/common.py", line 95, in get_full_path_with_slash
+    'url': request.get_host() + new_path,
+RuntimeError: You called this URL via POST, but the URL doesn't end in a slash and you have APPEND_SLASH set. Django can't redirect to the slash URL while maintaining POST data. Change your form to point to 43.162.120.233:8000/api/users/register/ (note the trailing slash), or set APPEND_SLASH=False in your Django settings.
+HTTP POST /api/users/register 500 [0.03, 36.110.197.18:6661]
+HTTP GET / 302 [0.01, 193.34.212.110:36362]
+HTTP POST /api/users/register/ 200 [0.27, 36.110.197.18:6714]
+HTTP POST /api/users/register/ 200 [0.28, 36.110.197.18:6859]
+Bad Request: /api/users/register/
+HTTP POST /api/users/register/ 400 [0.01, 36.110.197.18:6908]
+HTTP POST /api/users/register/ 200 [0.31, 36.110.197.18:6935]
+Bad Request: /api/users/register/
+HTTP POST /api/users/register/ 400 [0.04, 36.110.197.18:6943]
+Bad Request: /api/users/register/
+HTTP POST /api/users/register/ 400 [0.01, 36.110.197.18:6956]
+HTTP POST /api/users/register/ 200 [0.28, 36.110.197.18:6988]
+Bad Request: /api/users/register/
+HTTP POST /api/users/register/ 400 [0.01, 36.110.197.18:7080]
+HTTP POST /api/users/register/ 200 [0.29, 36.110.197.18:7147]
+HTTP POST /api/users/register/ 200 [0.27, 36.110.197.18:7172]
+HTTP POST /api/users/register/ 200 [0.33, 36.110.197.18:7210]
+HTTP GET / 302 [0.01, 193.34.212.110:38792]
+HTTP GET / 302 [0.01, 149.86.227.49:33834]
+HTTP GET / 302 [0.01, 149.86.227.49:37458]
+HTTP POST /api/users/register/ 200 [0.27, 219.143.88.250:50596]
+Internal Server Error: /api/users/register
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.6/site-packages/asgiref/sync.py", line 482, in thread_handler
+    raise exc_info[1]
+  File "/usr/local/lib/python3.6/site-packages/django/core/handlers/exception.py", line 38, in inner
+    response = await get_response(request)
+  File "/usr/local/lib/python3.6/site-packages/django/utils/deprecation.py", line 132, in __acall__
+    )(request)
+  File "/usr/local/lib/python3.6/site-packages/asgiref/sync.py", line 444, in __call__
+    ret = await asyncio.wait_for(future, timeout=None)
+  File "/usr/lib64/python3.6/asyncio/tasks.py", line 339, in wait_for
+    return (yield from fut)
+  File "/usr/lib64/python3.6/concurrent/futures/thread.py", line 56, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "/usr/local/lib/python3.6/site-packages/asgiref/sync.py", line 486, in thread_handler
+    return func(*args, **kwargs)
+  File "/usr/local/lib/python3.6/site-packages/django/middleware/common.py", line 54, in process_request
+    path = self.get_full_path_with_slash(request)
+  File "/usr/local/lib/python3.6/site-packages/django/middleware/common.py", line 95, in get_full_path_with_slash
+    'url': request.get_host() + new_path,
+RuntimeError: You called this URL via POST, but the URL doesn't end in a slash and you have APPEND_SLASH set. Django can't redirect to the slash URL while maintaining POST data. Change your form to point to 43.162.120.233:8000/api/users/register/ (note the trailing slash), or set APPEND_SLASH=False in your Django settings.
+HTTP POST /api/users/register 500 [0.05, 219.143.88.250:52461]
+HTTP POST /api/chat/chat_data/ 200 [0.07, 219.143.88.250:52461]
+HTTP POST /api/chat/chat_data/ 200 [0.01, 219.143.88.250:52461]
+HTTP GET / 302 [0.01, 193.34.212.110:53958]
+HTTP GET / 302 [0.01, 149.86.227.49:60718]
+HTTP GET / 302 [0.01, 193.34.212.110:50290]
+HTTP GET / 302 [0.01, 165.232.37.181:32966]
+HTTP GET /login/?next=/ 200 [0.01, 165.232.37.181:32966]
+HTTP GET /login 301 [0.00, 165.232.37.181:32972]
+HTTP GET /login/ 200 [0.01, 165.232.37.181:32972]
+HTTP OPTIONS /api/chat/chat_data/ 200 [0.01, 219.143.88.250:50574]
+HTTP OPTIONS /api/chat/chat_data/ 200 [0.01, 219.143.88.250:50886]
+HTTP OPTIONS /api/chat/chat_data/ 200 [0.01, 219.143.88.250:50923]
+HTTP GET / 302 [0.01, 149.86.227.49:39826]
+HTTP GET / 302 [0.01, 193.34.212.110:35354]
+HTTP GET / 302 [0.01, 87.236.176.12:35597]
+HTTP GET /login/?next=/ 200 [0.01, 87.236.176.12:38809]
+HTTP GET / 302 [0.01, 149.86.227.49:41662]
+HTTP GET / 302 [0.01, 193.34.212.110:44424]
+HTTP GET / 302 [0.01, 221.238.94.141:58358]
+HTTP OPTIONS / 302 [0.01, 221.238.94.141:58382]
+Not Found: /nice ports,/Trinity.txt.bak
+HTTP GET /nice%20ports%2C/Tri%6Eity.txt%2ebak 404 [0.02, 221.238.94.141:42356]
+Not Found: sip:nm
+HTTP OPTIONS sip:nm 404 [0.02, 221.238.94.141:42484]
+HTTP OPTIONS / 302 [0.01, 221.238.94.141:58372]
+HTTP GET / 302 [0.01, 141.98.11.174:59116]
+HTTP GET /login/?next=/ 200 [0.01, 141.98.11.174:59116]
+Not Found: /api/contents
+HTTP GET /api/contents?type=directory 404 [0.02, 141.98.11.174:59118]
+HTTP GET / 302 [0.01, 59.83.208.105:32968]
+HTTP GET /login/?next=/ 200 [0.01, 180.101.245.246:50220]
+HTTP GET / 302 [0.01, 180.101.244.12:58502]
+HTTP GET /login/?next=/ 200 [0.01, 180.101.244.12:58502]
+HTTP GET / 302 [0.01, 149.86.227.49:38456]
+Not Found: google.com:443
+HTTP CONNECT google.com:443 404 [0.01, 46.19.141.90:48238]
+HTTP GET / 302 [0.01, 149.86.227.49:45296]
+HTTP GET / 302 [0.01, 96.126.117.80:54376]
+Not Found: /nice ports,/Trinity.txt.bak
+HTTP GET /nice%20ports%2C/Tri%6Eity.txt%2ebak 404 [0.01, 96.126.117.80:54412]
+HTTP OPTIONS / 302 [0.01, 96.126.117.80:42728]
+HTTP OPTIONS / 302 [0.01, 96.126.117.80:42734]
+Not Found: sip:nm
+HTTP OPTIONS sip:nm 404 [0.01, 96.126.117.80:42742]
+Not Found: *
+HTTP GET / 302 [0.01, 96.126.117.80:42762]
+HTTP OPTIONS * 404 [0.02, 96.126.117.80:42758]
+HTTP GET /login/?next=/ 200 [0.01, 96.126.117.80:42780]
+Not Found: /favicon.ico
+HTTP GET /favicon.ico 404 [0.01, 96.126.117.80:42782]
+HTTP GET / 302 [0.01, 96.126.117.80:56632]
+HTTP GET / 302 [0.01, 96.126.117.80:56636]
+HTTP GET / 302 [0.01, 149.86.227.49:48132]
+HTTP GET / 302 [0.01, 162.142.125.207:41876]
+HTTP GET / 302 [0.01, 162.142.125.207:40900]
+Not Found: *
+HTTP PRI * 404 [0.01, 162.142.125.207:40916]
+HTTP GET /login/ 200 [0.01, 162.142.125.207:34830]
+Not Found: /favicon.ico
+HTTP GET /favicon.ico 404 [0.01, 162.142.125.207:52304]
+Not Found: *
+HTTP PRI * 404 [0.02, 162.142.125.207:52350]
+HTTP GET /login 301 [0.01, 162.142.125.207:53156]
+WebSocket HANDSHAKING /websockify [141.98.11.174:34528]
+Exception inside application: No route found for path 'websockify'.
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.6/site-packages/channels/staticfiles.py", line 44, in __call__
+    return await self.application(scope, receive, send)
+  File "/usr/local/lib/python3.6/site-packages/channels/routing.py", line 71, in __call__
+    return await application(scope, receive, send)
+  File "/usr/local/lib/python3.6/site-packages/channels/sessions.py", line 47, in __call__
+    return await self.inner(dict(scope, cookies=cookies), receive, send)
+  File "/usr/local/lib/python3.6/site-packages/channels/sessions.py", line 263, in __call__
+    return await self.inner(wrapper.scope, receive, wrapper.send)
+  File "/usr/local/lib/python3.6/site-packages/channels/auth.py", line 185, in __call__
+    return await super().__call__(scope, receive, send)
+  File "/usr/local/lib/python3.6/site-packages/channels/middleware.py", line 26, in __call__
+    return await self.inner(scope, receive, send)
+  File "/usr/local/lib/python3.6/site-packages/channels/routing.py", line 168, in __call__
+    raise ValueError("No route found for path %r." % path)
+ValueError: No route found for path 'websockify'.
+WebSocket DISCONNECT /websockify [141.98.11.174:34528]
+HTTP GET / 302 [0.01, 167.94.138.183:47098]
+Not Found: *
+HTTP PRI * 404 [0.01, 167.94.138.183:47126]
+HTTP GET /login/ 200 [0.01, 167.94.138.183:55360]
+Not Found: /favicon.ico
+HTTP GET /favicon.ico 404 [0.01, 167.94.138.183:55364]
+Not Found: *
+HTTP PRI * 404 [0.01, 167.94.138.183:37646]
+Not Found: /wiki
+HTTP GET /wiki 404 [0.01, 167.94.138.183:47376]
+HTTP GET / 302 [0.01, 149.86.227.49:39092]
+HTTP GET / 302 [0.01, 198.235.24.87:60710]
+HTTP GET /login/?next=/ 200 [0.01, 198.235.24.87:60718]
+HTTP GET / 302 [0.01, 149.86.227.49:51922]
+HTTP GET / 302 [0.01, 141.98.11.174:36346]
+HTTP GET /login/?next=/ 200 [0.01, 141.98.11.174:36346]
+HTTP GET / 302 [0.01, 106.75.155.108:54554]
+HTTP GET / 302 [0.01, 149.86.227.49:38444]
+HTTP GET / 302 [0.01, 91.230.168.1:35333]
+HTTP GET / 302 [0.01, 91.196.152.124:34373]
+HTTP GET / 302 [0.02, 149.86.227.49:48582]
+Not Found: /favicon.ico
+HTTP GET /favicon.ico 404 [0.02, 195.184.76.238:33279]
+HTTP GET /login/?next=/ 200 [0.01, 195.184.76.11:53417]
+HTTP GET /login/?next=/ 200 [0.01, 91.196.152.91:59277]
+Not Found: /favicon.ico
+HTTP GET /favicon.ico 404 [0.02, 91.196.152.2:42871]
+Not Found: /favicon.ico
+HTTP GET /favicon.ico 404 [0.01, 195.184.76.70:44073]
+HTTP GET / 302 [0.01, 149.86.227.49:51734]
+HTTP GET / 302 [0.01, 149.86.227.49:57266]
+HTTP GET / 302 [0.03, 159.75.198.113:53782]
+HTTP GET /login/?next=/ 200 [0.01, 159.75.198.113:53782]
+Not Found: /api/live/get_live_status/
+HTTP OPTIONS /api/live/get_live_status/ 404 [0.01, 219.143.88.250:58680]
+/usr/local/lib/python3.6/site-packages/OpenSSL/_util.py:6: CryptographyDeprecationWarning: Python 3.6 is no longer supported by the Python core team. Therefore, support for it is deprecated in cryptography. The next release of cryptography will remove support for Python 3.6.
+  from cryptography.hazmat.bindings.openssl.binding import Binding
+/usr/local/lib/python3.6/site-packages/OpenSSL/_util.py:6: CryptographyDeprecationWarning: Python 3.6 is no longer supported by the Python core team. Therefore, support for it is deprecated in cryptography. The next release of cryptography will remove support for Python 3.6.
+  from cryptography.hazmat.bindings.openssl.binding import Binding
+Watching for file changes with StatReloader
+HTTP OPTIONS /api/live/get_live_status/ 200 [0.00, 219.143.88.250:61229]
+Not Found: /api/live/get_live_status/
+HTTP POST /api/live/get_live_status/ 404 [0.03, 219.143.88.250:61229]
+HTTP OPTIONS /api/chat/chat_data/ 200 [0.00, 219.143.88.250:61229]
+Internal Server Error: /api/chat/chat_data/
+HTTP POST /api/chat/chat_data/ 500 [0.01, 219.143.88.250:61229]
+HTTP POST /api/chat/chat_data/ 200 [0.03, 219.143.88.250:61294]
+Internal Server Error: /api/chat/chat_data/
+HTTP POST /api/chat/chat_data/ 500 [0.01, 219.143.88.250:61381]
+Bad Request: /api/chat/chat_data/
+HTTP POST /api/chat/chat_data/ 400 [0.01, 219.143.88.250:61477]
+Bad Request: /api/chat/chat_data/
+HTTP POST /api/chat/chat_data/ 400 [0.01, 219.143.88.250:61477]
+Internal Server Error: /api/chat/chat_data/
+HTTP POST /api/chat/chat_data/ 500 [0.01, 219.143.88.250:61599]
+Internal Server Error: /api/chat/chat_data/
+HTTP POST /api/chat/chat_data/ 500 [0.01, 219.143.88.250:61807]
+Internal Server Error: /api/chat/chat_data/
+HTTP POST /api/chat/chat_data/ 500 [0.01, 219.143.88.250:61807]
+Bad Request: /api/chat/chat_data/
+HTTP POST /api/chat/chat_data/ 400 [0.01, 219.143.88.250:4227]
+Bad Request: /api/chat/chat_data/
+HTTP POST /api/chat/chat_data/ 400 [0.01, 219.143.88.250:4227]
+Bad Request: /api/chat/chat_data/
+HTTP POST /api/chat/chat_data/ 400 [0.01, 219.143.88.250:4366]
+Bad Request: /api/chat/chat_data/
+HTTP POST /api/chat/chat_data/ 400 [0.01, 219.143.88.250:4614]
+Internal Server Error: /api/chat/chat_data/
+HTTP POST /api/chat/chat_data/ 500 [0.01, 219.143.88.250:4742]
+Internal Server Error: /api/chat/chat_data/
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.6/site-packages/asgiref/sync.py", line 482, in thread_handler
+    raise exc_info[1]
+  File "/usr/local/lib/python3.6/site-packages/django/core/handlers/exception.py", line 38, in inner
+    response = await get_response(request)
+  File "/usr/local/lib/python3.6/site-packages/django/core/handlers/base.py", line 263, in _get_response_async
+    response = await sync_to_async(response.render, thread_sensitive=True)()
+  File "/usr/local/lib/python3.6/site-packages/asgiref/sync.py", line 444, in __call__
+    ret = await asyncio.wait_for(future, timeout=None)
+  File "/usr/lib64/python3.6/asyncio/tasks.py", line 339, in wait_for
+    return (yield from fut)
+  File "/usr/lib64/python3.6/concurrent/futures/thread.py", line 56, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "/usr/local/lib/python3.6/site-packages/asgiref/sync.py", line 486, in thread_handler
+    return func(*args, **kwargs)
+  File "/usr/local/lib/python3.6/site-packages/django/template/response.py", line 105, in render
+    self.content = self.rendered_content
+  File "/usr/local/lib/python3.6/site-packages/rest_framework/response.py", line 74, in rendered_content
+    ret = renderer.render(self.data, accepted_media_type, context)
+  File "/usr/local/lib/python3.6/site-packages/rest_framework/renderers.py", line 725, in render
+    template = loader.get_template(self.template)
+  File "/usr/local/lib/python3.6/site-packages/django/template/loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: rest_framework/api.html
+HTTP GET /api/chat/chat_data/ 500 [0.06, 219.143.88.250:4753]
+Not Found: /favicon.ico
+HTTP GET /favicon.ico 404 [0.01, 219.143.88.250:4753]
+Not Found: /api/live/get_live_status/
+HTTP POST /api/live/get_live_status/ 404 [0.01, 219.143.88.250:4742]
+Not Found: /api/live/get_live_status/
+HTTP GET /api/live/get_live_status/?uid=11&usernmae=22 404 [0.01, 219.143.88.250:4842]
+Not Found: /api/live/get_live_status/
+HTTP GET /api/live/get_live_status/?uid=11&usernmae=22 404 [0.01, 219.143.88.250:5007]
+Not Found: /api/live/get_live_status/
+HTTP GET /api/live/get_live_status/?uid=11&usernmae=22 404 [0.01, 219.143.88.250:5007]
+Not Found: /api/live/get_live_status/
+HTTP GET /api/live/get_live_status/?uid=11&usernmae=22 404 [0.02, 219.143.88.250:5007]
+HTTP POST /api/chat/chat_data/ 200 [0.01, 219.143.88.250:5181]
+HTTP POST /api/chat/chat_data/ 200 [0.04, 219.143.88.250:5488]
+HTTP POST /api/chat/chat_data/ 200 [0.01, 219.143.88.250:5488]
+Bad Request: /api/chat/chat_data/
+HTTP POST /api/chat/chat_data/ 400 [0.01, 219.143.88.250:5488]
+HTTP POST /api/chat/chat_data/ 200 [0.01, 219.143.88.250:5726]
+Bad Request: /api/chat/chat_data/
+HTTP POST /api/chat/chat_data/ 400 [0.01, 219.143.88.250:5726]
+HTTP GET /api/live/get_live_status?uid=1&username=pride 200 [0.01, 183.200.209.102:16900]
+HTTP POST /api/chat/chat_data/ 200 [0.01, 219.143.88.250:5920]
+HTTP GET /api/live/get_live_status?uid=1&username=pride 200 [0.01, 183.200.209.102:16900]
+Bad Request: /api/chat/chat_data/
+HTTP POST /api/chat/chat_data/ 400 [0.01, 219.143.88.250:5920]
+HTTP POST /api/chat/chat_data/ 200 [0.01, 219.143.88.250:6061]
+Bad Request: /api/chat/chat_data/
+HTTP POST /api/chat/chat_data/ 400 [0.01, 219.143.88.250:6061]
+HTTP POST /api/chat/chat_data/ 200 [0.01, 219.143.88.250:6188]
+Bad Request: /api/chat/chat_data/
+HTTP POST /api/chat/chat_data/ 400 [0.01, 219.143.88.250:6188]
+HTTP POST /api/chat/chat_data/ 200 [0.01, 219.143.88.250:6273]
+HTTP POST /api/chat/chat_data/ 200 [0.01, 219.143.88.250:6273]
+HTTP POST /api/chat/chat_data/ 200 [0.01, 219.143.88.250:6273]
+HTTP POST /api/chat/chat_data/ 200 [0.01, 219.143.88.250:6273]
+Bad Request: /api/chat/chat_data/
+HTTP POST /api/chat/chat_data/ 400 [0.01, 219.143.88.250:6273]
+HTTP GET /api/live/get_live_status?uid=1&username=1 200 [0.01, 183.200.209.102:17269]
+HTTP GET / 302 [0.01, 167.94.146.59:57974]
+HTTP GET / 302 [0.01, 167.94.146.59:33188]
+Not Found: *
+HTTP PRI * 404 [0.01, 167.94.146.59:33210]
+HTTP GET /login/ 200 [0.01, 167.94.146.59:39714]
+Not Found: /favicon.ico
+HTTP GET /favicon.ico 404 [0.01, 167.94.146.59:39732]
+Not Found: *
+HTTP PRI * 404 [0.01, 167.94.146.59:39740]
+HTTP POST /api/chat/chat_data/ 200 [0.01, 219.143.88.250:6447]
+HTTP GET /login 301 [0.00, 167.94.146.59:57000]
+Bad Request: /api/chat/chat_data/
+HTTP POST /api/chat/chat_data/ 400 [0.01, 219.143.88.250:6447]
+Not Found: /api/live/get_live_status/
+HTTP GET /api/live/get_live_status/?uid=11&usernmae=22 404 [0.01, 219.143.88.250:6704]
+Not Found: /api/live/get_live_status/
+HTTP GET /api/live/get_live_status/?uid=1&usernmae=pride 404 [0.01, 219.143.88.250:6704]
+Not Found: /api/live/get_live_status/
+HTTP GET /api/live/get_live_status/?uid=1&username=pride 404 [0.01, 219.143.88.250:6704]
+Not Found: /api/live/get_live_status/
+HTTP GET /api/live/get_live_status/?uid=1&username=pride 404 [0.02, 219.143.88.250:6704]
+Not Found: /api/live/get_live_status/
+HTTP GET /api/live/get_live_status/?uid=1&username=pride 404 [0.01, 219.143.88.250:6738]
+Internal Server Error: /api/live/get_live_status
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.6/site-packages/asgiref/sync.py", line 482, in thread_handler
+    raise exc_info[1]
+  File "/usr/local/lib/python3.6/site-packages/django/core/handlers/exception.py", line 38, in inner
+    response = await get_response(request)
+  File "/usr/local/lib/python3.6/site-packages/django/core/handlers/base.py", line 263, in _get_response_async
+    response = await sync_to_async(response.render, thread_sensitive=True)()
+  File "/usr/local/lib/python3.6/site-packages/asgiref/sync.py", line 444, in __call__
+    ret = await asyncio.wait_for(future, timeout=None)
+  File "/usr/lib64/python3.6/asyncio/tasks.py", line 339, in wait_for
+    return (yield from fut)
+  File "/usr/lib64/python3.6/concurrent/futures/thread.py", line 56, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "/usr/local/lib/python3.6/site-packages/asgiref/sync.py", line 486, in thread_handler
+    return func(*args, **kwargs)
+  File "/usr/local/lib/python3.6/site-packages/django/template/response.py", line 105, in render
+    self.content = self.rendered_content
+  File "/usr/local/lib/python3.6/site-packages/rest_framework/response.py", line 74, in rendered_content
+    ret = renderer.render(self.data, accepted_media_type, context)
+  File "/usr/local/lib/python3.6/site-packages/rest_framework/renderers.py", line 725, in render
+    template = loader.get_template(self.template)
+  File "/usr/local/lib/python3.6/site-packages/django/template/loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: rest_framework/api.html
+HTTP GET /api/live/get_live_status?uid=1&username=pride 500 [0.13, 219.143.88.250:6738]
+HTTP GET /api/live/get_live_status?uid=1&username=pride 200 [0.01, 219.143.88.250:6782]
+HTTP POST /api/chat/chat_data/ 200 [0.01, 219.143.88.250:6820]
+Bad Request: /api/chat/chat_data/
+HTTP POST /api/chat/chat_data/ 400 [0.01, 219.143.88.250:6820]
+HTTP POST /api/chat/chat_data/ 200 [0.01, 219.143.88.250:7021]
+Bad Request: /api/chat/chat_data/
+HTTP POST /api/chat/chat_data/ 400 [0.01, 219.143.88.250:7021]
+HTTP POST /api/chat/chat_data/ 200 [0.01, 219.143.88.250:7021]
+HTTP POST /api/chat/chat_data/ 200 [0.01, 219.143.88.250:7021]
+HTTP POST /api/chat/chat_data/ 200 [0.01, 219.143.88.250:7021]
+HTTP GET / 302 [0.01, 149.86.227.49:44194]
+HTTP OPTIONS /api/live/get_live_status/ 200 [0.00, 219.143.88.250:7285]
+Not Found: /api/live/get_live_status/
+HTTP POST /api/live/get_live_status/ 404 [0.01, 219.143.88.250:7285]
+Not Found: /api/live/get_live_status/
+HTTP GET /api/live/get_live_status/?username=pride1 404 [0.01, 219.143.88.250:7434]
+Bad Request: /api/live/get_live_status
+HTTP GET /api/live/get_live_status?username=pride1 400 [0.01, 219.143.88.250:7434]
+Bad Request: /api/live/get_live_status
+HTTP GET /api/live/get_live_status?username=pride1 400 [0.01, 219.143.88.250:7434]
+Bad Request: /api/live/get_live_status
+HTTP GET /api/live/get_live_status?username=pride1 400 [0.01, 219.143.88.250:7434]
+HTTP GET /api/live/get_live_status?uid=2&username=pride1 200 [0.01, 219.143.88.250:7434]
+HTTP GET /api/live/get_live_status?uid=2&username=pride1 200 [0.01, 219.143.88.250:7434]
+HTTP GET /api/live/get_live_status?uid=2&username=pride1 200 [0.01, 219.143.88.250:7434]
+HTTP GET /api/live/get_live_status?uid=2&username=pride1 200 [0.01, 219.143.88.250:7604]
+HTTP GET /api/live/get_live_status?uid=2&username=pride1 200 [0.01, 219.143.88.250:7434]
+HTTP GET /api/live/get_live_status?uid=2&username=pride1 200 [0.01, 219.143.88.250:7729]
+HTTP GET /api/live/get_live_status?uid=2&username=pride1 200 [0.01, 219.143.88.250:7729]
+HTTP POST /api/users/register/ 200 [0.30, 219.143.88.250:49189]
+HTTP POST /api/chat/chat_data/ 200 [0.01, 219.143.88.250:49255]
+HTTP POST /api/chat/chat_data/ 200 [0.01, 219.143.88.250:49375]
+HTTP POST /api/users/register/ 200 [0.27, 219.143.88.250:49919]
+HTTP POST /api/users/register/ 200 [0.28, 219.143.88.250:50156]
+HTTP POST /api/users/register/ 200 [0.27, 219.143.88.250:50377]
+HTTP POST /api/users/register/ 200 [0.29, 219.143.88.250:52142]
+HTTP GET / 302 [0.01, 64.62.156.192:44710]
+HTTP GET / 302 [0.01, 64.62.156.194:26969]
+HTTP GET /login/?next=/ 200 [0.01, 64.62.156.194:26969]
+Not Found: /favicon.ico
+HTTP GET /favicon.ico 404 [0.01, 64.62.156.196:13799]
+Not Found: http://api.ipify.org/
+HTTP GET http://api.ipify.org/?format=json 404 [0.01, 64.62.156.198:10095]
+Not Found: www.shadowserver.org:443
+HTTP CONNECT www.shadowserver.org:443 404 [0.01, 64.62.156.197:39669]
+HTTP GET / 302 [0.01, 149.86.227.49:43706]
+HTTP POST /api/users/register/ 200 [0.28, 219.143.88.250:53084]
+HTTP POST /api/chat/chat_data/ 200 [0.04, 219.143.88.250:53763]
+HTTP POST /api/chat/chat_data/ 200 [0.01, 219.143.88.250:53763]
+HTTP GET /api/live/get_live_status?uid=NQhunWj4RjyVAdAKGbunYQ&username=test6 200 [0.01, 219.143.88.250:53763]
+HTTP GET /api/live/get_live_status?uid=NQhunWj4RjyVAdAKGbunYQ&username=test6 200 [0.01, 219.143.88.250:53763]
+HTTP GET /api/live/get_live_status?uid=NQhunWj4RjyVAdAKGbunYQ&username=test6 200 [0.01, 219.143.88.250:53763]
+Internal Server Error: /api/live/get_live_status
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.6/site-packages/asgiref/sync.py", line 482, in thread_handler
+    raise exc_info[1]
+  File "/usr/local/lib/python3.6/site-packages/django/core/handlers/exception.py", line 38, in inner
+    response = await get_response(request)
+  File "/usr/local/lib/python3.6/site-packages/django/core/handlers/base.py", line 263, in _get_response_async
+    response = await sync_to_async(response.render, thread_sensitive=True)()
+  File "/usr/local/lib/python3.6/site-packages/asgiref/sync.py", line 444, in __call__
+    ret = await asyncio.wait_for(future, timeout=None)
+  File "/usr/lib64/python3.6/asyncio/tasks.py", line 339, in wait_for
+    return (yield from fut)
+  File "/usr/lib64/python3.6/concurrent/futures/thread.py", line 56, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "/usr/local/lib/python3.6/site-packages/asgiref/sync.py", line 486, in thread_handler
+    return func(*args, **kwargs)
+  File "/usr/local/lib/python3.6/site-packages/django/template/response.py", line 105, in render
+    self.content = self.rendered_content
+  File "/usr/local/lib/python3.6/site-packages/rest_framework/response.py", line 74, in rendered_content
+    ret = renderer.render(self.data, accepted_media_type, context)
+  File "/usr/local/lib/python3.6/site-packages/rest_framework/renderers.py", line 725, in render
+    template = loader.get_template(self.template)
+  File "/usr/local/lib/python3.6/site-packages/django/template/loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: rest_framework/api.html
+HTTP GET /api/live/get_live_status?uid=NQhunWj4RjyVAdAKGbunYQ&username=test6 500 [0.06, 39.144.95.249:13326]
+Not Found: /favicon.ico
+HTTP GET /favicon.ico 404 [0.01, 39.144.95.249:13326]
+HTTP GET /api/live/get_live_status?uid=1&username=1 200 [0.01, 180.163.29.217:47520]
+HTTP GET / 302 [0.01, 64.227.143.164:53082]
+HTTP GET /login/?next=/ 200 [0.01, 64.227.143.164:53082]
+HTTP GET /login 301 [0.00, 64.227.143.164:53086]
+HTTP GET /login/ 200 [0.01, 64.227.143.164:53086]
+HTTP GET / 302 [0.01, 149.86.227.49:36366]
+HTTP GET / 302 [0.01, 149.86.227.49:51440]
+HTTP GET / 302 [0.01, 149.86.227.49:53392]
+/home/OnLineDjangoChat/chatProject/chatApp/anchor/live.py changed, reloading.
+Performing system checks...
+
+System check identified no issues (0 silenced).
+July 14, 2025 - 06:57:55
+Django version 3.2.25, using settings 'chatProject.settings'
+Starting ASGI/Channels version 3.0.4 development server at http://0.0.0.0:8000/
+Quit the server with CONTROL-C.
+/usr/local/lib/python3.6/site-packages/OpenSSL/_util.py:6: CryptographyDeprecationWarning: Python 3.6 is no longer supported by the Python core team. Therefore, support for it is deprecated in cryptography. The next release of cryptography will remove support for Python 3.6.
+  from cryptography.hazmat.bindings.openssl.binding import Binding
+Watching for file changes with StatReloader
+/usr/local/lib/python3.6/site-packages/OpenSSL/_util.py:6: CryptographyDeprecationWarning: Python 3.6 is no longer supported by the Python core team. Therefore, support for it is deprecated in cryptography. The next release of cryptography will remove support for Python 3.6.
+  from cryptography.hazmat.bindings.openssl.binding import Binding
+/usr/local/lib/python3.6/site-packages/OpenSSL/_util.py:6: CryptographyDeprecationWarning: Python 3.6 is no longer supported by the Python core team. Therefore, support for it is deprecated in cryptography. The next release of cryptography will remove support for Python 3.6.
+  from cryptography.hazmat.bindings.openssl.binding import Binding
+Watching for file changes with StatReloader
+HTTP GET / 302 [0.03, 20.65.194.27:60034]
+Not Found: /api/v2/heartbeat
+HTTP GET /api/v2/heartbeat 404 [0.04, 123.58.209.243:19588]
+HTTP GET / 302 [0.01, 123.58.209.243:20010]
+HTTP GET / 302 [0.01, 101.36.112.233:32474]
+HTTP GET /login/?next=/ 200 [0.02, 101.36.112.233:32488]
+Not Found: /login/favicon.ico
+HTTP GET /login/favicon.ico 404 [0.02, 101.36.112.233:32518]
+Not Found: /favicon.ico
+HTTP GET /favicon.ico 404 [0.03, 101.36.112.233:32570]
+HTTP GET / 302 [0.02, 220.196.160.84:25086]
+HTTP GET /login/?next=/ 200 [0.02, 220.196.160.84:25086]
+HTTP GET / 302 [0.01, 34.28.207.190:60694]
+HTTP GET / 302 [0.01, 206.168.34.74:48880]
+HTTP GET / 302 [0.01, 206.168.34.74:40650]
+Not Found: *
+HTTP PRI * 404 [0.03, 206.168.34.74:40654]
+HTTP GET /login/ 200 [0.01, 206.168.34.74:33452]
+Not Found: /favicon.ico
+HTTP GET /favicon.ico 404 [0.02, 206.168.34.74:33462]
+Not Found: *
+HTTP PRI * 404 [0.03, 206.168.34.74:33472]
+Not Found: /security.txt
+HTTP GET /security.txt 404 [0.01, 206.168.34.74:43590]
+HTTP GET / 302 [0.01, 205.210.31.232:60200]
+HTTP GET /login/?next=/ 200 [0.01, 205.210.31.232:60212]
+HTTP GET / 302 [0.01, 157.245.76.143:47090]
+HTTP GET /login/?next=/ 200 [0.01, 157.245.76.143:47094]
+Not Found: /login/favicon.ico
+HTTP GET /login/favicon.ico 404 [0.01, 157.245.76.143:47096]
+Not Found: www.baidu.com:443
+HTTP CONNECT www.baidu.com:443 404 [0.02, 218.75.38.211:27258]
+HTTP GET / 302 [0.01, 3.130.96.91:48214]
+HTTP GET / 302 [0.01, 3.130.96.91:48218]
+HTTP GET /login/?next=/ 200 [0.01, 3.130.96.91:48218]
+HTTP OPTIONS / 302 [0.01, 221.238.94.141:46028]
+HTTP GET / 302 [0.01, 221.238.94.141:46040]
+HTTP OPTIONS / 302 [0.01, 221.238.94.141:46156]
+Not Found: /nice ports,/Trinity.txt.bak
+HTTP GET /nice%20ports%2C/Tri%6Eity.txt%2ebak 404 [0.02, 221.238.94.141:46182]
+Not Found: sip:nm
+HTTP OPTIONS sip:nm 404 [0.02, 221.238.94.141:46210]
+Internal Server Error: /api/live/get_live_status
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.6/site-packages/asgiref/sync.py", line 482, in thread_handler
+    raise exc_info[1]
+  File "/usr/local/lib/python3.6/site-packages/django/core/handlers/exception.py", line 38, in inner
+    response = await get_response(request)
+  File "/usr/local/lib/python3.6/site-packages/django/core/handlers/base.py", line 263, in _get_response_async
+    response = await sync_to_async(response.render, thread_sensitive=True)()
+  File "/usr/local/lib/python3.6/site-packages/asgiref/sync.py", line 444, in __call__
+    ret = await asyncio.wait_for(future, timeout=None)
+  File "/usr/lib64/python3.6/asyncio/tasks.py", line 339, in wait_for
+    return (yield from fut)
+  File "/usr/lib64/python3.6/concurrent/futures/thread.py", line 56, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "/usr/local/lib/python3.6/site-packages/asgiref/sync.py", line 486, in thread_handler
+    return func(*args, **kwargs)
+  File "/usr/local/lib/python3.6/site-packages/django/template/response.py", line 105, in render
+    self.content = self.rendered_content
+  File "/usr/local/lib/python3.6/site-packages/rest_framework/response.py", line 74, in rendered_content
+    ret = renderer.render(self.data, accepted_media_type, context)
+  File "/usr/local/lib/python3.6/site-packages/rest_framework/renderers.py", line 725, in render
+    template = loader.get_template(self.template)
+  File "/usr/local/lib/python3.6/site-packages/django/template/loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: rest_framework/api.html
+HTTP GET /api/live/get_live_status?uid=1&username=1 500 [0.09, 183.60.225.231:32913]
+HTTP GET / 302 [0.01, 69.164.213.157:12334]
+Not Found: /nice ports,/Trinity.txt.bak
+HTTP GET /nice%20ports%2C/Tri%6Eity.txt%2ebak 404 [0.01, 69.164.213.157:12380]
+HTTP OPTIONS / 302 [0.01, 69.164.213.157:8086]
+HTTP OPTIONS / 302 [0.01, 69.164.213.157:8090]
+Not Found: sip:nm
+HTTP OPTIONS sip:nm 404 [0.01, 69.164.213.157:8104]
+HTTP GET / 302 [0.03, 69.164.213.157:8128]
+Not Found: *
+HTTP OPTIONS * 404 [0.03, 69.164.213.157:8118]
+HTTP GET /login/?next=/ 200 [0.01, 69.164.213.157:8136]
+Not Found: /favicon.ico
+HTTP GET /favicon.ico 404 [0.01, 69.164.213.157:8138]
+HTTP GET / 302 [0.01, 69.164.213.157:65504]
+HTTP GET / 302 [0.01, 69.164.213.157:65516]
+HTTP GET / 302 [0.01, 196.251.86.124:49524]
+HTTP GET /login/?next=/ 200 [0.01, 196.251.86.124:49526]
+HTTP GET /api/live/get_live_status?uid=NQhunWj4RjyVAdAKGbunYQ&username=test6 200 [0.01, 219.143.88.250:6008]
+Method Not Allowed: /api/live/change_live_status
+HTTP GET /api/live/change_live_status?uid=NQhunWj4RjyVAdAKGbunYQ&character_name=test6&live_status=stop 405 [0.02, 219.143.88.250:6008]
+Method Not Allowed: /api/live/change_live_status
+HTTP GET /api/live/change_live_status?uid=NQhunWj4RjyVAdAKGbunYQ&character_name=test6&live_status=stop 405 [0.01, 219.143.88.250:6008]
+HTTP GET /api/live/get_live_status?uid=NQhunWj4RjyVAdAKGbunYQ&username=test6 200 [0.01, 219.143.88.250:6350]
+HTTP GET /api/live/get_live_status?uid=NQhunWj4RjyVAdAKGbunYQ&username=test6 200 [0.01, 219.143.88.250:6350]
+HTTP POST /api/live/change_live_status 200 [0.01, 219.143.88.250:6350]
+HTTP POST /api/live/change_live_status 200 [0.01, 219.143.88.250:6350]
+HTTP POST /api/live/change_live_status 200 [0.01, 219.143.88.250:6350]
+HTTP GET /api/live/get_live_status?uid=NQhunWj4RjyVAdAKGbunYQ&username=test6 200 [0.01, 219.143.88.250:6455]
+HTTP POST /api/live/change_live_status 200 [0.01, 219.143.88.250:6694]
+HTTP POST /api/live/change_live_status 200 [0.01, 219.143.88.250:6694]
+HTTP GET /api/live/get_live_status?uid=NQhunWj4RjyVAdAKGbunYQ&username=test6 200 [0.01, 219.143.88.250:6694]
+HTTP POST /api/live/change_live_status 200 [0.01, 219.143.88.250:6939]
+HTTP POST /api/live/change_live_status 200 [0.01, 219.143.88.250:6939]
+HTTP GET /api/live/get_live_status?uid=NQhunWj4RjyVAdAKGbunYQ&username=test6 200 [0.01, 219.143.88.250:7011]
+HTTP GET /api/live/get_live_status?uid=NQhunWj4RjyVAdAKGbunYQ&username=test6 200 [0.01, 219.143.88.250:7011]
+HTTP GET /api/live/get_live_status?uid=NQhunWj4RjyVAdAKGbunYQ&username=test6 200 [0.01, 219.143.88.250:7011]
+HTTP GET / 302 [0.01, 174.138.78.157:54110]
+HTTP GET /login/?next=/ 200 [0.01, 174.138.78.157:54110]
+HTTP GET /login 301 [0.00, 174.138.78.157:54124]
+HTTP GET /login/ 200 [0.01, 174.138.78.157:54124]
+HTTP POST /api/live/change_live_status 200 [0.01, 219.143.88.250:50435]
+HTTP POST /api/live/change_live_status 200 [0.01, 219.143.88.250:50435]
+HTTP GET / 302 [0.01, 106.75.101.188:58302]
+Not Found: /favicon.ico
+HTTP GET /favicon.ico 404 [0.02, 106.75.101.188:58380]
+HTTP GET /login/?next=/sitemap.xml 200 [0.02, 106.75.101.188:58464]
+HTTP GET /login/?next=/robots.txt 200 [0.01, 106.75.101.188:58460]
+HTTP GET /login/?next=/ 200 [0.01, 106.75.101.188:59448]
+Not Found: /favicon.ico
+HTTP GET /favicon.ico 404 [0.02, 106.75.101.188:59488]
+HTTP GET /login/?next=/robots.txt 200 [0.02, 106.75.101.188:59530]
+HTTP GET /login/?next=/sitemap.xml 200 [0.02, 106.75.101.188:59532]
+Not Found: google.com:443
+HTTP CONNECT google.com:443 404 [0.01, 46.19.141.90:38920]
+HTTP GET / 302 [0.01, 65.49.1.122:53454]
+HTTP GET / 302 [0.01, 65.49.1.127:49677]
+HTTP GET /login/?next=/ 200 [0.01, 65.49.1.127:49677]
+Not Found: /favicon.ico
+HTTP GET /favicon.ico 404 [0.01, 65.49.1.130:44431]
+Not Found: http://api.ipify.org/
+HTTP GET http://api.ipify.org/?format=json 404 [0.01, 65.49.1.124:35199]
+Not Found: www.shadowserver.org:443
+HTTP CONNECT www.shadowserver.org:443 404 [0.01, 65.49.1.125:40495]
+HTTP GET / 302 [0.01, 198.235.24.72:60670]
+HTTP GET /api/live/get_live_status?uid=NQhunWj4RjyVAdAKGbunYQ&username=test6 200 [0.01, 111.197.252.169:2885]
+/home/OnLineDjangoChat/chatProject/chatApp/anchor/live.py changed, reloading.
+Performing system checks...
+
+System check identified no issues (0 silenced).
+July 14, 2025 - 13:24:13
+Django version 3.2.25, using settings 'chatProject.settings'
+Starting ASGI/Channels version 3.0.4 development server at http://0.0.0.0:8000/
+Quit the server with CONTROL-C.
+/usr/local/lib/python3.6/site-packages/OpenSSL/_util.py:6: CryptographyDeprecationWarning: Python 3.6 is no longer supported by the Python core team. Therefore, support for it is deprecated in cryptography. The next release of cryptography will remove support for Python 3.6.
+  from cryptography.hazmat.bindings.openssl.binding import Binding
+Watching for file changes with StatReloader
+HTTP GET / 302 [0.03, 205.210.31.89:59276]
+HTTP GET / 302 [0.01, 88.151.192.197:52680]
+HTTP GET /login/?next=/ 200 [0.03, 88.151.192.197:52680]
+HTTP GET / 302 [0.01, 162.142.125.120:58304]
+Not Found: *
+HTTP PRI * 404 [0.03, 162.142.125.120:56604]
+HTTP GET /login/ 200 [0.01, 162.142.125.120:45246]
+Not Found: /favicon.ico
+HTTP GET /favicon.ico 404 [0.01, 162.142.125.120:45256]
+Not Found: *
+HTTP PRI * 404 [0.01, 162.142.125.120:45262]
+Not Found: /.well-known/security.txt
+HTTP GET /.well-known/security.txt 404 [0.01, 162.142.125.120:54296]
+HTTP GET / 302 [0.01, 45.82.78.254:43910]
+Not Found: /favicon.ico
+HTTP GET /favicon.ico 404 [0.02, 45.82.78.254:35564]
+HTTP GET / 302 [0.01, 3.130.96.91:49784]
+HTTP GET /login/?next=/ 200 [0.01, 3.130.96.91:49784]
+HTTP GET / 302 [0.01, 3.130.96.91:48016]
+HTTP GET / 302 [0.01, 205.210.31.230:62246]
+HTTP GET / 302 [0.01, 64.62.197.107:39856]
+HTTP GET / 302 [0.01, 64.62.197.112:33927]
+HTTP GET /login/?next=/ 200 [0.01, 64.62.197.112:33927]
+Not Found: /favicon.ico
+HTTP GET /favicon.ico 404 [0.01, 64.62.197.109:44021]
+Not Found: http://api.ipify.org/
+HTTP GET http://api.ipify.org/?format=json 404 [0.01, 64.62.197.115:49977]
+Not Found: www.shadowserver.org:443
+HTTP CONNECT www.shadowserver.org:443 404 [0.01, 64.62.197.115:16891]
+HTTP GET / 302 [0.01, 46.101.251.84:40738]
+HTTP GET /login/?next=/ 200 [0.01, 46.101.251.84:40738]
+HTTP GET /login 301 [0.00, 46.101.251.84:40754]
+HTTP GET /login/ 200 [0.01, 46.101.251.84:40754]
+/usr/local/lib/python3.6/site-packages/OpenSSL/_util.py:6: CryptographyDeprecationWarning: Python 3.6 is no longer supported by the Python core team. Therefore, support for it is deprecated in cryptography. The next release of cryptography will remove support for Python 3.6.
+  from cryptography.hazmat.bindings.openssl.binding import Binding
