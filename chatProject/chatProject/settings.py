@@ -114,7 +114,7 @@ DATABASES = {
     }
 }
 
-REDIS_HOST = '43.162.120.233'
+REDIS_HOST = 'localhost'
 REDIS_PORT = 6379
 
 # django-redis 配置
