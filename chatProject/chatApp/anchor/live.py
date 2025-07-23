@@ -1,21 +1,15 @@
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-import redis
+from django_redis import get_redis_connection  # 使用 django-redis 连接 Redis
 from django.conf import settings
 from pymongo import MongoClient
-
-# 建立 Redis 连接
-redis_client = redis.Redis(
-    host=settings.REDIS_HOST,
-    port=settings.REDIS_PORT,
-    db=settings.REDIS_DB,
-    decode_responses=True
-)
 
 # 初始化 MongoDB 连接
 client = MongoClient(settings.MONGO_URI)
 db = client.chat_db  # 连接到 chat_db 数据库
 
+# 获取 Redis 连接
+redis_client = get_redis_connection('default')  # 使用 django-redis 配置
 
 @api_view(['GET'])
 def get_live_status(request):
@@ -24,7 +18,6 @@ def get_live_status(request):
     GET /api/live/get_live_status?uid=<uid>&username=<username>
     """
     uid = request.GET.get("uid")
-    print(f"Received uid: {uid}")
     username = request.GET.get("username")
 
     if not uid or not username:
@@ -54,7 +47,10 @@ def get_live_status(request):
                         if status_str is None:
                             status = True  # 默认为直播中
                         else:
-                            # 转换状态为 True 或 False
+                            # 解码 Redis 中的字节数据并去除多余的空白字符
+                            status_str = status_str.decode('utf-8').strip().lower()
+
+                            # 判断状态，"start" 为 True, 其他为 False
                             status = True if status_str == "start" else False
 
                         live_status_list.append({

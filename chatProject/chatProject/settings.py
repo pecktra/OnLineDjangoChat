@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
-import os
+from datetime import timedelta
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -30,9 +30,7 @@ ALLOWED_HOSTS = ['*',]  # 开放访问权限
 
 
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'chatApp', 'static'),
-]
+STATICFILES_DIRS = [BASE_DIR / "templates/static"]
 STATIC_ROOT = BASE_DIR / "staticfiles"
 # Application definition
 
@@ -46,6 +44,8 @@ INSTALLED_APPS = [
     'channels',        # 添加通道应用
     'chatApp', # 添加聊天应用
     'corsheaders',#添加跨域
+    'rest_framework',
+    'rest_framework_simplejwt',
 ]
 
 MIDDLEWARE = [
@@ -109,9 +109,28 @@ DATABASES = {
 
 REDIS_HOST = '43.162.120.233'
 REDIS_PORT = 6379
-REDIS_DB = 0
 
-MONGO_URI = "mongodb://admin:Tura1050493761%40@43.162.120.233:27017/chat_db?authSource=admin"
+# django-redis 配置
+CACHES = {
+    'default': {
+        'BACKEND': 'django_redis.cache.RedisCache',
+        'LOCATION': f'redis://{REDIS_HOST}:{REDIS_PORT}/0',  # Redis 连接字符串
+        'OPTIONS': {
+            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+        },
+    },
+    # session 缓存配置
+    'session': {
+        'BACKEND': 'django_redis.cache.RedisCache',
+        'LOCATION': f'redis://{REDIS_HOST}:{REDIS_PORT}/1',  # 使用相同的 Redis 实例
+        'OPTIONS': {
+            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+        },
+    }
+}
+
+
+MONGO_URI = "mongodb://admin:Tura1050493761%40@127.0.0.1:27017/chat_db?authSource=admin"
 MONGO_DB_NAME = "chat_db"
 
 # Password validation
@@ -173,4 +192,18 @@ CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels.layers.InMemoryChannelLayer",
     }
+}
+#JWT 相关的认证
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ],
+}
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=360),  # 设置访问令牌的有效期（15分钟）
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),     # 设置刷新令牌的有效期（7天）
+    'ROTATE_REFRESH_TOKENS': False,                   # 设置为 False 表示不使用自动刷新令牌
+    'BLACKLIST_AFTER_ROTATION': False,                # 设置为 False 表示刷新令牌过期后不会加入黑名单
+    'ALGORITHM': 'HS256',                             # 设置 JWT 使用的加密算法
+    'SIGNING_KEY': 'your-secret-key',                 # 设置 JWT 签名密钥
 }

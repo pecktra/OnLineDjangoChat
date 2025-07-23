@@ -16,12 +16,13 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from chatApp.views import home,user_login,user_signup,user_logout
+# from chatApp.views import home,user_login,user_signup,user_logout
 from chatApp.anchor import login , chat_data ,live
+from chatApp.client import login ,lives
 # 导入静态文件模块，为了显示上传图片
 from django.conf.urls.static import static
 from . import settings
-from chatApp import views
+# from chatApp import views
 
 from django.views.static import serve
 from django.urls import re_path
@@ -29,11 +30,11 @@ from django.urls import re_path
 urlpatterns = [
 
     path('admin/', admin.site.urls),
-    path('', home, name='home'), # 首页
-    path('login/', user_login, name='login'), # 登录
-    path('signup/', user_signup, name='signup'), # 注册
-    path('logout/', user_logout, name='logout'), # 退出
-    path('chat/<str:room_name>/', views.room_view, name='chatroom'), # 聊天室
+    # path('', home, name='home'), # 首页
+    # path('login/', user_login, name='login'), # 登录
+    # path('signup/', user_signup, name='signup'), # 注册
+    # path('logout/', user_logout, name='logout'), # 退出
+    # path('chat/<str:room_name>/', views.room_view, name='chatroom'), # 聊天室
 
     path('chat1/', views.room_test), # 聊天室
 
@@ -47,8 +48,21 @@ urlpatterns = [
 
 
     #主播端直播状态
-    path('api/live/get_live_status', live.get_live_status),
-    path('api/live/change_live_status', live.change_live_status),
+    path('api/live/get_live_status/', live.get_live_status),
+    path('api/live/change_live_status/', live.change_live_status),
+
+
+    #客户端
+    path('api/users/register/', login.register),#注册
+    path('api/users/user_login/', login.user_login),#登录
+    path('api/users/is_logged_in/', login.is_logged_in),#检测是否登录
+    path('api/users/logout/', login.logout),#退出登录
+
+    path('api/live/get_all_lives/', lives.get_all_lives),#获取正在直播的直播间列表
+    path('api/live/get_live_info/', lives.get_live_info),#获取单个直播间信息
+    path('api/live/get_live_chat_history/', lives.get_live_chat_history),#获取当前直播间主播历史消息数据
+    path('api/live/get_user_chat_history/', lives.get_user_chat_history),#获取当前直播间用户历史消息数据   只获取最后20条数据
+    path('api/live/redirect_to_random_room/', lives.redirect_to_random_room),  # 获取当前直播间用户历史消息数据   只获取最后20条数据
 ]
 
 
