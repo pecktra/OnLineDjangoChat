@@ -27,6 +27,8 @@ from . import settings
 from django.views.static import serve
 from django.urls import re_path
 
+from chatApp import views
+
 urlpatterns = [
 
     path('admin/', admin.site.urls),

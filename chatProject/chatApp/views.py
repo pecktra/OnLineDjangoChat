@@ -1,11 +1,15 @@
-# from django.shortcuts import render, redirect
-# from .forms import signup_form
-# from .models import ChatUser
-# from django.contrib.auth import authenticate, login, logout
-# from django.contrib.auth.decorators import login_required
-# from django.views.decorators.csrf import csrf_exempt
-# from chatApp.models import Room
-#
+from django.shortcuts import render, redirect
+
+from django.views.decorators.csrf import csrf_exempt
+
+
+
+@csrf_exempt
+
+def room_test(request):
+    return render(request, 'room_v3.html')
+
+
 # @csrf_exempt
 # @login_required
 # def home(request):

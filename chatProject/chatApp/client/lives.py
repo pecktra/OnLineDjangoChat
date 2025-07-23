@@ -6,7 +6,12 @@ from pymongo import MongoClient
 from django.conf import settings
 import json
 
+# 获取 Redis 连接
+redis_client = get_redis_connection('default')  # 使用 django-redis 配置
+
 # 初始化 MongoDB 连接
+
+
 client = MongoClient(settings.MONGO_URI)
 db = client.chat_db  # 连接到 chat_db 数据库
 

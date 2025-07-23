@@ -20,10 +20,12 @@ import os
 from channels.routing import ProtocolTypeRouter, URLRouter
 from django.core.asgi import get_asgi_application
 
+from chatApp.routing import websocket_urlpatterns
+
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'chatProject.settings')
 
 django_asgi_app = get_asgi_application() # 该行代码和下面一行代码顺序不能调换，否则会报错
-import chatApp.routing
+
 from channels.auth import AuthMiddlewareStack  
 
 application = ProtocolTypeRouter({
@@ -33,7 +35,7 @@ application = ProtocolTypeRouter({
   #   ),
   'websocket': AuthMiddlewareStack(  # new
         URLRouter(
-            chatApp.routing.websocket_urlpatterns
+            websocket_urlpatterns
         )
     ),  # new
 })
