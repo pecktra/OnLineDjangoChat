@@ -1,0 +1,358 @@
+.live-container {
+    /* 保持flex布局 */
+    display: flex;
+    flex-direction: column;
+    /* 设置宽度为50% */
+    width: 60%;
+    /* 设置高度为100%视口高度 */
+    height: 100vh;
+    overflow: hidden;
+
+}
+.streamer-info {
+    flex: 0 0 20%;
+    background-color: #000000;
+    padding: 1rem;
+    border-bottom: 1px solid rgba(0, 0, 0, .1);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+/* 主播详情区域 */
+.streamer-details {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    transition: background-color 0.2s ease;
+}
+
+/* 主播头像 */
+.streamer-details img.rounded-circle {
+    width: 60px !important; /* 强制固定宽高 */
+    height: 60px !important;
+    min-width: 60px; /* 防止压缩 */
+    min-height: 60px;
+    border-radius: 50% !important; /* 强制圆形 */
+    object-fit: cover; /* 确保图片填充不拉伸 */
+    border: 3px solid #0d6efd; /* Bootstrap 蓝色边框 */
+    display: block; /* 防止 flex 布局影响 */
+    transition: transform 0.2s ease;
+}
+
+/* 头像悬停效果 */
+.streamer-details img.rounded-circle:hover {
+    transform: scale(1.05);
+}
+
+/* 防止父容器压缩 */
+.streamer-details .position-relative {
+    flex-shrink: 0; /* 防止头像被压缩 */
+}
+
+/* 响应式调整 */
+@media (max-width: 576px) {
+    .streamer-details img.rounded-circle {
+        width: 40px !important;
+        height: 40px !important;
+        min-width: 40px;
+        min-height: 40px;
+        border-width: 2px;
+    }
+}
+
+
+/* 按钮容器（让两个按钮水平排列） */
+.streamer-actions {
+    display: flex;
+    gap: 0.5rem; /* 按钮间距 */
+}
+
+/* 分享按钮样式 */
+.share-btn {
+    padding: 0; /* 移除默认padding，改用固定宽高 */
+    width: 36px; /* 固定宽度 */
+    height: 36px; /* 固定高度（与宽度相同） */
+    background-color: #6c757d; /* 灰色背景 */
+    color: white;
+    border: none;
+    border-radius: 50%; /* 关键代码：设为50%变成圆形 */
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center; /* 内容居中 */
+}
+
+
+/* 悬停效果 */
+.share-btn:hover {
+    background-color: #5a6268; /* 深灰色 */
+}
+
+/* 点击效果 */
+.share-btn:active {
+    transform: scale(0.95);
+}
+
+
+.follow-btn {
+    padding: 0.5rem 1.5rem; /* 水平padding稍大，增强椭圆效果 */
+    background-color: #0d6efd; /* 主色调（Bootstrap 蓝色） */
+    color: white;
+    border: none;
+    border-radius: 100px; /* 关键代码：超大值实现椭圆形 */
+    cursor: pointer;
+    font-weight: 500;
+    transition: background-color 0.2s ease;
+    display: inline-block; /* 确保按钮宽度随内容调整 */
+}
+
+
+/* 悬停效果 */
+.follow-btn:hover {
+    background-color: #0b5ed7; /* 深一点的蓝色 */
+}
+
+/* 点击效果 */
+.follow-btn:active {
+    background-color: #0a58ca; /* 更深的蓝色 */
+    transform: scale(0.98); /* 轻微缩小 */
+}
+
+/* 禁用状态 */
+.follow-btn:disabled {
+    background-color: #6c757d; /* 灰色 */
+    cursor: not-allowed; /* 禁用光标 */
+    opacity: 0.7;
+}
+
+
+.chat-area {
+    flex: 0 0 80%;
+    background-color: #000000;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    padding: 1rem;
+    /* 新增滑动条样式 */
+    scrollbar-width: thin; /* Firefox */
+    scrollbar-color: #495057 #000000; /* Firefox */
+}
+
+/* Chrome/Safari/Edge 滚动条样式 */
+.chat-area::-webkit-scrollbar {
+    width: 8px;
+}
+.chat-area::-webkit-scrollbar-track {
+    background: #000000;
+}
+.chat-area::-webkit-scrollbar-thumb {
+    background-color: #495057;
+    border-radius: 4px;
+}
+
+/*.chat-message {*/
+/*    max-width: 70%;*/
+/*    margin-bottom: 1rem;*/
+/*    padding: 0.75rem 1.25rem; !* 增加内边距 *!*/
+/*    border-radius: 0.75rem; !* 更圆润的边角 *!*/
+/*    box-shadow: 0 1px 2px rgba(0,0,0,0.1); !* 轻微阴影 *!*/
+/*    transition: transform 0.2s ease; !* 悬停动画 *!*/
+/*}*/
+
+/* 悬停时轻微放大 */
+/*.chat-message:hover {*/
+/*    transform: scale(1.01);*/
+/*}*/
+
+
+.message-sender {
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+    color: #212529; /* 更深的文字颜色 */
+}
+
+
+
+
+@keyframes messageIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+
+
+.live-room {
+    padding: 0.5rem 1rem !important;
+    font-size: 0.85rem;  /* 调小整体字号 */
+    line-height: 1.3;    /* 调整行高保持紧凑 */
+}
+
+.live-room .text-truncate {
+    max-width: 140px;    /* 稍微增加最大宽度 */
+    display: inline-block;
+    font-weight: 500;    /* 中等字重保持可读性 */
+}
+
+.live-room .badge {
+    font-size: 0.75rem;  /* 数字稍小一点 */
+    padding: 0.25em 0.4em; /* 紧凑的padding */
+}
+
+.chat-message {
+    font-size: 0.9rem;  /* 调小文字大小 */
+    line-height: 1.4;    /* 适当调整行高 */
+    /* 删除限制性属性 */
+    display: block; /* 改为block布局 */
+    width: auto; /* 宽度自动 */
+    max-width: none; /* 移除最大宽度限制 */
+
+    /* 保留的必要属性 */
+    min-width: 200px;
+    padding: 16px 20px;
+    border-radius: 18px;
+    margin-bottom: 20px;
+    box-sizing: border-box; /* 新增：包含padding计算 */
+
+    /* 换行优化 */
+    word-break: break-word;
+    white-space: normal;
+}
+
+/* 用户消息 */
+.user-message {
+    background: white;
+    border: 1px solid #e1e5eb;
+    margin-left: auto;
+    border-top-right-radius: 0;
+    min-width: 200px;
+}
+
+
+/* AI消息 */
+.ai-message {
+    background: white;
+    border: 1px solid #e1e5eb;
+    margin-right: auto;
+    border-bottom-left-radius: 4px;
+    width: fit-content; /* 关键属性 */
+}
+
+/* 消息内容段落 */
+.chat-message p {
+    margin: 0;
+    min-height: 24px;  /* 保持单行文本的视觉高度 */
+}
+
+
+
+.message-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+}
+
+.message-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.message-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 6px;
+}
+
+.sender-name {
+    font-weight: 600;
+    font-size: 0.7rem;
+}
+
+.model-info {
+    font-size: 0.7rem;
+    color: #888;
+    margin-top: 4px;
+    font-style: italic;
+}
+
+/* 主播名称 */
+#streamerName {
+    font-family: 'Roboto', sans-serif; /* 现代无衬线字体 */
+    font-size: 1.15rem; /* 稍大，突出主播 */
+    font-weight: 700; /* 粗体 */
+    background: linear-gradient(90deg, #0d6efd, #6610f2); /* 蓝色到紫色渐变 */
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent; /* 渐变文字效果 */
+    letter-spacing: 0.5px; /* 字间距 */
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2); /* 轻微阴影 */
+}
+
+/* 观看人数 */
+#viewerCount {
+    font-family: 'Poppins', sans-serif; /* 动态字体 */
+    font-size: 0.9rem; /* 稍大，突出人数 */
+    font-weight: 600; /* 中等粗体 */
+    color: #0d6efd; /* Bootstrap 蓝色 */
+    background-color: rgba(13, 110, 253, 0.15); /* 浅蓝色背景 */
+    padding: 0.2rem 0.6rem; /* 内边距 */
+    border-radius: 4px; /* 圆角 */
+    letter-spacing: 0.3px; /* 字间距 */
+    transition: background-color 0.2s ease; /* 平滑过渡 */
+}
+
+#viewerCount:hover {
+    background-color: rgba(13, 110, 253, 0.25); /* 悬停背景加深 */
+}
+
+/* 响应式调整 */
+@media (max-width: 576px) {
+    #streamerName {
+        font-size: 1rem;
+    }
+
+    #viewerCount {
+        font-size: 0.8rem;
+        padding: 0.15rem 0.4rem;
+    }
+}
+
+
+
+
+
+
+
+.live-user-header {
+    flex: 0 0 20%;
+    padding: 1rem;
+    border-bottom: 1px solid rgba(0, 0, 0, .1);
+    display: flex;
+    align-items: center;
+    gap: 10px; /* 添加间距 */
+}
+
+.live-user-header img {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%; /* 圆形效果 */
+    object-fit: cover; /* 确保图片比例正确 */
+}
+
+.live-user-header span {
+    color: white; /* 文字颜色 */
+    font-weight: bold; /* 加粗 */
+    font-size: 14px; /* 调整字号 */
+}
+
+
+
+
+
+

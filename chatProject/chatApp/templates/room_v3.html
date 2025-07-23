@@ -1,14 +1,19 @@
+{% load static %}
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>Pecktra</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="https://cdn.staticfile.net/twitter-bootstrap/5.1.1/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="static/css/nav.css">
-    <link rel="stylesheet" href="static/css/chat.css">
-    <link rel="stylesheet" href="static/css/user_chat.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/nav.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/chat.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/user_chat.css' %}">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+    <!-- Bootstrap 5 CSS -->
+
 
     <style>
         * {
@@ -61,75 +66,32 @@
                     Home
                 </a>
             </li>
-            <li>
-                <a href="#" class="nav-link text-white" data-bs-toggle="tooltip" data-bs-placement="right" title="View Dashboard">
-                    <svg class="bi me-2" width="16" height="16"><use xlink:href="#speedometer2"/></svg>
-                    Dashboard
-                </a>
-            </li>
-            <li>
-                <a href="#" class="nav-link text-white" data-bs-toggle="tooltip" data-bs-placement="right" title="Check Orders">
-                    <svg class="bi me-2" width="16" height="16"><use xlink:href="#table"/></svg>
-                    Orders
-                </a>
-            </li>
-            <li>
-                <a href="#" class="nav-link text-white" data-bs-toggle="tooltip" data-bs-placement="right" title="Manage Products">
-                    <svg class="bi me-2" width="16" height="16"><use xlink:href="#grid"/></svg>
-                    Products
-                </a>
-            </li>
-            <li>
-                <a href="#" class="nav-link text-white" data-bs-toggle="tooltip" data-bs-placement="right" title="View Customers">
-                    <svg class="bi me-2" width="16" height="16"><use xlink:href="#people-circle"/></svg>
-                    Customers
-                </a>
-            </li>
+
         </ul>
         <hr>
         <h6 class="text-white mb-2">Lives</h6>
-        <div class="scrollarea" style="overflow-y: scroll; max-height: 200px;">
-            <a href="#" class="nav-link text-white d-flex align-items-center" data-bs-toggle="tooltip" data-bs-placement="right" title="Join Officer Austin">
-                <svg class="bi me-2" width="16" height="16"><use xlink:href="#people-circle"/></svg>
-                Officer Austin
-            </a>
-            <a href="#" class="nav-link text-white d-flex align-items-center" data-bs-toggle="tooltip" data-bs-placement="right" title="Join Blake">
-                <svg class="bi me-2" width="16" height="16"><use xlink:href="#people-circle"/></svg>
-                Blake
-            </a>
-            <a href="#" class="nav-link text-white d-flex align-items-center" data-bs-toggle="tooltip" data-bs-placement="right" title="Join Emily">
-                <svg class="bi me-2" width="16" height="16"><use xlink:href="#people-circle"/></svg>
-                Emily
-            </a>
-            <a href="#" class="nav-link text-white d-flex align-items-center" data-bs-toggle="tooltip" data-bs-placement="right" title="Join David">
-                <svg class="bi me-2" width="16" height="16"><use xlink:href="#people-circle"/></svg>
-                David
-            </a>
-            <a href="#" class="nav-link text-white d-flex align-items-center" data-bs-toggle="tooltip" data-bs-placement="right" title="Join Sarah">
-                <svg class="bi me-2" width="16" height="16"><use xlink:href="#people-circle"/></svg>
-                Sarah
-            </a>
-            <a href="#" class="nav-link text-white d-flex align-items-center" data-bs-toggle="tooltip" data-bs-placement="right" title="Join Sarah">
-                <svg class="bi me-2" width="16" height="16"><use xlink:href="#people-circle"/></svg>
-                Sarah2
-            </a>
-            <a href="#" class="nav-link text-white d-flex align-items-center" data-bs-toggle="tooltip" data-bs-placement="right" title="Join Sarah">
-                <svg class="bi me-2" width="16" height="16"><use xlink:href="#people-circle"/></svg>
-                Sarah3
-            </a>
+        <div class="scrollarea" style="overflow-y: scroll; max-height: 600px;" id="liveListContainer">
+            <!-- 静态占位内容可以保留作为加载状态 -->
+            <div class="text-center py-3 text-white" id="loadingIndicator">
+                <div class="spinner-border spinner-border-sm" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                正在加载直播列表...
+            </div>
+
+            <!-- 动态内容将由JavaScript填充 -->
         </div>
         <hr>
         <div class="dropdown">
             <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
-                <img src="https://github.com/mdo.png" alt="" width="32" height="32" class="rounded-circle me-2">
-                <strong>mdo</strong>
+                <!-- <img src="https://github.com/mdo.png" alt="" width="32" height="32" class="rounded-circle me-2" id="userAvatar"> -->
+                <strong id="username">Loading...</strong>
             </a>
             <ul class="dropdown-menu dropdown-menu-dark text-small shadow" aria-labelledby="dropdownUser1">
-                <li><a class="dropdown-item" href="#">New project...</a></li>
-                <li><a class="dropdown-item" href="#">Settings</a></li>
-                <li><a class="dropdown-item" href="#">Profile</a></li>
+                <li><a class="dropdown-item" href="#" id="profileLink">Profile</a></li>
                 <li><hr class="dropdown-divider"></li>
-                <li><a class="dropdown-item" href="#">Sign out</a></li>
+                <li><a class="dropdown-item" href="#" id="logoutLink">Sign out</a></li>
+                <li><a class="dropdown-item" href="#" id="loginLink" style="display:none;">Sign in</a></li>
             </ul>
         </div>
     </div>
@@ -137,41 +99,39 @@
 
     <div class="live-container">
         <div class="streamer-info">
-            <div class="streamer-details">
-                <img src="https://via.placeholder.com/60" alt="Streamer Avatar">
+            <div class="streamer-details d-flex align-items-center">
+                <!-- 主播头像 -->
+                <div class="position-relative me-3">
+                    <img src="https://via.placeholder.com/60" alt="主播头像"
+                         class="rounded-circle border border-3 border-primary"
+                         >
+                </div>
+
                 <div>
-                    <h5 class="mb-0">Officer Austin</h5>
-                    <p class="mb-0 text-muted">200 followers</p>
+                    <h5 class="mb-0">
+                        <i class="bi bi-person-check-fill text-primary me-2"></i>
+                        <span id="streamerName">Officer Austin</span>
+                    </h5>
+                    <p class="mb-0 text-muted">
+                        <i class="bi bi-people-fill me-2"></i>
+                        <span id="viewerCount">0</span>人观看
+                    </p>
                 </div>
             </div>
-            <div class="streamer-actions">
-                <button class="btn btn-primary follow-btn">Follow</button>
-                <!-- Bootstrap 分享按钮 -->
-                <button class="btn btn-outline-secondary share-btn">
-                    <i class="bi bi-share"></i>
-                </button>
-            </div>
+            <!-- <div class="streamer-actions">-->
+            <!--     <button class="btn btn-primary follow-btn">Follow</button>-->
+            <!--      Bootstrap 分享按钮 -->
+            <!--     <button class="btn btn-outline-secondary share-btn">-->
+            <!--         <i class="bi bi-share"></i>-->
+            <!--     </button>-->
+            <!-- </div>-->
         </div>
-        <div class="chat-area ">
-            <div class="chat-message streamer-message">
-                <div class="message-sender">Officer Austin</div>
-                <p>Hey AI, what's the best way to organize a community event?</p>
-                <div class="message-time">12:30 AM</div>
-            </div>
-            <div class="chat-message ai-message">
-                <div class="message-sender">AI Assistant</div>
-                <p>Organizing a community event starts with a clear goal—say, fostering local engagement or raising funds. Pick a date and venue early, ideally 3-6 months out, to secure permits and vendors. Create a detailed budget covering venue, food, entertainment, and marketing. Rally a small team to delegate tasks like promotion or logistics. Use social media and local networks for outreach, and consider free platforms like X for real-time updates. Engage attendees with interactive elements like Q&A sessions or live polls. Post-event, gather feedback to improve next time. Want tips for a specific event type?</p>
-                <div class="message-time">12:32 AM</div>
-            </div>
-            <div class="chat-message streamer-message">
-                <div class="message-sender">Officer Austin</div>
-                <p>That’s solid advice! I’m thinking about a charity fundraiser. Any specific ideas for that?</p>
-                <div class="message-time">12:34 AM</div>
-            </div>
-            <div class="chat-message ai-message">
-                <div class="message-sender">AI Assistant</div>
-                <p>For a charity fundraiser, focus on emotional connection to the cause. Host a themed event, like a gala or fun run, with a clear story about who benefits. Offer multiple donation tiers with perks (e.g., shoutouts for $50, VIP access for $200). Live auctions or raffles with donated items from local businesses boost engagement. Stream parts of it on X to widen reach and encourage online donations. Partner with local influencers to amplify turnout. Track donations transparently in real-time to build trust. Need help with a theme or promotion strategy?</p>
-                <div class="message-time">12:35 AM</div>
+        <!-- 动态聊天区域 -->
+        <div class="chat-area" id="chatArea">
+            <!-- 这里会被JavaScript动态填充 -->
+            <div class="text-center py-4 text-muted">
+                <div class="spinner-border spinner-border-sm" role="status"></div>
+                <span>正在加载聊天记录...</span>
             </div>
         </div>
     </div>
@@ -179,80 +139,31 @@
     <!--右侧聊天-->
     <div class="chat-panel">
         <div class="chat-header">
-            <div class="streamer-info">
-                <img src="https://via.placeholder.com/30" alt="Officer Austin">
+            <div class="live-user-header">
+                <img src="https://via.placeholder.com/30" alt="">
                 <span>Officer Austin</span>
             </div>
 
         </div>
         <div class="chat-content">
-            <!-- 其他用户消息 -->
-            <div class="message other-user-message">
-                <div class="message-user-info">
-                    <img src="avatar1.jpg" class="message-avatar">
-                    <span class="message-username">用户名1</span>
+            <div class="text-center py-4 loading-container">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">加载中...</span>
                 </div>
-                <div class="message-bubble">111111111</div>
-                <div class="message-time">时间</div>
-            </div>
-            <div class="message other-user-message">
-                <div class="message-user-info">
-                    <img src="avatar1.jpg" class="message-avatar">
-                    <span class="message-username">用户名1</span>
-                </div>
-                <div class="message-bubble">2222222</div>
-                <div class="message-time">时间</div>
-            </div>
-            <div class="message other-user-message">
-                <div class="message-user-info">
-                    <img src="avatar1.jpg" class="message-avatar">
-                    <span class="message-username">用户名1</span>
-                </div>
-                <div class="message-bubble">333333333</div>
-                <div class="message-time">时间</div>
-            </div>
-            <div class="message other-user-message">
-                <div class="message-user-info">
-                    <img src="avatar1.jpg" class="message-avatar">
-                    <span class="message-username">用户名1</span>
-                </div>
-                <div class="message-bubble">44444444</div>
-                <div class="message-time">时间</div>
-            </div>
-            <div class="message other-user-message">
-                <div class="message-user-info">
-                    <img src="avatar1.jpg" class="message-avatar">
-                    <span class="message-username">用户名1</span>
-                </div>
-                <div class="message-bubble">5555555</div>
-                <div class="message-time">时间</div>
-            </div>
-            <div class="message other-user-message">
-                <div class="message-user-info">
-                    <img src="avatar1.jpg" class="message-avatar">
-                    <span class="message-username">用户名1</span>
-                </div>
-                <div class="message-bubble">666666</div>
-                <div class="message-time">时间</div>
-            </div>
-            <!-- 我的消息 -->
-            <div class="message my-message">
-                <div class="message-user-info">
-                    <img src="my-avatar.jpg" class="message-avatar">
-                    <span class="message-username">我</span>
-                </div>
-                <div class="message-bubble">我的消息内容</div>
-                <div class="message-time">时间</div>
+                <div class="mt-2 text-muted">正在加载消息...</div>
             </div>
         </div>
-        <div class="chat-input">
-            <img src="https://via.placeholder.com/24" alt="用户头像">
-            <input type="text" placeholder="输入你的评论...">
+        <div class="input-group">
+            <label for="chatMessageInput"></label><input type="text" class="form-control" id="chatMessageInput" placeholder="输入消息" />
+            <div class="input-group-append">
+                <button class="btn btn-success" id="chatMessageSend" type="button">发送</button>
+            </div>
         </div>
     </div>
 
 </main>
 <script src="https://cdn.staticfile.net/twitter-bootstrap/5.1.1/js/bootstrap.bundle.min.js"></script>
-<script src="static/js/script.js"></script>
+<script type="module" src="{% static 'js/script.mjs' %}"></script>
+<script type="module" src="{% static 'js/main.mjs' %}"></script>
 </body>
 </html>

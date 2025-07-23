@@ -6,6 +6,8 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 from chatApp.models import Room
 
+
+
 @csrf_exempt
 @login_required
 def home(request):
@@ -26,7 +28,13 @@ def room_view(request, room_name):
     return render(request, 'room.html', {
         'room': chat_room,
     })
-    
+
+
+@csrf_exempt
+def room_test(request):
+
+    return render(request, 'room_v3.html')
+
 
 @csrf_exempt
 def user_signup(request):

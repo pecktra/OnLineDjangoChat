@@ -22,9 +22,6 @@
             this.classList.add('active');
         });
 
-        link.addEventListener('mouseout', function () {
-            navLinks.forEach(l => l.classList.remove('active'));
-            document.querySelector('.nav-link[aria-current="page"]').classList.add('active');
-        });
+
     });
 })();

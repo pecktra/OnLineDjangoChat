@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -29,8 +30,10 @@ ALLOWED_HOSTS = ['*',]  # 开放访问权限
 
 
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [BASE_DIR / "templates/static"]
-
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'chatApp', 'static'),
+]
+STATIC_ROOT = BASE_DIR / "staticfiles"
 # Application definition
 
 INSTALLED_APPS = [
@@ -95,7 +98,7 @@ DATABASES = {
         'NAME': 'Pecktra',                        # 数据库名称
         'USER': 'root',                      # 用户名
         'PASSWORD': 'Tura1050493761@',              # 密码
-        'HOST': 'localhost',                   # 主机地址
+        'HOST': '43.162.120.233',                   # 主机地址
         'PORT': '3306',                        # 端口号
         'OPTIONS': {
             'charset': 'utf8mb4',              # 推荐使用 utf8mb4 以支持表情符号
@@ -104,11 +107,11 @@ DATABASES = {
     }
 }
 
-REDIS_HOST = 'localhost'
+REDIS_HOST = '43.162.120.233'
 REDIS_PORT = 6379
 REDIS_DB = 0
 
-MONGO_URI = "mongodb://admin:Tura1050493761%40@127.0.0.1:27017/chat_db?authSource=admin"
+MONGO_URI = "mongodb://admin:Tura1050493761%40@43.162.120.233:27017/chat_db?authSource=admin"
 MONGO_DB_NAME = "chat_db"
 
 # Password validation

@@ -23,14 +23,19 @@ from django.conf.urls.static import static
 from . import settings
 from chatApp import views
 
+from django.views.static import serve
+from django.urls import re_path
 
 urlpatterns = [
+
     path('admin/', admin.site.urls),
     path('', home, name='home'), # 首页
     path('login/', user_login, name='login'), # 登录
     path('signup/', user_signup, name='signup'), # 注册
     path('logout/', user_logout, name='logout'), # 退出
     path('chat/<str:room_name>/', views.room_view, name='chatroom'), # 聊天室
+
+    path('chat1/', views.room_test), # 聊天室
 
 
     #主播端
@@ -46,4 +51,8 @@ urlpatterns = [
     path('api/live/change_live_status', live.change_live_status),
 ]
 
+
+
+
 urlpatterns += static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)
+
