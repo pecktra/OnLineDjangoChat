@@ -1,17 +1,20 @@
+from channels.layers import get_channel_layer
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from django.conf import settings
 from pymongo import MongoClient
 import json
 
-
 # 建立 MongoDB 连接
 client = MongoClient(settings.MONGO_URI)
 db = client[settings.MONGO_DB_NAME]
 
+# 获取 Channel Layer
+channel_layer = get_channel_layer()
 
+# 将 chat_data 改为异步函数
 @api_view(['POST'])
-def chat_data(request):
+async def chat_data(request):
     """
     聊天数据接口
     POST /api/chat/chat_data
@@ -53,6 +56,7 @@ def chat_data(request):
         # 每个 room_id 存一张 collection
         collection = db[room_id]
 
+        # 将数据存入 MongoDB
         collection.insert_one({
             "username": username,
             "uid": uid,
@@ -61,6 +65,25 @@ def chat_data(request):
             "data_type": data_type,
             "data": data
         })
+
+        # 从 data 中获取需要转发的数据
+        send_data = {
+            'uid': uid,
+            'username': username,
+            'send_date': data.get('send_date', ''),
+            'user_message': data.get('user_message', '')
+        }
+
+        # 将消息转发到 WebSocket
+        if send_data['user_message']:
+            # 使用 await 来异步发送消息
+            await channel_layer.group_send(
+                room_id,  # 这里传递的是 room_id，确保 WebSocket 消费者订阅该 room
+                {
+                    'type': 'chat_message',  # 指定要调用消费者中的 chat_message 方法
+                    'data': send_data  # 发送的消息数据
+                }
+            )
 
         return Response({"code": 0})
 

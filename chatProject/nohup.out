@@ -807,3 +807,1307 @@ HTTP GET /login 301 [0.00, 46.101.251.84:40754]
 HTTP GET /login/ 200 [0.01, 46.101.251.84:40754]
 /usr/local/lib/python3.6/site-packages/OpenSSL/_util.py:6: CryptographyDeprecationWarning: Python 3.6 is no longer supported by the Python core team. Therefore, support for it is deprecated in cryptography. The next release of cryptography will remove support for Python 3.6.
   from cryptography.hazmat.bindings.openssl.binding import Binding
+Watching for file changes with StatReloader
+Performing system checks...
+
+System check identified no issues (0 silenced).
+July 16, 2025 - 09:34:29
+Django version 4.2.11, using settings 'chatProject.settings'
+Starting development server at http://0.0.0.0:8000/
+Quit the server with CONTROL-C.
+
+/home/OnLineDjangoChat/chatProject/chatApp/anchor/live.py changed, reloading.
+Watching for file changes with StatReloader
+Performing system checks...
+
+System check identified no issues (0 silenced).
+July 16, 2025 - 09:35:45
+Django version 4.2.11, using settings 'chatProject.settings'
+Starting development server at http://0.0.0.0:8000/
+Quit the server with CONTROL-C.
+
+[16/Jul/2025 09:37:44] "GET / HTTP/1.1" 302 0
+[16/Jul/2025 09:37:45] "GET /login/?next=/ HTTP/1.1" 200 1706
+[16/Jul/2025 09:37:46] "GET / HTTP/1.1" 302 0
+[16/Jul/2025 09:37:46] "GET /login/?next=/ HTTP/1.1" 200 1706
+[16/Jul/2025 11:06:57,304] - Broken pipe from ('167.94.145.101', 56922)
+[16/Jul/2025 11:07:00] "GET / HTTP/1.1" 302 0
+[16/Jul/2025 11:07:06,704] - Broken pipe from ('167.94.145.101', 56934)
+[16/Jul/2025 11:07:09] "GET / HTTP/1.1" 302 0
+[16/Jul/2025 11:07:10] code 505, message Invalid HTTP version (2.0)
+[16/Jul/2025 11:07:10] "PRI * HTTP/2.0" 505 -
+[16/Jul/2025 11:07:16] "GET /login/ HTTP/1.1" 200 1706
+Not Found: /favicon.ico
+[16/Jul/2025 11:07:16] "GET /favicon.ico HTTP/1.1" 404 3356
+[16/Jul/2025 11:07:17] code 505, message Invalid HTTP version (2.0)
+[16/Jul/2025 11:07:17] "PRI * HTTP/2.0" 505 -
+[16/Jul/2025 11:07:24] code 400, message Bad request version ('À\x14À')
+[16/Jul/2025 11:07:24] You're accessing the development server over HTTPS, but it only supports HTTP.
+Not Found: /.well-known/security.txt
+[16/Jul/2025 11:07:25] "GET /.well-known/security.txt HTTP/1.1" 404 3395
+Internal Server Error: /api/live/get_live_status
+Traceback (most recent call last):
+  File "/usr/lib/python3/dist-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3/dist-packages/django/core/handlers/base.py", line 220, in _get_response
+    response = response.render()
+               ^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3/dist-packages/django/template/response.py", line 114, in render
+    self.content = self.rendered_content
+                   ^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/rest_framework/response.py", line 74, in rendered_content
+    ret = renderer.render(self.data, accepted_media_type, context)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/rest_framework/renderers.py", line 730, in render
+    template = loader.get_template(self.template)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3/dist-packages/django/template/loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: rest_framework/api.html
+[16/Jul/2025 11:36:09] "GET /api/live/get_live_status?uid=1&username=pride HTTP/1.1" 500 78318
+Not Found: /favicon.ico
+[16/Jul/2025 11:36:09] "GET /favicon.ico HTTP/1.1" 404 3356
+Not Found: /api/v2/heartbeat
+[16/Jul/2025 12:03:57] "GET /api/v2/heartbeat HTTP/1.1" 404 3371
+[16/Jul/2025 12:03:58] "GET / HTTP/1.1" 302 0
+[16/Jul/2025 12:42:30,854] - Broken pipe from ('162.142.125.44', 58278)
+[16/Jul/2025 12:42:40] code 400, message Bad request syntax ('\x16\x03\x01\x00î\x01\x00\x00ê\x03\x03\x14')
+[16/Jul/2025 12:42:40] You're accessing the development server over HTTPS, but it only supports HTTP.
+[16/Jul/2025 12:42:43] code 400, message Bad request syntax ('version')
+[16/Jul/2025 12:42:43] "version" 400 -
+[16/Jul/2025 12:43:00] code 400, message Bad request syntax ('\x80\x10\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00')
+[16/Jul/2025 12:43:00] "                      " 400 -
+[16/Jul/2025 12:43:16,500] - Broken pipe from ('162.142.125.44', 41410)
+[16/Jul/2025 13:07:39] code 400, message Bad request version ('ÚÚ\x13\x01\x13\x02\x13\x03À+À/À,À0Ì©Ì¨À\x13À\x14\x00\x9c\x00\x9d\x00/\x005\x01\x00\x00{\x00\x05\x00\x05\x01\x00\x00\x00\x00\x00')
+[16/Jul/2025 13:07:39] You're accessing the development server over HTTPS, but it only supports HTTP.
+[16/Jul/2025 13:23:17] "GET / HTTP/1.1" 302 0
+[16/Jul/2025 13:23:17] "GET /login/?next=/ HTTP/1.1" 200 1706
+Not Found: /favicon.ico
+[16/Jul/2025 13:23:47] "GET /favicon.ico HTTP/1.1" 404 3356
+[16/Jul/2025 13:36:29] "GET / HTTP/1.1" 302 0
+[16/Jul/2025 13:36:29,339] - Broken pipe from ('205.210.31.50', 58324)
+[16/Jul/2025 14:27:36] code 400, message Bad HTTP/0.9 request type ('\x16\x03\x01\x00{\x01\x00\x00w\x03\x03^\x08V·v!«Q\x8f:ô\x01ÞÑÕ1\x9c0C¾ö?·Ö°\x17Êß\x93\x1a\x05Ì\x00\x00\x1aÀ/À+À\x11À\x07À\x13À')
+[16/Jul/2025 14:27:36] You're accessing the development server over HTTPS, but it only supports HTTP.
+[16/Jul/2025 14:27:36] code 400, message Bad request syntax ('MGLNDD_43.162.120.233_8000')
+[16/Jul/2025 14:27:36] "MGLNDD_43.162.120.233_8000" 400 -
+[16/Jul/2025 15:18:29] code 400, message Bad HTTP/0.9 request type ('\x03\x00\x00/*à\x00\x00\x00\x00\x00Cookie:')
+[16/Jul/2025 15:18:29] "  /*à     Cookie: mstshash=Administr" 400 -
+[16/Jul/2025 15:47:27] code 400, message Bad HTTP/0.9 request type ('\x03\x00\x00/*à\x00\x00\x00\x00\x00Cookie:')
+[16/Jul/2025 15:47:27] "  /*à     Cookie: mstshash=Administr" 400 -
+[16/Jul/2025 16:19:52] code 400, message Bad HTTP/0.9 request type ('\x03\x00\x00/*à\x00\x00\x00\x00\x00Cookie:')
+[16/Jul/2025 16:19:52] "  /*à     Cookie: mstshash=Administr" 400 -
+[16/Jul/2025 16:31:39] code 400, message Bad HTTP/0.9 request type ('\x03\x00\x00/*à\x00\x00\x00\x00\x00Cookie:')
+[16/Jul/2025 16:31:39] "  /*à     Cookie: mstshash=Administr" 400 -
+[16/Jul/2025 16:47:54] code 400, message Bad request version ('À\x14À')
+[16/Jul/2025 16:47:54] You're accessing the development server over HTTPS, but it only supports HTTP.
+[16/Jul/2025 17:52:26] "GET / HTTP/1.1" 302 0
+[16/Jul/2025 17:52:26] "GET /login/?next=/ HTTP/1.1" 200 1706
+[16/Jul/2025 20:32:10] "GET / HTTP/1.1" 302 0
+[16/Jul/2025 20:32:10] "GET / HTTP/1.1" 302 0
+[16/Jul/2025 20:32:10] "GET / HTTP/1.1" 302 0
+[16/Jul/2025 20:32:10] "GET / HTTP/1.1" 302 0
+[16/Jul/2025 20:32:10] "GET / HTTP/1.1" 302 0
+[16/Jul/2025 20:32:10] "GET / HTTP/1.1" 302 0
+[16/Jul/2025 20:32:10] "GET / HTTP/1.1" 302 0
+[16/Jul/2025 20:32:10] "GET / HTTP/1.1" 302 0
+[16/Jul/2025 20:32:10] "GET / HTTP/1.1" 302 0
+[16/Jul/2025 20:32:10] "GET / HTTP/1.1" 302 0
+[16/Jul/2025 20:32:10] "GET / HTTP/1.1" 302 0
+[16/Jul/2025 20:36:05] "GET / HTTP/1.1" 302 0
+[16/Jul/2025 20:36:06] "GET /login/?next=/ HTTP/1.1" 200 1706
+[16/Jul/2025 20:36:07] "GET / HTTP/1.1" 302 0
+[16/Jul/2025 20:36:07] "GET /login/?next=/ HTTP/1.1" 200 1706
+[16/Jul/2025 22:41:15] "GET / HTTP/1.0" 302 0
+[16/Jul/2025 22:41:21] code 400, message Bad HTTP/0.9 request type ('l\x00')
+[16/Jul/2025 22:41:21] "l          " 400 -
+Not Found: /nice ports,/Trinity.txt.bak
+[16/Jul/2025 22:41:21] "GET /nice%20ports%2C/Tri%6Eity.txt%2ebak HTTP/1.0" 404 3413
+[16/Jul/2025 22:41:21] code 400, message Bad request syntax ('\x05\x04\x00\x01\x02\x80\x05\x01\x00\x03')
+[16/Jul/2025 22:41:21] "  " 400 -
+[16/Jul/2025 22:41:26] code 400, message Bad request syntax ('\x04\x01\x00\x16\x7f\x00\x00\x01root\x00')
+[16/Jul/2025 22:41:26] "   root " 400 -
+[16/Jul/2025 22:41:26] "OPTIONS / HTTP/1.0" 302 0
+[16/Jul/2025 22:41:26] code 400, message Bad request version ('RTSP/1.0')
+[16/Jul/2025 22:41:26] "OPTIONS / RTSP/1.0" 400 -
+[16/Jul/2025 22:41:31] code 400, message Bad request version ('\x00\x01\x97|\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00')
+[16/Jul/2025 22:41:31] "  (rþ          |                    " 400 -
+[16/Jul/2025 22:41:36] code 400, message Bad HTTP/0.9 request type ('\x00')
+[16/Jul/2025 22:41:36] "          versionbind   " 400 -
+[16/Jul/2025 22:41:36] code 400, message Bad request syntax ('HELP')
+[16/Jul/2025 22:41:36] "HELP" 400 -
+[16/Jul/2025 22:41:36] code 400, message Bad request syntax ('\x16\x03\x00\x00S\x01\x00\x00O\x03\x00?G×÷º,îê²`~ó\x00ý\x82{¹Õ\x96Èw\x9bæÄÛ<=Ûoï\x10n\x00\x00(\x00\x16\x00\x13\x00')
+[16/Jul/2025 22:41:36] You're accessing the development server over HTTPS, but it only supports HTTP.
+[16/Jul/2025 22:41:36] code 400, message Bad request version ('\x00/\x00')
+[16/Jul/2025 22:41:36] You're accessing the development server over HTTPS, but it only supports HTTP.
+[16/Jul/2025 22:41:36] code 400, message Bad request syntax ('\x00\x00\x00qj\x81n0\x81k¡\x03\x02\x01\x05¢\x03\x02\x01')
+[16/Jul/2025 22:41:36] "   qjn0k¡¢" 400 -
+[16/Jul/2025 22:41:41] code 400, message Bad request version ('0.12\x00')
+[16/Jul/2025 22:41:41] "   ¤ÿSMBr    @              @     PC NETWORK PROGRAM 1.0 MICROSOFT NETWORKS 1.03 MICROSOFT NETWORKS 3.0 LANMAN1.0 LM1.2X002 Samba NT LANMAN 1.0 NT LM 0.12 " 400 -
+[16/Jul/2025 22:41:41] code 400, message Bad request version ('SIP/2.0')
+[16/Jul/2025 22:41:41] "OPTIONS sip:nm SIP/2.0" 400 -
+[16/Jul/2025 22:41:46] code 400, message Bad HTTP/0.9 request type ('AMQP\x00\x00')
+[16/Jul/2025 22:41:46] "AMQP  	" 400 -
+[16/Jul/2025 22:41:46] code 400, message Bad request version ('\x00/\x00')
+[16/Jul/2025 22:41:46] You're accessing the development server over HTTPS, but it only supports HTTP.
+[16/Jul/2025 22:41:46] "GET / HTTP/1.1" 302 0
+[16/Jul/2025 22:41:46] "GET /login/?next=/ HTTP/1.1" 200 1706
+Not Found: /favicon.ico
+[16/Jul/2025 22:41:46] "GET /favicon.ico HTTP/1.1" 404 3356
+[16/Jul/2025 22:41:56] code 400, message Bad request version ("Q<\x92\x8b«¹Ë\x07åÜ\x80´¿yýþµ\x06ò8Ä\\\x89[(õÈ¸\x80d\x03Ú\x00\x9c\x13\x02\x13\x03\x13\x01\x003\x009\x005\x00/À,À0\x00£\x00\x9fÌ©Ì¨ÌªÀ¯À\xadÀ£À\x9fÀ]ÀaÀWÀSÀ+À/\x00¢\x00\x9eÀ®À¬À¢À\x9eÀ\\À`ÀVÀRÀ$À(\x00k\x00jÀsÀw\x00Ä\x00ÃÀ#À'\x00g\x00@ÀrÀv\x00¾\x00½À")
+[16/Jul/2025 22:41:56] You're accessing the development server over HTTPS, but it only supports HTTP.
+[16/Jul/2025 22:42:06] "GET / HTTP/1.1" 302 0
+[16/Jul/2025 22:42:06,775] - Broken pipe from ('172.232.188.177', 60690)
+[16/Jul/2025 23:48:36] code 400, message Bad request version ('À\x13À')
+[16/Jul/2025 23:48:36] You're accessing the development server over HTTPS, but it only supports HTTP.
+[16/Jul/2025 23:48:45] "GET / HTTP/1.1" 302 0
+[16/Jul/2025 23:48:45] "GET /login/?next=/ HTTP/1.1" 200 1706
+[17/Jul/2025 00:35:43] "GET / HTTP/1.1" 302 0
+[17/Jul/2025 00:35:43] "GET /login/?next=/ HTTP/1.1" 200 1706
+Not Found: /login/favicon.ico
+[17/Jul/2025 00:35:43] "GET /login/favicon.ico HTTP/1.1" 404 3369
+[17/Jul/2025 00:49:25] "GET / HTTP/1.1" 302 0
+[17/Jul/2025 00:49:25] "GET /login/?next=/ HTTP/1.1" 200 1706
+[17/Jul/2025 01:12:48] code 400, message Bad request version ('À\x14À')
+[17/Jul/2025 01:12:48] You're accessing the development server over HTTPS, but it only supports HTTP.
+[17/Jul/2025 01:12:48] code 400, message Bad request version ('À\x14À')
+[17/Jul/2025 01:12:48] You're accessing the development server over HTTPS, but it only supports HTTP.
+[17/Jul/2025 01:12:48] "GET / HTTP/1.1" 302 0
+[17/Jul/2025 01:12:48] "GET /login/?next=/ HTTP/1.1" 200 1706
+[17/Jul/2025 01:12:48] "GET /login HTTP/1.1" 301 0
+[17/Jul/2025 01:12:49] "GET /login/ HTTP/1.1" 200 1706
+[17/Jul/2025 01:28:51] code 400, message Bad request syntax ('SSH-2.0-Go')
+[17/Jul/2025 01:28:51] "SSH-2.0-Go" 400 -
+[17/Jul/2025 02:20:33] code 400, message Bad request syntax ('SSH-2.0-Go')
+[17/Jul/2025 02:20:33] "SSH-2.0-Go" 400 -
+[17/Jul/2025 02:36:10] "GET / HTTP/1.1" 302 0
+[17/Jul/2025 02:36:13,085] - Broken pipe from ('198.235.24.173', 60390)
+[17/Jul/2025 04:30:44] "GET / HTTP/1.0" 302 0
+[17/Jul/2025 04:30:45] "GET / HTTP/1.1" 302 0
+Not Found: /favicon.ico
+[17/Jul/2025 04:30:45] "GET /favicon.ico HTTP/1.1" 404 3356
+[17/Jul/2025 04:30:45] "GET /login/?next=/ HTTP/1.1" 200 1706
+[17/Jul/2025 04:43:39] "GET / HTTP/1.1" 302 0
+[17/Jul/2025 04:43:42] "GET /login/?next=/ HTTP/1.1" 200 1706
+[17/Jul/2025 05:43:04] code 400, message Bad request syntax ('nil')
+[17/Jul/2025 05:43:04] "nil" 400 -
+[17/Jul/2025 05:43:04] "GET / HTTP/1.0" 302 0
+[17/Jul/2025 05:43:04] "GET / HTTP/1.1" 302 0
+Not Found: /favicon.ico
+[17/Jul/2025 05:43:05] "GET /favicon.ico HTTP/1.1" 404 3356
+[17/Jul/2025 05:43:05] "GET /login/?next=/ HTTP/1.1" 200 1706
+Not Found: /favicon.ico
+[17/Jul/2025 05:43:05] "GET /favicon.ico HTTP/1.1" 404 3356
+[17/Jul/2025 05:58:02] "GET / HTTP/1.1" 302 0
+[17/Jul/2025 05:58:04] "GET /login/?next=/ HTTP/1.1" 200 1706
+[17/Jul/2025 05:58:04] "GET / HTTP/1.1" 302 0
+[17/Jul/2025 05:58:05] "GET /login/?next=/ HTTP/1.1" 200 1706
+Not Found: /favicon.ico
+[17/Jul/2025 05:58:11] "GET /favicon.ico HTTP/1.1" 404 3356
+[17/Jul/2025 06:53:33] "GET / HTTP/1.1" 302 0
+[17/Jul/2025 06:53:33] "GET / HTTP/1.1" 302 0
+[17/Jul/2025 06:53:33] "GET / HTTP/1.1" 302 0
+[17/Jul/2025 06:53:34,275] - Broken pipe from ('176.65.148.10', 59790)
+[17/Jul/2025 06:53:34] "GET / HTTP/1.1" 302 0
+[17/Jul/2025 06:53:34] "GET / HTTP/1.1" 302 0
+[17/Jul/2025 06:53:34,643] - Broken pipe from ('176.65.148.10', 59624)
+[17/Jul/2025 06:53:34] "GET / HTTP/1.1" 302 0
+[17/Jul/2025 06:53:34] "GET / HTTP/1.1" 302 0
+[17/Jul/2025 06:53:34] "GET / HTTP/1.1" 302 0
+[17/Jul/2025 06:53:34] "GET / HTTP/1.1" 302 0
+[17/Jul/2025 06:53:35] "GET / HTTP/1.1" 302 0
+[17/Jul/2025 06:53:35] "GET / HTTP/1.1" 302 0
+[17/Jul/2025 06:53:35,649] - Broken pipe from ('176.65.148.10', 59804)
+[17/Jul/2025 08:09:43] code 400, message Bad request version ('À\x14À')
+[17/Jul/2025 08:09:43] You're accessing the development server over HTTPS, but it only supports HTTP.
+[17/Jul/2025 08:09:43] code 400, message Bad HTTP/0.9 request type ('\x16\x03\x01\x00{\x01\x00\x00w\x03\x03îBt;?h!£GÄ{`czÒ¨l\x8fÆºõã6~\x91cUCøÏa3\x00\x00\x1aÀ/À+À\x11À\x07À\x13À')
+[17/Jul/2025 08:09:43] You're accessing the development server over HTTPS, but it only supports HTTP.
+[17/Jul/2025 08:09:43] "GET / HTTP/1.1" 302 0
+[17/Jul/2025 08:09:44] "GET /login/?next=/ HTTP/1.1" 200 1706
+[17/Jul/2025 08:09:44] "GET /login HTTP/1.1" 301 0
+[17/Jul/2025 08:09:44] "GET /login/ HTTP/1.1" 200 1706
+[17/Jul/2025 08:20:12] code 400, message Bad request syntax ('JDWP-Handshake')
+[17/Jul/2025 08:20:12] "JDWP-Handshake" 400 -
+[17/Jul/2025 11:19:06] "GET / HTTP/1.1" 302 0
+[17/Jul/2025 11:19:16] "GET / HTTP/1.1" 302 0
+[17/Jul/2025 11:19:16] "GET /login/?next=/ HTTP/1.1" 200 1706
+Not Found: /favicon.ico
+[17/Jul/2025 11:19:29] "GET /favicon.ico HTTP/1.1" 404 3356
+Not Found: /http:/api.ipify.org/
+[17/Jul/2025 11:19:33] "GET http://api.ipify.org/?format=json HTTP/1.1" 404 1818
+Not Found: /www.shadowserver.org:443
+[17/Jul/2025 11:19:39] "CONNECT www.shadowserver.org:443 HTTP/1.1" 404 1827
+[17/Jul/2025 11:57:14] "GET / HTTP/1.1" 302 0
+[17/Jul/2025 11:57:19] code 505, message Invalid HTTP version (2.0)
+[17/Jul/2025 11:57:19] "PRI * HTTP/2.0" 505 -
+[17/Jul/2025 11:57:30] "GET /login/ HTTP/1.1" 200 1706
+Not Found: /favicon.ico
+[17/Jul/2025 11:57:32] "GET /favicon.ico HTTP/1.1" 404 3356
+[17/Jul/2025 11:57:36] code 505, message Invalid HTTP version (2.0)
+[17/Jul/2025 11:57:36] "PRI * HTTP/2.0" 505 -
+[17/Jul/2025 11:57:53] code 400, message Bad request version ('4\x97Ò"S6âÈÿ\x18mý')
+[17/Jul/2025 11:57:53] You're accessing the development server over HTTPS, but it only supports HTTP.
+[17/Jul/2025 11:57:56] "GET /login HTTP/1.1" 301 0
+[17/Jul/2025 13:43:17] "GET / HTTP/1.1" 302 0
+[17/Jul/2025 13:43:18,546] - Broken pipe from ('198.235.24.162', 60512)
+[17/Jul/2025 16:41:06] code 400, message Bad HTTP/0.9 request type ('\x03\x00\x00/*à\x00\x00\x00\x00\x00Cookie:')
+[17/Jul/2025 16:41:06] "  /*à     Cookie: mstshash=Administr" 400 -
+[17/Jul/2025 17:57:17] code 400, message Bad request syntax ('MGLNDD_43.162.120.233_8000')
+[17/Jul/2025 17:57:17] "MGLNDD_43.162.120.233_8000" 400 -
+[17/Jul/2025 18:02:11] "GET / HTTP/1.1" 302 0
+[17/Jul/2025 18:30:15] code 400, message Bad request version ('À\x14À')
+[17/Jul/2025 18:30:15] You're accessing the development server over HTTPS, but it only supports HTTP.
+[17/Jul/2025 18:30:15] code 400, message Bad request syntax ('MGLNDD_43.162.120.233_8000')
+[17/Jul/2025 18:30:15] "MGLNDD_43.162.120.233_8000" 400 -
+[17/Jul/2025 18:45:49] code 400, message Bad request version ('\x804\x03XÜt\x91\x8b\x8as\x8b\x93\x88Ï\x84\x08ó\x15ê\x83')
+[17/Jul/2025 18:45:49] You're accessing the development server over HTTPS, but it only supports HTTP.
+[17/Jul/2025 18:45:49] code 400, message Bad request version ('À(À$À\x14À')
+[17/Jul/2025 18:45:49] You're accessing the development server over HTTPS, but it only supports HTTP.
+[17/Jul/2025 19:08:57] code 400, message Bad request syntax ('\x05\x01\x00')
+[17/Jul/2025 19:08:57] " " 400 -
+[17/Jul/2025 19:08:57] code 400, message Bad request syntax ('\x05\x01\x00')
+[17/Jul/2025 19:08:57] " " 400 -
+[17/Jul/2025 19:08:57] code 400, message Bad request syntax ('\x05\x01\x00')
+[17/Jul/2025 19:08:57] " " 400 -
+[17/Jul/2025 19:08:57] code 400, message Bad request syntax ('\x05\x01\x00')
+[17/Jul/2025 19:08:57] " " 400 -
+[17/Jul/2025 19:08:57] code 400, message Bad request syntax ('\x05\x01\x00')
+[17/Jul/2025 19:08:57] " " 400 -
+[17/Jul/2025 19:08:57] code 400, message Bad request syntax ('\x05\x01\x00')
+[17/Jul/2025 19:08:57] " " 400 -
+[17/Jul/2025 19:08:57] code 400, message Bad request syntax ('\x05\x01\x00')
+[17/Jul/2025 19:08:57] " " 400 -
+[17/Jul/2025 19:08:57] code 400, message Bad request syntax ('\x05\x01\x00')
+[17/Jul/2025 19:08:57] " " 400 -
+[17/Jul/2025 19:08:59] code 400, message Bad request syntax ('\x04\x01\x01»\x00\x00\x00\x01\x00checkip.amazonaws.com\x00')
+[17/Jul/2025 19:08:59] "»    checkip.amazonaws.com " 400 -
+[17/Jul/2025 19:08:59] code 400, message Bad request syntax ('\x04\x01\x01»\x00\x00\x00\x01\x00api.myip.com\x00')
+[17/Jul/2025 19:08:59] "»    api.myip.com " 400 -
+[17/Jul/2025 19:08:59] code 400, message Bad request syntax ('\x04\x01\x01»\x00\x00\x00\x01\x00httpbin.org\x00')
+[17/Jul/2025 19:08:59] "»    httpbin.org " 400 -
+[17/Jul/2025 19:08:59] code 400, message Bad request syntax ('\x04\x01\x01»\x00\x00\x00\x01\x00ipinfo.io\x00')
+[17/Jul/2025 19:08:59] "»    ipinfo.io " 400 -
+[17/Jul/2025 19:08:59] code 400, message Bad request syntax ('\x04\x01\x01»\x00\x00\x00\x01\x00ip.seeip.org\x00')
+[17/Jul/2025 19:08:59] "»    ip.seeip.org " 400 -
+[17/Jul/2025 19:08:59] code 400, message Bad request syntax ('\x04\x01\x01»\x00\x00\x00\x01\x00ipv4.icanhazip.com\x00')
+[17/Jul/2025 19:08:59] "»    ipv4.icanhazip.com " 400 -
+[17/Jul/2025 19:08:59] code 400, message Bad request syntax ('\x04\x01\x01»\x00\x00\x00\x01\x00api.ipify.org\x00')
+[17/Jul/2025 19:08:59] "»    api.ipify.org " 400 -
+[17/Jul/2025 19:08:59] code 400, message Bad request syntax ('\x04\x01\x01»\x00\x00\x00\x01\x00ifconfig.me\x00')
+[17/Jul/2025 19:08:59] "»    ifconfig.me " 400 -
+Not Found: /ipv4.icanhazip.com:443
+[17/Jul/2025 19:08:59] "CONNECT ipv4.icanhazip.com:443 HTTP/1.0" 404 1827
+Not Found: /checkip.amazonaws.com:443
+[17/Jul/2025 19:08:59] "CONNECT checkip.amazonaws.com:443 HTTP/1.0" 404 1836
+Not Found: /ipinfo.io:443
+Not Found: /ifconfig.me:443
+[17/Jul/2025 19:08:59] "CONNECT ipinfo.io:443 HTTP/1.0" 404 1800
+Not Found: /api.ipify.org:443
+Not Found: /ip.seeip.org:443
+Not Found: /httpbin.org:443
+[17/Jul/2025 19:08:59] "CONNECT ifconfig.me:443 HTTP/1.0" 404 1806
+[17/Jul/2025 19:08:59] "CONNECT api.ipify.org:443 HTTP/1.0" 404 1812
+[17/Jul/2025 19:08:59] "CONNECT httpbin.org:443 HTTP/1.0" 404 1806
+[17/Jul/2025 19:08:59] "CONNECT ip.seeip.org:443 HTTP/1.0" 404 1809
+Not Found: /api.myip.com:443
+[17/Jul/2025 19:08:59] "CONNECT api.myip.com:443 HTTP/1.0" 404 1809
+[17/Jul/2025 19:21:47] code 400, message Bad HTTP/0.9 request type ('\x03\x00\x00/*à\x00\x00\x00\x00\x00Cookie:')
+[17/Jul/2025 19:21:47] "  /*à     Cookie: mstshash=Administr" 400 -
+Not Found: /google.com:443
+[17/Jul/2025 19:37:33] "CONNECT google.com:443 HTTP/1.1" 404 1791
+[17/Jul/2025 20:23:14] code 400, message Bad HTTP/0.9 request type ('\x03\x00\x00/*à\x00\x00\x00\x00\x00Cookie:')
+[17/Jul/2025 20:23:14] "  /*à     Cookie: mstshash=Administr" 400 -
+[17/Jul/2025 22:00:08] code 400, message Bad request version ('À\x14À')
+[17/Jul/2025 22:00:08] You're accessing the development server over HTTPS, but it only supports HTTP.
+[17/Jul/2025 22:00:08] code 400, message Bad HTTP/0.9 request type ('\x16\x03\x01\x00{\x01\x00\x00w\x03\x03*¸<´ÁÛ\x00\x827C¡äÞ*E\x95LËe\x14Ï\x14a¶³âÜ\x7f¹f·À\x00\x00\x1aÀ/À+À\x11À\x07À\x13À')
+[17/Jul/2025 22:00:08] You're accessing the development server over HTTPS, but it only supports HTTP.
+[17/Jul/2025 22:00:09] "GET / HTTP/1.1" 302 0
+[17/Jul/2025 22:00:09] "GET /login/?next=/ HTTP/1.1" 200 1706
+[17/Jul/2025 22:00:09] "GET /login HTTP/1.1" 301 0
+[17/Jul/2025 22:00:10] "GET /login/ HTTP/1.1" 200 1706
+[18/Jul/2025 02:20:01] "GET / HTTP/1.1" 302 0
+[18/Jul/2025 02:22:08] code 400, message Bad HTTP/0.9 request type ('\x16\x03\x01\x00{\x01\x00\x00w\x03\x03N\x98A\x00Üm\x15\x8dlô\x9dÝ£¶ûâD¦\x02\x07mó\x92:Z\x99¯ç¶(+ê\x00\x00\x1aÀ/À+À\x11À\x07À\x13À')
+[18/Jul/2025 02:22:08] You're accessing the development server over HTTPS, but it only supports HTTP.
+[18/Jul/2025 02:23:20] code 400, message Bad request version ('À\x14À')
+[18/Jul/2025 02:23:20] You're accessing the development server over HTTPS, but it only supports HTTP.
+[18/Jul/2025 02:23:22] code 400, message Bad request syntax ('SSH-2.0-Go')
+[18/Jul/2025 02:23:22] "SSH-2.0-Go" 400 -
+[18/Jul/2025 02:27:39] "GET / HTTP/1.1" 302 0
+[18/Jul/2025 02:27:39] "GET /login/?next=/ HTTP/1.1" 200 1706
+[18/Jul/2025 02:27:41] "GET / HTTP/1.1" 302 0
+[18/Jul/2025 02:27:41] "GET /login/?next=/ HTTP/1.1" 200 1706
+[18/Jul/2025 02:33:41] "GET / HTTP/1.1" 302 0
+[18/Jul/2025 02:33:48,358] - Broken pipe from ('205.210.31.44', 60270)
+[18/Jul/2025 02:50:33] "GET / HTTP/1.1" 302 0
+[18/Jul/2025 02:50:33] "GET /login/?next=/ HTTP/1.1" 200 1706
+[18/Jul/2025 02:56:25,932] - Broken pipe from ('199.45.154.121', 48518)
+[18/Jul/2025 02:56:29] "GET / HTTP/1.1" 302 0
+[18/Jul/2025 02:56:35,885] - Broken pipe from ('199.45.154.121', 44244)
+[18/Jul/2025 02:56:41] "GET / HTTP/1.1" 302 0
+[18/Jul/2025 02:56:42] code 505, message Invalid HTTP version (2.0)
+[18/Jul/2025 02:56:42] "PRI * HTTP/2.0" 505 -
+[18/Jul/2025 02:56:46] "GET /login/ HTTP/1.1" 200 1706
+Not Found: /favicon.ico
+[18/Jul/2025 02:56:48] "GET /favicon.ico HTTP/1.1" 404 3356
+[18/Jul/2025 02:56:50] code 505, message Invalid HTTP version (2.0)
+[18/Jul/2025 02:56:50] "PRI * HTTP/2.0" 505 -
+[18/Jul/2025 02:56:57] code 400, message Bad request version ('À\x14À')
+[18/Jul/2025 02:56:57] You're accessing the development server over HTTPS, but it only supports HTTP.
+Not Found: /sitemap.xml
+[18/Jul/2025 02:56:58] "GET /sitemap.xml HTTP/1.1" 404 3356
+[18/Jul/2025 06:41:42] "GET / HTTP/1.0" 302 0
+[18/Jul/2025 06:41:47] code 400, message Bad HTTP/0.9 request type ('l\x00')
+[18/Jul/2025 06:41:47] "l          " 400 -
+Not Found: /nice ports,/Trinity.txt.bak
+[18/Jul/2025 06:41:47] "GET /nice%20ports%2C/Tri%6Eity.txt%2ebak HTTP/1.0" 404 3413
+[18/Jul/2025 06:41:47] code 400, message Bad request syntax ('\x05\x04\x00\x01\x02\x80\x05\x01\x00\x03')
+[18/Jul/2025 06:41:47] "  " 400 -
+[18/Jul/2025 06:41:52] code 400, message Bad request syntax ('\x04\x01\x00\x16\x7f\x00\x00\x01root\x00')
+[18/Jul/2025 06:41:52] "   root " 400 -
+[18/Jul/2025 06:41:52] "OPTIONS / HTTP/1.0" 302 0
+[18/Jul/2025 06:41:52] code 400, message Bad request version ('RTSP/1.0')
+[18/Jul/2025 06:41:52] "OPTIONS / RTSP/1.0" 400 -
+[18/Jul/2025 06:41:57] code 400, message Bad request version ('\x00\x01\x97|\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00')
+[18/Jul/2025 06:41:57] "  (rþ          |                    " 400 -
+[18/Jul/2025 06:42:02] code 400, message Bad HTTP/0.9 request type ('\x00')
+[18/Jul/2025 06:42:02] "          versionbind   " 400 -
+[18/Jul/2025 06:42:02] code 400, message Bad request syntax ('HELP')
+[18/Jul/2025 06:42:02] "HELP" 400 -
+[18/Jul/2025 06:42:02] code 400, message Bad request syntax ('\x16\x03\x00\x00S\x01\x00\x00O\x03\x00?G×÷º,îê²`~ó\x00ý\x82{¹Õ\x96Èw\x9bæÄÛ<=Ûoï\x10n\x00\x00(\x00\x16\x00\x13\x00')
+[18/Jul/2025 06:42:02] You're accessing the development server over HTTPS, but it only supports HTTP.
+[18/Jul/2025 06:42:02] code 400, message Bad request version ('\x00/\x00')
+[18/Jul/2025 06:42:02] You're accessing the development server over HTTPS, but it only supports HTTP.
+[18/Jul/2025 06:42:03] code 400, message Bad request syntax ('\x00\x00\x00qj\x81n0\x81k¡\x03\x02\x01\x05¢\x03\x02\x01')
+[18/Jul/2025 06:42:03] "   qjn0k¡¢" 400 -
+[18/Jul/2025 06:42:08] code 400, message Bad request version ('0.12\x00')
+[18/Jul/2025 06:42:08] "   ¤ÿSMBr    @              @     PC NETWORK PROGRAM 1.0 MICROSOFT NETWORKS 1.03 MICROSOFT NETWORKS 3.0 LANMAN1.0 LM1.2X002 Samba NT LANMAN 1.0 NT LM 0.12 " 400 -
+[18/Jul/2025 06:42:08] code 400, message Bad request version ('SIP/2.0')
+[18/Jul/2025 06:42:08] "OPTIONS sip:nm SIP/2.0" 400 -
+[18/Jul/2025 06:42:13] code 400, message Bad HTTP/0.9 request type ('AMQP\x00\x00')
+[18/Jul/2025 06:42:13] "AMQP  	" 400 -
+[18/Jul/2025 06:42:13] code 400, message Bad request version ('\x00/\x00')
+[18/Jul/2025 06:42:13] You're accessing the development server over HTTPS, but it only supports HTTP.
+[18/Jul/2025 06:42:13] "GET / HTTP/1.1" 302 0
+[18/Jul/2025 06:42:13] "GET /login/?next=/ HTTP/1.1" 200 1706
+Not Found: /favicon.ico
+[18/Jul/2025 06:42:13] "GET /favicon.ico HTTP/1.1" 404 3356
+[18/Jul/2025 06:42:23] code 400, message Bad request version ("H¯¸/\x00\x9c\x13\x02\x13\x03\x13\x01\x003\x009\x005\x00/À,À0\x00£\x00\x9fÌ©Ì¨ÌªÀ¯À\xadÀ£À\x9fÀ]ÀaÀWÀSÀ+À/\x00¢\x00\x9eÀ®À¬À¢À\x9eÀ\\À`ÀVÀRÀ$À(\x00k\x00jÀsÀw\x00Ä\x00ÃÀ#À'\x00g\x00@ÀrÀv\x00¾\x00½À")
+[18/Jul/2025 06:42:23] You're accessing the development server over HTTPS, but it only supports HTTP.
+[18/Jul/2025 06:42:33] "GET / HTTP/1.1" 302 0
+[18/Jul/2025 09:29:49] "GET / HTTP/1.1" 302 0
+[18/Jul/2025 09:29:58] "GET / HTTP/1.1" 302 0
+[18/Jul/2025 09:29:58] "GET /login/?next=/ HTTP/1.1" 200 1706
+Not Found: /favicon.ico
+[18/Jul/2025 09:30:07] "GET /favicon.ico HTTP/1.1" 404 3356
+Not Found: /http:/api.ipify.org/
+[18/Jul/2025 09:30:10] "GET http://api.ipify.org/?format=json HTTP/1.1" 404 1818
+Not Found: /www.shadowserver.org:443
+[18/Jul/2025 09:30:13] "CONNECT www.shadowserver.org:443 HTTP/1.1" 404 1827
+Not Found: /aaa9
+[18/Jul/2025 09:51:03] "GET /aaa9 HTTP/1.1" 404 3335
+Not Found: /aab8
+[18/Jul/2025 09:51:05] "GET /aab8 HTTP/1.1" 404 3335
+[18/Jul/2025 09:51:08] "GET / HTTP/1.1" 302 0
+[18/Jul/2025 09:51:09] code 400, message Bad request version ('À\x14À')
+[18/Jul/2025 09:51:09] You're accessing the development server over HTTPS, but it only supports HTTP.
+[18/Jul/2025 11:32:13] "GET / HTTP/1.1" 302 0
+[18/Jul/2025 11:32:13,697] - Broken pipe from ('205.210.31.72', 59358)
+[18/Jul/2025 13:43:33] "GET / HTTP/1.1" 302 0
+[18/Jul/2025 13:43:36,996] - Broken pipe from ('205.210.31.173', 59978)
+[18/Jul/2025 14:01:53] code 400, message Bad request version ('\x00\x9eÌ¨Ìª\x003\x00=\x00\x16À')
+[18/Jul/2025 14:01:53] You're accessing the development server over HTTPS, but it only supports HTTP.
+[18/Jul/2025 14:02:04] "GET / HTTP/1.1" 302 0
+[18/Jul/2025 14:02:22] "GET /login/?next=/ HTTP/1.1" 200 1706
+Not Found: /favicon.ico
+[18/Jul/2025 14:02:23] "GET /favicon.ico HTTP/1.1" 404 3356
+Not Found: /robots.txt
+[18/Jul/2025 14:02:23] "GET /robots.txt HTTP/1.1" 404 3353
+Not Found: /sitemap.xml
+[18/Jul/2025 14:02:23] "GET /sitemap.xml HTTP/1.1" 404 3356
+Not Found: /config.json
+[18/Jul/2025 14:02:25] "GET /config.json HTTP/1.1" 404 3356
+[18/Jul/2025 15:28:37] "GET / HTTP/1.1" 302 0
+[18/Jul/2025 17:14:41] code 400, message Bad HTTP/0.9 request type ('\x03\x00\x00/*à\x00\x00\x00\x00\x00Cookie:')
+[18/Jul/2025 17:14:41] "  /*à     Cookie: mstshash=Administr" 400 -
+[18/Jul/2025 18:24:00] code 400, message Bad HTTP/0.9 request type ('\x00\x00\x00TZ\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x04\x010I\x00\x00\x00\x00\x8ed¨À\x00\x00¤\x0f')
+[18/Jul/2025 18:24:00] "   TZ          0I    d¨À  ¤ û tsXrcsXYs9                      scsXtcbXc       " 400 -
+[18/Jul/2025 18:33:35,188] - Broken pipe from ('45.33.109.18', 36739)
+[18/Jul/2025 18:33:35] "GET / HTTP/1.1" 302 0
+[18/Jul/2025 18:33:35,498] - Broken pipe from ('45.33.109.18', 36740)
+[18/Jul/2025 18:46:39] code 400, message Bad request version ('À\x14À')
+[18/Jul/2025 18:46:39] You're accessing the development server over HTTPS, but it only supports HTTP.
+[18/Jul/2025 18:46:39] code 400, message Bad request version ('À\x14À')
+[18/Jul/2025 18:46:39] You're accessing the development server over HTTPS, but it only supports HTTP.
+[18/Jul/2025 18:46:39] "GET / HTTP/1.1" 302 0
+[18/Jul/2025 18:46:39] "GET /login/?next=/ HTTP/1.1" 200 1706
+[18/Jul/2025 18:46:39] "GET /login HTTP/1.1" 301 0
+[18/Jul/2025 18:46:39] "GET /login/ HTTP/1.1" 200 1706
+[18/Jul/2025 19:05:53] code 400, message Bad HTTP/0.9 request type ('\x00\x00\x00TZ\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x04\x010I\x00\x00\x00\x00\x8ed¨À\x00\x00¤\x0f')
+[18/Jul/2025 19:05:53] "   TZ          0I    d¨À  ¤ û tsXrcsXYs9                      scsXtcbXc       " 400 -
+Not Found: /.env
+[18/Jul/2025 19:20:08] "GET /.env HTTP/1.1" 404 3335
+[18/Jul/2025 19:36:09] code 400, message Bad HTTP/0.9 request type ('\x00\x00\x00TZ\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x04\x010I\x00\x00\x00\x00\x8ed¨À\x00\x00¤\x0f')
+[18/Jul/2025 19:36:09] "   TZ          0I    d¨À  ¤ û tsXrcsXYs9                      tsXrcsXYs9      " 400 -
+[18/Jul/2025 20:06:24] code 400, message Bad HTTP/0.9 request type ('\x00\x00\x00TZ\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x04\x010I\x00\x00\x00\x00\x8ed¨À\x00\x00¤\x0f')
+[18/Jul/2025 20:06:24] "   TZ          0I    d¨À  ¤ û tsXrcsXYs9                      bXccsscrcr      " 400 -
+[18/Jul/2025 20:36:39] code 400, message Bad HTTP/0.9 request type ('\x00\x00\x00TZ\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x04\x010I\x00\x00\x00\x00\x8ed¨À\x00\x00¤\x0f')
+[18/Jul/2025 20:36:39] "   TZ          0I    d¨À  ¤ û tsXrcsXYs9                      bYXtcXYcsY      " 400 -
+[18/Jul/2025 21:06:55] code 400, message Bad HTTP/0.9 request type ('\x00\x00\x00TZ\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x04\x010I\x00\x00\x00\x00\x8ed¨À\x00\x00¤\x0f')
+[18/Jul/2025 21:06:55] "   TZ          0I    d¨À  ¤ û tsXrcsXYs9                      ctXsbtsbXb      " 400 -
+[18/Jul/2025 21:30:02] "GET / HTTP/1.1" 302 0
+[18/Jul/2025 21:30:32] code 400, message Bad HTTP/0.9 request type ('\x16\x03\x01\x00{\x01\x00\x00w\x03\x03´©s³ÅJPCû¤\x8bÝ\x14ËÙþ\x94¨åóI\x13¿\x14·\x05Äpô¥«¨\x00\x00\x1aÀ/À+À\x11À\x07À\x13À')
+[18/Jul/2025 21:30:32] You're accessing the development server over HTTPS, but it only supports HTTP.
+[18/Jul/2025 21:38:17] code 400, message Bad HTTP/0.9 request type ('\x00\x00\x00TZ\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x04\x010I\x00\x00\x00\x00\x8ed¨À\x00\x00¤\x0f')
+[18/Jul/2025 21:38:17] "   TZ          0I    d¨À  ¤ û tsXrcsXYs9                      bcbsXtbYts      " 400 -
+[18/Jul/2025 22:04:41] "GET / HTTP/1.1" 302 0
+[18/Jul/2025 22:04:41] "GET /login/?next=/ HTTP/1.1" 200 1706
+[18/Jul/2025 22:05:54] "GET / HTTP/1.1" 302 0
+[18/Jul/2025 22:05:54] "GET /login/?next=/ HTTP/1.1" 200 1706
+[18/Jul/2025 22:05:55] "GET / HTTP/1.1" 302 0
+[18/Jul/2025 22:05:56] "GET /login/?next=/ HTTP/1.1" 200 1706
+[18/Jul/2025 22:08:31] code 400, message Bad HTTP/0.9 request type ('\x00\x00\x00TZ\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x04\x010I\x00\x00\x00\x00\x8ed¨À\x00\x00¤\x0f')
+[18/Jul/2025 22:08:31] "   TZ          0I    d¨À  ¤ û tsXrcsXYs9                      brYtcttcbs      " 400 -
+[18/Jul/2025 22:30:12] code 400, message Bad request version ('À\x14À')
+[18/Jul/2025 22:30:12] You're accessing the development server over HTTPS, but it only supports HTTP.
+[18/Jul/2025 22:30:12] code 400, message Bad request syntax ('MGLNDD_43.162.120.233_8000')
+[18/Jul/2025 22:30:12] "MGLNDD_43.162.120.233_8000" 400 -
+[18/Jul/2025 22:38:46] code 400, message Bad HTTP/0.9 request type ('\x00\x00\x00TZ\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x04\x010I\x00\x00\x00\x00\x8ed¨À\x00\x00¤\x0f')
+[18/Jul/2025 22:38:46] "   TZ          0I    d¨À  ¤ û tsXrcsXYs9                      t9tbctttXt      " 400 -
+[18/Jul/2025 23:09:01] code 400, message Bad HTTP/0.9 request type ('\x00\x00\x00TZ\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x04\x010I\x00\x00\x00\x00\x8ed¨À\x00\x00¤\x0f')
+[18/Jul/2025 23:09:01] "   TZ          0I    d¨À  ¤ û tsXrcsXYs9                      tstYtbsrc       " 400 -
+[18/Jul/2025 23:39:16] code 400, message Bad HTTP/0.9 request type ('\x00\x00\x00TZ\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x04\x010I\x00\x00\x00\x00\x8ed¨À\x00\x00¤\x0f')
+[18/Jul/2025 23:39:16] "   TZ          0I    d¨À  ¤ û tsXrcsXYs9                      csrbrtrXt9      " 400 -
+[19/Jul/2025 00:09:30] code 400, message Bad HTTP/0.9 request type ('\x00\x00\x00TZ\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x04\x010I\x00\x00\x00\x00\x8ed¨À\x00\x00¤\x0f')
+[19/Jul/2025 00:09:30] "   TZ          0I    d¨À  ¤ û tsXrcsXYs9                      bbXcsXctst      " 400 -
+[19/Jul/2025 00:39:45] code 400, message Bad HTTP/0.9 request type ('\x00\x00\x00TZ\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x04\x010I\x00\x00\x00\x00\x8ed¨À\x00\x00¤\x0f')
+[19/Jul/2025 00:39:45] "   TZ          0I    d¨À  ¤ û tsXrcsXYs9                      YXtscYbtr       " 400 -
+[19/Jul/2025 00:40:30] "GET / HTTP/1.1" 302 0
+[19/Jul/2025 00:40:31] "GET /login/?next=/ HTTP/1.1" 200 1706
+Not Found: /console
+[19/Jul/2025 00:40:33] "GET /console HTTP/1.1" 404 3344
+[19/Jul/2025 01:08:44] code 400, message Bad HTTP/0.9 request type ('\x00\x00\x00')
+[19/Jul/2025 01:08:44] "    c                           " 400 -
+[19/Jul/2025 01:09:59] code 400, message Bad HTTP/0.9 request type ('\x00\x00\x00TZ\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x04\x010I\x00\x00\x00\x00\x8ed¨À\x00\x00¤\x0f')
+[19/Jul/2025 01:09:59] "   TZ          0I    d¨À  ¤ û tsXrcsXYs9                      YttY99ctc       " 400 -
+[19/Jul/2025 01:28:28] "GET / HTTP/1.1" 302 0
+[19/Jul/2025 01:28:28] "GET /login/?next=/ HTTP/1.1" 200 1706
+[19/Jul/2025 01:40:11] code 400, message Bad HTTP/0.9 request type ('\x00\x00\x00TZ\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x04\x010I\x00\x00\x00\x00\x8ed¨À\x00\x00¤\x0f')
+[19/Jul/2025 01:40:11] "   TZ          0I    d¨À  ¤ û tsXrcsXYs9                      sbrb99YrXt      " 400 -
+[19/Jul/2025 02:10:23] code 400, message Bad HTTP/0.9 request type ('\x00\x00\x00TZ\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x04\x010I\x00\x00\x00\x00\x8ed¨À\x00\x00¤\x0f')
+[19/Jul/2025 02:10:23] "   TZ          0I    d¨À  ¤ û tsXrcsXYs9                      bXXrtccsbt      " 400 -
+[19/Jul/2025 02:30:19] "GET / HTTP/1.1" 302 0
+[19/Jul/2025 02:30:19] "GET /login/?next=/ HTTP/1.1" 200 1706
+[19/Jul/2025 02:32:26] "GET / HTTP/1.1" 302 0
+[19/Jul/2025 02:34:15] code 400, message Bad request version ('À\x14À')
+[19/Jul/2025 02:34:15] You're accessing the development server over HTTPS, but it only supports HTTP.
+[19/Jul/2025 02:36:00] code 400, message Bad request syntax ('SSH-2.0-Go')
+[19/Jul/2025 02:36:00] "SSH-2.0-Go" 400 -
+[19/Jul/2025 02:37:14] code 400, message Bad request version ('À\x14À')
+[19/Jul/2025 02:37:14] You're accessing the development server over HTTPS, but it only supports HTTP.
+[19/Jul/2025 02:37:40] "GET / HTTP/1.1" 302 0
+[19/Jul/2025 02:37:48,721] - Broken pipe from ('205.210.31.23', 64882)
+[19/Jul/2025 02:40:36] code 400, message Bad HTTP/0.9 request type ('\x00\x00\x00TZ\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x04\x010I\x00\x00\x00\x00\x8ed¨À\x00\x00¤\x0f')
+[19/Jul/2025 02:40:36] "   TZ          0I    d¨À  ¤ û tsXrcsXYs9                      ssbrrtXXt       " 400 -
+[19/Jul/2025 03:10:50] code 400, message Bad HTTP/0.9 request type ('\x00\x00\x00TZ\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x04\x010I\x00\x00\x00\x00\x8ed¨À\x00\x00¤\x0f')
+[19/Jul/2025 03:10:50] "   TZ          0I    d¨À  ¤ û tsXrcsXYs9                      YrtsbbscX       " 400 -
+[19/Jul/2025 03:41:02] code 400, message Bad HTTP/0.9 request type ('\x00\x00\x00TZ\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x04\x010I\x00\x00\x00\x00\x8ed¨À\x00\x00¤\x0f')
+[19/Jul/2025 03:41:02] "   TZ          0I    d¨À  ¤ û tsXrcsXYs9                      stcrrssYYb      " 400 -
+[19/Jul/2025 03:59:44] "GET / HTTP/1.1" 302 0
+[19/Jul/2025 03:59:45] code 505, message Invalid HTTP version (2.0)
+[19/Jul/2025 03:59:45] "PRI * HTTP/2.0" 505 -
+[19/Jul/2025 03:59:51] "GET /login/ HTTP/1.1" 200 1706
+Not Found: /favicon.ico
+[19/Jul/2025 03:59:52] "GET /favicon.ico HTTP/1.1" 404 3356
+[19/Jul/2025 03:59:53] code 505, message Invalid HTTP version (2.0)
+[19/Jul/2025 03:59:53] "PRI * HTTP/2.0" 505 -
+[19/Jul/2025 04:00:18] code 400, message Bad request version ('~')
+[19/Jul/2025 04:00:18] You're accessing the development server over HTTPS, but it only supports HTTP.
+Not Found: /security.txt
+[19/Jul/2025 04:00:18] "GET /security.txt HTTP/1.1" 404 3359
+[19/Jul/2025 04:11:14] code 400, message Bad HTTP/0.9 request type ('\x00\x00\x00TZ\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x04\x010I\x00\x00\x00\x00\x8ed¨À\x00\x00¤\x0f')
+[19/Jul/2025 04:11:14] "   TZ          0I    d¨À  ¤ û tsXrcsXYs9                      bcssssYrs9      " 400 -
+[19/Jul/2025 04:18:08] "GET / HTTP/1.1" 302 0
+[19/Jul/2025 04:18:09] "GET /login/?next=/ HTTP/1.1" 200 1706
+[19/Jul/2025 04:41:27] code 400, message Bad HTTP/0.9 request type ('\x00\x00\x00TZ\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x04\x010I\x00\x00\x00\x00\x8ed¨À\x00\x00¤\x0f')
+[19/Jul/2025 04:41:27] "   TZ          0I    d¨À  ¤ û tsXrcsXYs9                      bXYXs9rtrs      " 400 -
+[19/Jul/2025 05:03:48] code 400, message Bad request syntax ('MGLNDD_43.162.120.233_8000')
+[19/Jul/2025 05:03:48] "MGLNDD_43.162.120.233_8000" 400 -
+[19/Jul/2025 05:11:42] code 400, message Bad HTTP/0.9 request type ('\x00\x00\x00TZ\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x04\x010I\x00\x00\x00\x00\x8ed¨À\x00\x00¤\x0f')
+[19/Jul/2025 05:11:42] "   TZ          0I    d¨À  ¤ û tsXrcsXYs9                      cttttrrtXt      " 400 -
+[19/Jul/2025 06:51:55] "POST /api/users/register/ HTTP/1.1" 200 130
+[19/Jul/2025 06:52:14] "GET /api/live/get_live_status?uid=bQcbFy0cTj-xOFcQhgAVXA&username=pride100 HTTP/1.1" 200 36
+[19/Jul/2025 06:52:25] "GET /api/live/get_live_status?uid=bQcbFy0cTj-xOFcQhgAVXA&username=pride100 HTTP/1.1" 200 36
+[19/Jul/2025 09:31:13] code 400, message Bad request version ('\x9c\x84úÝ²9nÅß')
+[19/Jul/2025 09:31:13] You're accessing the development server over HTTPS, but it only supports HTTP.
+[19/Jul/2025 11:22:57] "GET / HTTP/1.1" 302 0
+[19/Jul/2025 11:22:57] "GET /login/?next=/ HTTP/1.1" 200 1706
+[19/Jul/2025 11:28:20] "GET / HTTP/1.1" 302 0
+[19/Jul/2025 11:28:21] "GET /login/?next=/ HTTP/1.1" 200 1706
+[19/Jul/2025 11:28:22] "GET / HTTP/1.1" 302 0
+[19/Jul/2025 11:28:22] "GET /login/?next=/ HTTP/1.1" 200 1706
+[19/Jul/2025 12:54:18] "GET / HTTP/1.1" 302 0
+[19/Jul/2025 12:54:27] "GET / HTTP/1.1" 302 0
+[19/Jul/2025 12:54:27] "GET /login/?next=/ HTTP/1.1" 200 1706
+Not Found: /favicon.ico
+[19/Jul/2025 12:54:36] "GET /favicon.ico HTTP/1.1" 404 3356
+Not Found: /http:/api.ipify.org/
+[19/Jul/2025 12:54:41] "GET http://api.ipify.org/?format=json HTTP/1.1" 404 1818
+Not Found: /www.shadowserver.org:443
+[19/Jul/2025 12:54:43] "CONNECT www.shadowserver.org:443 HTTP/1.1" 404 1827
+[19/Jul/2025 13:39:25] "GET / HTTP/1.1" 302 0
+[19/Jul/2025 13:39:27,037] - Broken pipe from ('198.235.24.92', 62364)
+[19/Jul/2025 15:35:09] code 400, message Bad request version ('À\x14À')
+[19/Jul/2025 15:35:09] You're accessing the development server over HTTPS, but it only supports HTTP.
+[19/Jul/2025 15:35:09] code 400, message Bad request version ('À\x14À')
+[19/Jul/2025 15:35:09] You're accessing the development server over HTTPS, but it only supports HTTP.
+[19/Jul/2025 15:35:09] "GET / HTTP/1.1" 302 0
+[19/Jul/2025 15:35:09] "GET /login/?next=/ HTTP/1.1" 200 1706
+[19/Jul/2025 15:35:09] "GET /login HTTP/1.1" 301 0
+[19/Jul/2025 15:35:09] "GET /login/ HTTP/1.1" 200 1706
+[19/Jul/2025 17:35:49] "GET / HTTP/1.0" 302 0
+[19/Jul/2025 17:35:54] code 400, message Bad HTTP/0.9 request type ('l\x00')
+[19/Jul/2025 17:35:54] "l          " 400 -
+Not Found: /nice ports,/Trinity.txt.bak
+[19/Jul/2025 17:35:54] "GET /nice%20ports%2C/Tri%6Eity.txt%2ebak HTTP/1.0" 404 3413
+[19/Jul/2025 17:35:54] code 400, message Bad request syntax ('\x05\x04\x00\x01\x02\x80\x05\x01\x00\x03')
+[19/Jul/2025 17:35:54] "  " 400 -
+[19/Jul/2025 17:36:00] code 400, message Bad request syntax ('\x04\x01\x00\x16\x7f\x00\x00\x01root\x00')
+[19/Jul/2025 17:36:00] "   root " 400 -
+[19/Jul/2025 17:36:00] "OPTIONS / HTTP/1.0" 302 0
+[19/Jul/2025 17:36:00] code 400, message Bad request version ('RTSP/1.0')
+[19/Jul/2025 17:36:00] "OPTIONS / RTSP/1.0" 400 -
+[19/Jul/2025 17:36:05] code 400, message Bad request version ('\x00\x01\x97|\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00')
+[19/Jul/2025 17:36:05] "  (rþ          |                    " 400 -
+[19/Jul/2025 17:36:10] code 400, message Bad HTTP/0.9 request type ('\x00')
+[19/Jul/2025 17:36:10] "          versionbind   " 400 -
+[19/Jul/2025 17:36:10] code 400, message Bad request syntax ('HELP')
+[19/Jul/2025 17:36:10] "HELP" 400 -
+[19/Jul/2025 17:36:10] code 400, message Bad request syntax ('\x16\x03\x00\x00S\x01\x00\x00O\x03\x00?G×÷º,îê²`~ó\x00ý\x82{¹Õ\x96Èw\x9bæÄÛ<=Ûoï\x10n\x00\x00(\x00\x16\x00\x13\x00')
+[19/Jul/2025 17:36:10] You're accessing the development server over HTTPS, but it only supports HTTP.
+[19/Jul/2025 17:36:10] code 400, message Bad request version ('\x00/\x00')
+[19/Jul/2025 17:36:10] You're accessing the development server over HTTPS, but it only supports HTTP.
+[19/Jul/2025 17:36:10] code 400, message Bad request syntax ('\x00\x00\x00qj\x81n0\x81k¡\x03\x02\x01\x05¢\x03\x02\x01')
+[19/Jul/2025 17:36:10] "   qjn0k¡¢" 400 -
+[19/Jul/2025 17:36:16] code 400, message Bad request version ('0.12\x00')
+[19/Jul/2025 17:36:16] "   ¤ÿSMBr    @              @     PC NETWORK PROGRAM 1.0 MICROSOFT NETWORKS 1.03 MICROSOFT NETWORKS 3.0 LANMAN1.0 LM1.2X002 Samba NT LANMAN 1.0 NT LM 0.12 " 400 -
+[19/Jul/2025 17:36:16] code 400, message Bad request version ('SIP/2.0')
+[19/Jul/2025 17:36:16] "OPTIONS sip:nm SIP/2.0" 400 -
+[19/Jul/2025 17:36:21] code 400, message Bad HTTP/0.9 request type ('AMQP\x00\x00')
+[19/Jul/2025 17:36:21] "AMQP  	" 400 -
+Not Found: /devicedesc.xml
+[19/Jul/2025 17:36:21] "GET /devicedesc.xml HTTP/1.1" 404 3372
+[19/Jul/2025 17:36:26] code 400, message Bad request version ('\x00/\x00')
+[19/Jul/2025 17:36:26] You're accessing the development server over HTTPS, but it only supports HTTP.
+[19/Jul/2025 17:36:26] "GET / HTTP/1.1" 302 0
+[19/Jul/2025 17:36:26] "GET /login/?next=/ HTTP/1.1" 200 1706
+Not Found: /favicon.ico
+[19/Jul/2025 17:36:27] "GET /favicon.ico HTTP/1.1" 404 3356
+[19/Jul/2025 18:19:18] code 400, message Bad HTTP/0.9 request type ('\x03\x00\x00/*à\x00\x00\x00\x00\x00Cookie:')
+[19/Jul/2025 18:19:18] "  /*à     Cookie: mstshash=Administr" 400 -
+[19/Jul/2025 19:55:15] code 400, message Bad HTTP/0.9 request type ('\x00\x00\x00TZ\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x04\x010I\x00\x00\x00\x00\x8ed¨À\x00\x00¤\x0f')
+[19/Jul/2025 19:55:15] "   TZ          0I    d¨À  ¤ û tsXrcsXYs9                      scsXtcbXc       " 400 -
+[19/Jul/2025 20:10:24] code 400, message Bad HTTP/0.9 request type ('\x00\x00\x00TZ\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x04\x010I\x00\x00\x00\x00\x8ed¨À\x00\x00¤\x0f')
+[19/Jul/2025 20:10:24] "   TZ          0I    d¨À  ¤ û tsXrcsXYs9                      tsXrcsXYs9      " 400 -
+[19/Jul/2025 20:10:24,570] - Broken pipe from ('62.221.88.134', 46728)
+[19/Jul/2025 20:25:35] code 400, message Bad HTTP/0.9 request type ('\x00\x00\x00TZ\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x04\x010I\x00\x00\x00\x00\x8ed¨À\x00\x00¤\x0f')
+[19/Jul/2025 20:25:35] "   TZ          0I    d¨À  ¤ û tsXrcsXYs9                      bXccsscrcr      " 400 -
+[19/Jul/2025 20:40:44] code 400, message Bad HTTP/0.9 request type ('\x00\x00\x00TZ\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x04\x010I\x00\x00\x00\x00\x8ed¨À\x00\x00¤\x0f')
+[19/Jul/2025 20:40:44] "   TZ          0I    d¨À  ¤ û tsXrcsXYs9                      bYXtcXYcsY      " 400 -
+[19/Jul/2025 20:55:53] code 400, message Bad HTTP/0.9 request type ('\x00\x00\x00TZ\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x04\x010I\x00\x00\x00\x00\x8ed¨À\x00\x00¤\x0f')
+[19/Jul/2025 20:55:53] "   TZ          0I    d¨À  ¤ û tsXrcsXYs9                      ctXsbtsbXb      " 400 -
+[19/Jul/2025 21:12:08] code 400, message Bad HTTP/0.9 request type ('\x00\x00\x00TZ\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x04\x010I\x00\x00\x00\x00\x8ed¨À\x00\x00¤\x0f')
+[19/Jul/2025 21:12:08] "   TZ          0I    d¨À  ¤ û tsXrcsXYs9                      bcbsXtbYts      " 400 -
+[19/Jul/2025 21:27:16] code 400, message Bad HTTP/0.9 request type ('\x00\x00\x00TZ\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x04\x010I\x00\x00\x00\x00\x8ed¨À\x00\x00¤\x0f')
+[19/Jul/2025 21:27:16] "   TZ          0I    d¨À  ¤ û tsXrcsXYs9                      brYtcttcbs      " 400 -
+[19/Jul/2025 21:42:26] code 400, message Bad HTTP/0.9 request type ('\x00\x00\x00TZ\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x04\x010I\x00\x00\x00\x00\x8ed¨À\x00\x00¤\x0f')
+[19/Jul/2025 21:42:26] "   TZ          0I    d¨À  ¤ û tsXrcsXYs9                      t9tbctttXt      " 400 -
+[19/Jul/2025 21:57:35] code 400, message Bad HTTP/0.9 request type ('\x00\x00\x00TZ\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x04\x010I\x00\x00\x00\x00\x8ed¨À\x00\x00¤\x0f')
+[19/Jul/2025 21:57:35] "   TZ          0I    d¨À  ¤ û tsXrcsXYs9                      tstYtbsrc       " 400 -
+[19/Jul/2025 22:12:44] code 400, message Bad HTTP/0.9 request type ('\x00\x00\x00TZ\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x04\x010I\x00\x00\x00\x00\x8ed¨À\x00\x00¤\x0f')
+[19/Jul/2025 22:12:44] "   TZ          0I    d¨À  ¤ û tsXrcsXYs9                      csrbrtrXt9      " 400 -
+[19/Jul/2025 22:27:52] code 400, message Bad HTTP/0.9 request type ('\x00\x00\x00TZ\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x04\x010I\x00\x00\x00\x00\x8ed¨À\x00\x00¤\x0f')
+[19/Jul/2025 22:27:52] "   TZ          0I    d¨À  ¤ û tsXrcsXYs9                      bbXcsXctst      " 400 -
+[19/Jul/2025 22:43:02] code 400, message Bad HTTP/0.9 request type ('\x00\x00\x00TZ\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x04\x010I\x00\x00\x00\x00\x8ed¨À\x00\x00¤\x0f')
+[19/Jul/2025 22:43:02] "   TZ          0I    d¨À  ¤ û tsXrcsXYs9                      YXtscYbtr       " 400 -
+[19/Jul/2025 22:58:10] code 400, message Bad HTTP/0.9 request type ('\x00\x00\x00TZ\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x04\x010I\x00\x00\x00\x00\x8ed¨À\x00\x00¤\x0f')
+[19/Jul/2025 22:58:10] "   TZ          0I    d¨À  ¤ û tsXrcsXYs9                      YttY99ctc       " 400 -
+[19/Jul/2025 22:59:23] "GET / HTTP/1.1" 302 0
+[19/Jul/2025 22:59:23] "GET /login/?next=/ HTTP/1.1" 200 1706
+[19/Jul/2025 23:13:20] code 400, message Bad HTTP/0.9 request type ('\x00\x00\x00TZ\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x04\x010I\x00\x00\x00\x00\x8ed¨À\x00\x00¤\x0f')
+[19/Jul/2025 23:13:20] "   TZ          0I    d¨À  ¤ û tsXrcsXYs9                      sbrb99YrXt      " 400 -
+[19/Jul/2025 23:27:49] "GET / HTTP/1.1" 302 0
+[19/Jul/2025 23:27:49] "GET /login/?next=/ HTTP/1.1" 200 1706
+[19/Jul/2025 23:28:30] code 400, message Bad HTTP/0.9 request type ('\x00\x00\x00TZ\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x04\x010I\x00\x00\x00\x00\x8ed¨À\x00\x00¤\x0f')
+[19/Jul/2025 23:28:30] "   TZ          0I    d¨À  ¤ û tsXrcsXYs9                      bXXrtccsbt      " 400 -
+[19/Jul/2025 23:31:47] "GET / HTTP/1.0" 302 0
+[19/Jul/2025 23:36:15] "GET / HTTP/1.1" 302 0
+[19/Jul/2025 23:36:16] "GET /login/?next=/ HTTP/1.1" 200 1706
+[19/Jul/2025 23:36:17] "GET / HTTP/1.1" 302 0
+[19/Jul/2025 23:36:17] "GET /login/?next=/ HTTP/1.1" 200 1706
+[19/Jul/2025 23:43:39] code 400, message Bad HTTP/0.9 request type ('\x00\x00\x00TZ\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x04\x010I\x00\x00\x00\x00\x8ed¨À\x00\x00¤\x0f')
+[19/Jul/2025 23:43:39] "   TZ          0I    d¨À  ¤ û tsXrcsXYs9                      ssbrrtXXt       " 400 -
+[19/Jul/2025 23:58:47] code 400, message Bad HTTP/0.9 request type ('\x00\x00\x00TZ\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x04\x010I\x00\x00\x00\x00\x8ed¨À\x00\x00¤\x0f')
+[19/Jul/2025 23:58:47] "   TZ          0I    d¨À  ¤ û tsXrcsXYs9                      YrtsbbscX       " 400 -
+[20/Jul/2025 00:13:55] code 400, message Bad HTTP/0.9 request type ('\x00\x00\x00TZ\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x04\x010I\x00\x00\x00\x00\x8ed¨À\x00\x00¤\x0f')
+[20/Jul/2025 00:13:55] "   TZ          0I    d¨À  ¤ û tsXrcsXYs9                      stcrrssYYb      " 400 -
+[20/Jul/2025 00:29:03] code 400, message Bad HTTP/0.9 request type ('\x00\x00\x00TZ\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x04\x010I\x00\x00\x00\x00\x8ed¨À\x00\x00¤\x0f')
+[20/Jul/2025 00:29:03] "   TZ          0I    d¨À  ¤ û tsXrcsXYs9                      bcssssYrs9      " 400 -
+[20/Jul/2025 00:44:11] code 400, message Bad HTTP/0.9 request type ('\x00\x00\x00TZ\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x04\x010I\x00\x00\x00\x00\x8ed¨À\x00\x00¤\x0f')
+[20/Jul/2025 00:44:11] "   TZ          0I    d¨À  ¤ û tsXrcsXYs9                      bXYXs9rtrs      " 400 -
+[20/Jul/2025 00:59:21] code 400, message Bad HTTP/0.9 request type ('\x00\x00\x00TZ\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x04\x010I\x00\x00\x00\x00\x8ed¨À\x00\x00¤\x0f')
+[20/Jul/2025 00:59:21] "   TZ          0I    d¨À  ¤ û tsXrcsXYs9                      cttttrrtXt      " 400 -
+[20/Jul/2025 01:14:29] code 400, message Bad HTTP/0.9 request type ('\x00\x00\x00TZ\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x04\x010I\x00\x00\x00\x00\x8ed¨À\x00\x00¤\x0f')
+[20/Jul/2025 01:14:29] "   TZ          0I    d¨À  ¤ û tsXrcsXYs9                      cscY9t9sss      " 400 -
+[20/Jul/2025 01:29:38] code 400, message Bad HTTP/0.9 request type ('\x00\x00\x00TZ\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x04\x010I\x00\x00\x00\x00\x8ed¨À\x00\x00¤\x0f')
+[20/Jul/2025 01:29:38] "   TZ          0I    d¨À  ¤ û tsXrcsXYs9                      tXbscYrsrs      " 400 -
+[20/Jul/2025 01:44:47] code 400, message Bad HTTP/0.9 request type ('\x00\x00\x00TZ\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x04\x010I\x00\x00\x00\x00\x8ed¨À\x00\x00¤\x0f')
+[20/Jul/2025 01:44:47] "   TZ          0I    d¨À  ¤ û tsXrcsXYs9                      sssttsscrs      " 400 -
+[20/Jul/2025 01:59:56] code 400, message Bad HTTP/0.9 request type ('\x00\x00\x00TZ\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x04\x010I\x00\x00\x00\x00\x8ed¨À\x00\x00¤\x0f')
+[20/Jul/2025 01:59:56] "   TZ          0I    d¨À  ¤ û tsXrcsXYs9                      sXXrYtXtst      " 400 -
+[20/Jul/2025 02:15:00] "GET / HTTP/1.1" 302 0
+[20/Jul/2025 02:15:00] "GET / HTTP/1.1" 302 0
+[20/Jul/2025 02:15:00] "GET /login/?next=/ HTTP/1.1" 200 1706
+[20/Jul/2025 02:15:05] code 400, message Bad HTTP/0.9 request type ('\x00\x00\x00TZ\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x04\x010I\x00\x00\x00\x00\x8ed¨À\x00\x00¤\x0f')
+[20/Jul/2025 02:15:05] "   TZ          0I    d¨À  ¤ û tsXrcsXYs9                      crYYscXbts      " 400 -
+[20/Jul/2025 02:17:35] code 400, message Bad request version ('À\x14À')
+[20/Jul/2025 02:17:35] You're accessing the development server over HTTPS, but it only supports HTTP.
+[20/Jul/2025 02:19:09] code 400, message Bad request syntax ('SSH-2.0-Go')
+[20/Jul/2025 02:19:09] "SSH-2.0-Go" 400 -
+[20/Jul/2025 02:19:51] code 400, message Bad HTTP/0.9 request type ('\x16\x03\x01\x00{\x01\x00\x00w\x03\x034\x80\x137±ìÒÈ:b\\\x88Q:#e`\x10{Ç6\x881<¤FPóû\x05\x19ä\x00\x00\x1aÀ/À+À\x11À\x07À\x13À')
+[20/Jul/2025 02:19:51] You're accessing the development server over HTTPS, but it only supports HTTP.
+[20/Jul/2025 02:25:15] "GET / HTTP/1.1" 302 0
+[20/Jul/2025 02:25:15] "GET /login/?next=/ HTTP/1.1" 200 1706
+Not Found: /favicon.ico
+[20/Jul/2025 02:25:16] "GET /favicon.ico HTTP/1.1" 404 3356
+[20/Jul/2025 02:25:54] code 400, message Bad request version ('À#À¬À®À+À')
+[20/Jul/2025 02:25:54] You're accessing the development server over HTTPS, but it only supports HTTP.
+[20/Jul/2025 02:26:11] "GET / HTTP/1.1" 302 0
+[20/Jul/2025 02:30:14] code 400, message Bad HTTP/0.9 request type ('\x00\x00\x00TZ\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x04\x010I\x00\x00\x00\x00\x8ed¨À\x00\x00¤\x0f')
+[20/Jul/2025 02:30:14] "   TZ          0I    d¨À  ¤ û tsXrcsXYs9                      ssX9tsrrrt      " 400 -
+[20/Jul/2025 02:41:06] "GET / HTTP/1.1" 302 0
+[20/Jul/2025 02:41:12,519] - Broken pipe from ('205.210.31.129', 63344)
+[20/Jul/2025 02:45:23] code 400, message Bad HTTP/0.9 request type ('\x00\x00\x00TZ\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x04\x010I\x00\x00\x00\x00\x8ed¨À\x00\x00¤\x0f')
+[20/Jul/2025 02:45:23] "   TZ          0I    d¨À  ¤ û tsXrcsXYs9                      ssttbs9cst      " 400 -
+[20/Jul/2025 02:55:14] code 400, message Bad HTTP/0.9 request type ('\x16\x03\x01\x00{\x01\x00\x00w\x03\x03ÉõÉ\x9e|\x15hp.Ù\x014ü&þ\x07ç;ÂÇ¡½þÆ?÷x!<vYÌ\x00\x00\x1aÀ/À+À\x11À\x07À\x13À')
+[20/Jul/2025 02:55:14] You're accessing the development server over HTTPS, but it only supports HTTP.
+[20/Jul/2025 02:55:14] code 400, message Bad request syntax ('MGLNDD_43.162.120.233_8000')
+[20/Jul/2025 02:55:14] "MGLNDD_43.162.120.233_8000" 400 -
+[20/Jul/2025 03:00:32] code 400, message Bad HTTP/0.9 request type ('\x00\x00\x00TZ\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x04\x010I\x00\x00\x00\x00\x8ed¨À\x00\x00¤\x0f')
+[20/Jul/2025 03:00:32] "   TZ          0I    d¨À  ¤ û tsXrcsXYs9                      bbssYrrttb      " 400 -
+[20/Jul/2025 03:15:41] code 400, message Bad HTTP/0.9 request type ('\x00\x00\x00TZ\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x04\x010I\x00\x00\x00\x00\x8ed¨À\x00\x00¤\x0f')
+[20/Jul/2025 03:15:41] "   TZ          0I    d¨À  ¤ û tsXrcsXYs9                      csrscstsXb      " 400 -
+[20/Jul/2025 03:30:50] code 400, message Bad HTTP/0.9 request type ('\x00\x00\x00TZ\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x04\x010I\x00\x00\x00\x00\x8ed¨À\x00\x00¤\x0f')
+[20/Jul/2025 03:30:50] "   TZ          0I    d¨À  ¤ û tsXrcsXYs9                      srcYcsbbtX      " 400 -
+[20/Jul/2025 03:46:00] code 400, message Bad HTTP/0.9 request type ('\x00\x00\x00TZ\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x04\x010I\x00\x00\x00\x00\x8ed¨À\x00\x00¤\x0f')
+[20/Jul/2025 03:46:00] "   TZ          0I    d¨À  ¤ û tsXrcsXYs9                      strYsYbct       " 400 -
+[20/Jul/2025 04:01:08] code 400, message Bad HTTP/0.9 request type ('\x00\x00\x00TZ\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x04\x010I\x00\x00\x00\x00\x8ed¨À\x00\x00¤\x0f')
+[20/Jul/2025 04:01:08] "   TZ          0I    d¨À  ¤ û tsXrcsXYs9                      sscXssrX9       " 400 -
+[20/Jul/2025 04:06:45] "GET / HTTP/1.1" 302 0
+[20/Jul/2025 04:06:45] "GET /login/?next=/ HTTP/1.1" 200 1706
+[20/Jul/2025 04:16:18] code 400, message Bad HTTP/0.9 request type ('\x00\x00\x00TZ\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x04\x010I\x00\x00\x00\x00\x8ed¨À\x00\x00¤\x0f')
+[20/Jul/2025 04:16:18] "   TZ          0I    d¨À  ¤ û tsXrcsXYs9                      ctctXtttst      " 400 -
+[20/Jul/2025 04:31:27] code 400, message Bad HTTP/0.9 request type ('\x00\x00\x00TZ\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x04\x010I\x00\x00\x00\x00\x8ed¨À\x00\x00¤\x0f')
+[20/Jul/2025 04:31:27] "   TZ          0I    d¨À  ¤ û tsXrcsXYs9                      bXYcXsX9cr      " 400 -
+[20/Jul/2025 04:46:37] code 400, message Bad HTTP/0.9 request type ('\x00\x00\x00TZ\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x04\x010I\x00\x00\x00\x00\x8ed¨À\x00\x00¤\x0f')
+[20/Jul/2025 04:46:37] "   TZ          0I    d¨À  ¤ û tsXrcsXYs9                      s9csrYcrtX      " 400 -
+[20/Jul/2025 04:54:53] "GET / HTTP/1.1" 302 0
+[20/Jul/2025 04:54:57] code 505, message Invalid HTTP version (2.0)
+[20/Jul/2025 04:54:57] "PRI * HTTP/2.0" 505 -
+[20/Jul/2025 04:55:09] "GET /login/ HTTP/1.1" 200 1706
+Not Found: /favicon.ico
+[20/Jul/2025 04:55:10] "GET /favicon.ico HTTP/1.1" 404 3356
+[20/Jul/2025 04:55:12] code 505, message Invalid HTTP version (2.0)
+[20/Jul/2025 04:55:12] "PRI * HTTP/2.0" 505 -
+[20/Jul/2025 04:55:33] code 400, message Bad request version ('À\x14À')
+[20/Jul/2025 04:55:33] You're accessing the development server over HTTPS, but it only supports HTTP.
+Not Found: /sitemap.xml
+[20/Jul/2025 04:55:36] "GET /sitemap.xml HTTP/1.1" 404 3356
+Not Found: /google.com:443
+[20/Jul/2025 04:56:06] "CONNECT google.com:443 HTTP/1.1" 404 1791
+[20/Jul/2025 05:01:47] code 400, message Bad HTTP/0.9 request type ('\x00\x00\x00TZ\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x04\x010I\x00\x00\x00\x00\x8ed¨À\x00\x00¤\x0f')
+[20/Jul/2025 05:01:47] "   TZ          0I    d¨À  ¤ û tsXrcsXYs9                      bcc9rt9cYt      " 400 -
+[20/Jul/2025 05:17:00] code 400, message Bad HTTP/0.9 request type ('\x00\x00\x00TZ\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x04\x010I\x00\x00\x00\x00\x8ed¨À\x00\x00¤\x0f')
+[20/Jul/2025 05:17:00] "   TZ          0I    d¨À  ¤ û tsXrcsXYs9                      ssXcrstsYs      " 400 -
+[20/Jul/2025 06:25:34] "GET / HTTP/1.1" 302 0
+[20/Jul/2025 06:25:34] "GET /login/?next=/ HTTP/1.1" 200 1706
+[20/Jul/2025 08:49:20,081] - Broken pipe from ('87.251.64.11', 64723)
+[20/Jul/2025 08:54:04] code 400, message Bad request syntax ('SSH-2.0-Go')
+[20/Jul/2025 08:54:04] "SSH-2.0-Go" 400 -
+[20/Jul/2025 09:34:18] "GET / HTTP/1.1" 302 0
+[20/Jul/2025 09:34:24] "GET / HTTP/1.1" 302 0
+[20/Jul/2025 09:34:24] "GET /login/?next=/ HTTP/1.1" 200 1706
+Not Found: /favicon.ico
+[20/Jul/2025 09:34:34] "GET /favicon.ico HTTP/1.1" 404 3356
+Not Found: /http:/api.ipify.org/
+[20/Jul/2025 09:34:38] "GET http://api.ipify.org/?format=json HTTP/1.1" 404 1818
+Not Found: /www.shadowserver.org:443
+[20/Jul/2025 09:34:41] "CONNECT www.shadowserver.org:443 HTTP/1.1" 404 1827
+[20/Jul/2025 10:01:48] "GET / HTTP/1.1" 302 0
+[20/Jul/2025 11:41:12] code 400, message Bad request version ('À\x14À')
+[20/Jul/2025 11:41:12] You're accessing the development server over HTTPS, but it only supports HTTP.
+[20/Jul/2025 12:02:49] "GET / HTTP/1.1" 302 0
+[20/Jul/2025 12:02:49] "GET /login/?next=/ HTTP/1.1" 200 1706
+[20/Jul/2025 12:31:38] code 400, message Bad HTTP/0.9 request type ('\x16\x03\x01\x00{\x01\x00\x00w\x03\x03÷\x80hö\x8dlÎè×')
+[20/Jul/2025 12:31:38] You're accessing the development server over HTTPS, but it only supports HTTP.
+[20/Jul/2025 12:31:38] code 400, message Bad request version ('À\x14À')
+[20/Jul/2025 12:31:38] You're accessing the development server over HTTPS, but it only supports HTTP.
+[20/Jul/2025 12:31:39] "GET / HTTP/1.1" 302 0
+[20/Jul/2025 12:31:39] "GET /login/?next=/ HTTP/1.1" 200 1706
+[20/Jul/2025 12:31:40] "GET /login HTTP/1.1" 301 0
+[20/Jul/2025 12:31:40] "GET /login/ HTTP/1.1" 200 1706
+[20/Jul/2025 13:07:56,540] - Broken pipe from ('206.168.34.123', 48226)
+[20/Jul/2025 13:37:09] "GET / HTTP/1.1" 302 0
+[20/Jul/2025 13:37:10,292] - Broken pipe from ('147.185.132.114', 59932)
+[20/Jul/2025 13:57:27] code 400, message Bad request syntax ('MGLNDD_43.162.120.233_8000')
+[20/Jul/2025 13:57:27] "MGLNDD_43.162.120.233_8000" 400 -
+[20/Jul/2025 14:06:45] "GET / HTTP/1.1" 302 0
+[20/Jul/2025 14:06:45] "GET /login/?next=/ HTTP/1.1" 200 1706
+Not Found: /login/favicon.ico
+[20/Jul/2025 14:06:45] "GET /login/favicon.ico HTTP/1.1" 404 3369
+[20/Jul/2025 15:56:04] "GET / HTTP/1.1" 302 0
+[20/Jul/2025 15:56:04] "GET /login/?next=/ HTTP/1.1" 200 1706
+Not Found: /api/contents
+[20/Jul/2025 15:56:05] "GET /api/contents?type=directory HTTP/1.1" 404 3374
+[20/Jul/2025 15:56:05,470] - Broken pipe from ('141.98.11.174', 59738)
+[20/Jul/2025 16:07:40] "GET / HTTP/1.1" 302 0
+[20/Jul/2025 16:07:41] "GET /login/?next=/ HTTP/1.1" 200 1706
+[20/Jul/2025 16:07:43] "GET / HTTP/1.1" 302 0
+[20/Jul/2025 16:07:43] "GET /login/?next=/ HTTP/1.1" 200 1706
+[20/Jul/2025 18:02:58] code 400, message Bad request syntax ('SSH-2.0-Go')
+[20/Jul/2025 18:02:58] "SSH-2.0-Go" 400 -
+[20/Jul/2025 20:51:41] "GET / HTTP/1.1" 302 0
+[20/Jul/2025 20:56:54] code 400, message Bad HTTP/0.9 request type ('\x03\x00\x00/*à\x00\x00\x00\x00\x00Cookie:')
+[20/Jul/2025 20:56:54] "  /*à     Cookie: mstshash=Administr" 400 -
+[20/Jul/2025 21:05:58] "GET / HTTP/1.1" 302 0
+[20/Jul/2025 21:05:58] "GET /login/?next=/ HTTP/1.1" 200 1706
+[20/Jul/2025 23:50:06] "GET / HTTP/1.1" 302 0
+[20/Jul/2025 23:50:06] "GET /login/?next=/ HTTP/1.1" 200 1706
+[21/Jul/2025 00:07:10] code 400, message Bad request syntax ('JDWP-Handshake')
+[21/Jul/2025 00:07:10] "JDWP-Handshake" 400 -
+[21/Jul/2025 01:14:35] code 400, message Bad request version ('À#À¬À®À+À')
+[21/Jul/2025 01:14:35] You're accessing the development server over HTTPS, but it only supports HTTP.
+[21/Jul/2025 01:14:38] "GET / HTTP/1.1" 302 0
+[21/Jul/2025 01:24:39] code 400, message Bad request version ('À#À¬À®À+À')
+[21/Jul/2025 01:24:39] You're accessing the development server over HTTPS, but it only supports HTTP.
+[21/Jul/2025 01:24:45] "GET / HTTP/1.1" 302 0
+Not Found: /favicon.ico
+[21/Jul/2025 01:28:07] "GET /favicon.ico HTTP/1.1" 404 3356
+[21/Jul/2025 01:28:21] "GET /login/?next=/ HTTP/1.1" 200 1706
+[21/Jul/2025 01:33:15] "GET /login/?next=/ HTTP/1.1" 200 1706
+Not Found: /favicon.ico
+[21/Jul/2025 01:41:11] "GET /favicon.ico HTTP/1.1" 404 3356
+Not Found: /favicon.ico
+[21/Jul/2025 01:41:35] "GET /favicon.ico HTTP/1.1" 404 3356
+Not Found: /favicon.ico
+[21/Jul/2025 01:42:10] "GET /favicon.ico HTTP/1.1" 404 3356
+[21/Jul/2025 02:16:10] "GET / HTTP/1.1" 302 0
+[21/Jul/2025 02:16:11] "GET / HTTP/1.1" 302 0
+[21/Jul/2025 02:16:11] "GET /login/?next=/ HTTP/1.1" 200 1706
+[21/Jul/2025 02:16:16] code 400, message Bad request version ('À\x14À')
+[21/Jul/2025 02:16:16] You're accessing the development server over HTTPS, but it only supports HTTP.
+[21/Jul/2025 02:16:17] code 400, message Bad request version ('À\x14À')
+[21/Jul/2025 02:16:17] You're accessing the development server over HTTPS, but it only supports HTTP.
+[21/Jul/2025 02:16:38] code 400, message Bad request syntax ('SSH-2.0-Go')
+[21/Jul/2025 02:16:38] "SSH-2.0-Go" 400 -
+[21/Jul/2025 02:42:17] "GET / HTTP/1.1" 302 0
+[21/Jul/2025 02:42:23,888] - Broken pipe from ('198.235.24.204', 64250)
+[21/Jul/2025 02:44:10] code 400, message Bad request syntax ('JDWP-Handshake')
+[21/Jul/2025 02:44:10] "JDWP-Handshake" 400 -
+[21/Jul/2025 02:52:15] "GET / HTTP/1.1" 302 0
+[21/Jul/2025 02:52:26] "GET / HTTP/1.1" 302 0
+[21/Jul/2025 02:52:26] "GET /login/?next=/ HTTP/1.1" 200 1706
+Not Found: /favicon.ico
+[21/Jul/2025 02:52:37] "GET /favicon.ico HTTP/1.1" 404 3356
+Not Found: /http:/api.ipify.org/
+[21/Jul/2025 02:52:41] "GET http://api.ipify.org/?format=json HTTP/1.1" 404 1818
+Not Found: /www.shadowserver.org:443
+[21/Jul/2025 02:52:44] "CONNECT www.shadowserver.org:443 HTTP/1.1" 404 1827
+[21/Jul/2025 03:58:10] code 400, message Bad request syntax ('\x16\x03\x01\x00{\x01\x00\x00w\x03\x03È¨ØVS¶¿/0Ö\x04QO¥uð')
+[21/Jul/2025 03:58:10] You're accessing the development server over HTTPS, but it only supports HTTP.
+[21/Jul/2025 03:58:10] code 400, message Bad request version ('À\x14À')
+[21/Jul/2025 03:58:10] You're accessing the development server over HTTPS, but it only supports HTTP.
+[21/Jul/2025 03:58:10] "GET / HTTP/1.1" 302 0
+[21/Jul/2025 03:58:10] "GET /login/?next=/ HTTP/1.1" 200 1706
+[21/Jul/2025 03:58:10] "GET /login HTTP/1.1" 301 0
+[21/Jul/2025 03:58:10] "GET /login/ HTTP/1.1" 200 1706
+[21/Jul/2025 04:20:37] "GET / HTTP/1.1" 302 0
+[21/Jul/2025 04:20:37] "GET /login/?next=/ HTTP/1.1" 200 1706
+[21/Jul/2025 04:28:49] code 400, message Bad request version ('À\x14À')
+[21/Jul/2025 04:28:49] You're accessing the development server over HTTPS, but it only supports HTTP.
+[21/Jul/2025 04:28:49] code 400, message Bad request syntax ('MGLNDD_43.162.120.233_8000')
+[21/Jul/2025 04:28:49] "MGLNDD_43.162.120.233_8000" 400 -
+[21/Jul/2025 04:30:07] "GET / HTTP/1.1" 302 0
+[21/Jul/2025 05:33:48] code 400, message Bad request syntax ('\x05\x02\x00\x02')
+[21/Jul/2025 05:33:48] " " 400 -
+Not Found: /www.google-analytics.com:80
+[21/Jul/2025 05:33:48] "CONNECT www.google-analytics.com:80 HTTP/1.1" 404 1843
+[21/Jul/2025 05:47:04] "GET / HTTP/1.0" 302 0
+[21/Jul/2025 05:47:09] code 400, message Bad HTTP/0.9 request type ('l\x00')
+[21/Jul/2025 05:47:09] "l          " 400 -
+Not Found: /nice ports,/Trinity.txt.bak
+[21/Jul/2025 05:47:09] "GET /nice%20ports%2C/Tri%6Eity.txt%2ebak HTTP/1.0" 404 3413
+[21/Jul/2025 05:47:09] code 400, message Bad request syntax ('\x05\x04\x00\x01\x02\x80\x05\x01\x00\x03')
+[21/Jul/2025 05:47:09] "  " 400 -
+[21/Jul/2025 05:47:14] code 400, message Bad request syntax ('\x04\x01\x00\x16\x7f\x00\x00\x01root\x00')
+[21/Jul/2025 05:47:14] "   root " 400 -
+[21/Jul/2025 05:47:14] "OPTIONS / HTTP/1.0" 302 0
+[21/Jul/2025 05:47:14] code 400, message Bad request version ('RTSP/1.0')
+[21/Jul/2025 05:47:14] "OPTIONS / RTSP/1.0" 400 -
+[21/Jul/2025 05:47:19] code 400, message Bad request version ('\x00\x01\x97|\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00')
+[21/Jul/2025 05:47:19] "  (rþ          |                    " 400 -
+[21/Jul/2025 05:47:24] code 400, message Bad HTTP/0.9 request type ('\x00')
+[21/Jul/2025 05:47:24] "          versionbind   " 400 -
+[21/Jul/2025 05:47:24] code 400, message Bad request syntax ('HELP')
+[21/Jul/2025 05:47:24] "HELP" 400 -
+[21/Jul/2025 05:47:24] code 400, message Bad request syntax ('\x16\x03\x00\x00S\x01\x00\x00O\x03\x00?G×÷º,îê²`~ó\x00ý\x82{¹Õ\x96Èw\x9bæÄÛ<=Ûoï\x10n\x00\x00(\x00\x16\x00\x13\x00')
+[21/Jul/2025 05:47:24] You're accessing the development server over HTTPS, but it only supports HTTP.
+[21/Jul/2025 05:47:25] code 400, message Bad request version ('\x00/\x00')
+[21/Jul/2025 05:47:25] You're accessing the development server over HTTPS, but it only supports HTTP.
+[21/Jul/2025 05:47:25] code 400, message Bad request syntax ('\x00\x00\x00qj\x81n0\x81k¡\x03\x02\x01\x05¢\x03\x02\x01')
+[21/Jul/2025 05:47:25] "   qjn0k¡¢" 400 -
+[21/Jul/2025 05:47:30] code 400, message Bad request version ('0.12\x00')
+[21/Jul/2025 05:47:30] "   ¤ÿSMBr    @              @     PC NETWORK PROGRAM 1.0 MICROSOFT NETWORKS 1.03 MICROSOFT NETWORKS 3.0 LANMAN1.0 LM1.2X002 Samba NT LANMAN 1.0 NT LM 0.12 " 400 -
+[21/Jul/2025 05:47:30] code 400, message Bad request version ('SIP/2.0')
+[21/Jul/2025 05:47:30] "OPTIONS sip:nm SIP/2.0" 400 -
+[21/Jul/2025 05:47:35] code 400, message Bad HTTP/0.9 request type ('AMQP\x00\x00')
+[21/Jul/2025 05:47:35] "AMQP  	" 400 -
+Not Found: /devicedesc.xml
+[21/Jul/2025 05:47:35] "GET /devicedesc.xml HTTP/1.1" 404 3372
+[21/Jul/2025 05:47:40] code 400, message Bad request version ('\x00/\x00')
+[21/Jul/2025 05:47:40] You're accessing the development server over HTTPS, but it only supports HTTP.
+[21/Jul/2025 05:47:40] "GET / HTTP/1.1" 302 0
+[21/Jul/2025 05:47:40] "GET /login/?next=/ HTTP/1.1" 200 1706
+Not Found: /favicon.ico
+[21/Jul/2025 05:47:40] "GET /favicon.ico HTTP/1.1" 404 3356
+[21/Jul/2025 06:00:32] "GET / HTTP/1.1" 302 0
+[21/Jul/2025 06:00:36] code 505, message Invalid HTTP version (2.0)
+[21/Jul/2025 06:00:36] "PRI * HTTP/2.0" 505 -
+[21/Jul/2025 06:01:02] "GET /login/ HTTP/1.1" 200 1706
+Not Found: /favicon.ico
+[21/Jul/2025 06:01:09] "GET /favicon.ico HTTP/1.1" 404 3356
+[21/Jul/2025 06:01:13] code 505, message Invalid HTTP version (2.0)
+[21/Jul/2025 06:01:13] "PRI * HTTP/2.0" 505 -
+[21/Jul/2025 06:01:40] code 400, message Bad request version ('À\x14À')
+[21/Jul/2025 06:01:40] You're accessing the development server over HTTPS, but it only supports HTTP.
+[21/Jul/2025 06:01:44] "GET /login HTTP/1.1" 301 0
+[21/Jul/2025 10:49:48,694] - Broken pipe from ('87.251.64.11', 64604)
+[21/Jul/2025 13:42:30] "GET / HTTP/1.1" 302 0
+[21/Jul/2025 13:42:36,426] - Broken pipe from ('147.185.132.103', 60220)
+Not Found: /ipv4-internet.yandex.net:443
+[21/Jul/2025 13:55:54] "CONNECT ipv4-internet.yandex.net:443 HTTP/1.1" 404 1847
+[21/Jul/2025 14:23:17] code 400, message Bad request version ('$¶.\x95\x03É\x8cÎÏH\x90Å%')
+[21/Jul/2025 14:23:17] "   àZ          =K   ¬VÑ	o admin                                           0 Ài+Sl$¶.ÉÎÏHÅ%" 400 -
+[21/Jul/2025 14:27:51,508] - Broken pipe from ('15.235.131.121', 38152)
+[21/Jul/2025 14:37:02] code 400, message Bad request version ('\x83MÍDM\x11\x19º£\x03\x86')
+[21/Jul/2025 14:37:02] "   àZ          =K   ¬VÑ	o admin                                           0 ½þÐñÚMiÐ®Å*Ý­UsÚùïÕJ$¡Ã'°ÕúXPV«¢;Ñ5ÄKSîÇQÖ]>JÛ1!¬$äZ3ôå¹ÎIØVLtoAèÞþÑÑèÍÎóþ8s(gÒägVMÍDMº£" 400 -
+Not Found: /httpbin.org:443
+[21/Jul/2025 16:12:16] "CONNECT httpbin.org:443 HTTP/1.1" 404 1795
+Not Found: /http:/149.130.171.76:5000
+[21/Jul/2025 17:29:50] "GET http://149.130.171.76:5000 HTTP/1.1" 404 1827
+Not Found: /http:/149.130.171.76:5000
+[21/Jul/2025 17:29:50] "GET http://149.130.171.76:5000 HTTP/1.1" 404 1827
+[21/Jul/2025 18:38:18,829] - Broken pipe from ('167.94.145.97', 60460)
+[21/Jul/2025 18:38:22] "GET / HTTP/1.1" 302 0
+[21/Jul/2025 18:38:28,608] - Broken pipe from ('167.94.145.97', 60472)
+[21/Jul/2025 18:38:33] "GET / HTTP/1.1" 302 0
+[21/Jul/2025 18:38:34] code 505, message Invalid HTTP version (2.0)
+[21/Jul/2025 18:38:34] "PRI * HTTP/2.0" 505 -
+[21/Jul/2025 18:38:39] "GET /login/ HTTP/1.1" 200 1706
+Not Found: /favicon.ico
+[21/Jul/2025 18:38:44] "GET /favicon.ico HTTP/1.1" 404 3356
+[21/Jul/2025 18:38:45] code 505, message Invalid HTTP version (2.0)
+[21/Jul/2025 18:38:45] "PRI * HTTP/2.0" 505 -
+[21/Jul/2025 18:38:51] code 400, message Bad request version ('À\x14À')
+[21/Jul/2025 18:38:51] You're accessing the development server over HTTPS, but it only supports HTTP.
+Not Found: /security.txt
+[21/Jul/2025 18:38:53] "GET /security.txt HTTP/1.1" 404 3359
+[21/Jul/2025 19:44:55] code 400, message Bad request syntax ('\x00\x00\x00l\x00\x00\x00\x00\x00\x00\x00\x0e\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x04\x00\x00\x00\x00\x00')
+[21/Jul/2025 19:44:55] "   l                                                                                                      " 400 -
+[21/Jul/2025 19:44:55] code 400, message Bad request version ('À\x13À')
+[21/Jul/2025 19:44:55] You're accessing the development server over HTTPS, but it only supports HTTP.
+[21/Jul/2025 20:05:12] "GET / HTTP/1.1" 302 0
+[21/Jul/2025 20:05:12] "GET /login/?next=/ HTTP/1.1" 200 1706
+[21/Jul/2025 21:32:19] code 400, message Bad HTTP/0.9 request type ('\x03\x00\x00/*à\x00\x00\x00\x00\x00Cookie:')
+[21/Jul/2025 21:32:19] "  /*à     Cookie: mstshash=Administr" 400 -
+[21/Jul/2025 22:57:12] code 400, message Bad request syntax ('MGLNDD_43.162.120.233_8000')
+[21/Jul/2025 22:57:12] "MGLNDD_43.162.120.233_8000" 400 -
+Not Found: /httpbin.org:443
+[21/Jul/2025 23:00:37] "CONNECT httpbin.org:443 HTTP/1.1" 404 1795
+[21/Jul/2025 23:06:40] code 400, message Bad HTTP/0.9 request type ('\x03\x00\x00/*à\x00\x00\x00\x00\x00Cookie:')
+[21/Jul/2025 23:06:40] "  /*à     Cookie: mstshash=Administr" 400 -
+[22/Jul/2025 00:18:52] code 400, message Bad request version ('À\x14À')
+[22/Jul/2025 00:18:52] You're accessing the development server over HTTPS, but it only supports HTTP.
+[22/Jul/2025 00:18:52] code 400, message Bad HTTP/0.9 request type ('\x16\x03\x01\x00{\x01\x00\x00w\x03\x03z´ë\x18¿E?°\x0fm¼hA\x06\x14s\x99úÌ\xad\x9d0Øk¿*¬ÉÿA^\x05\x00\x00\x1aÀ/À+À\x11À\x07À\x13À')
+[22/Jul/2025 00:18:52] You're accessing the development server over HTTPS, but it only supports HTTP.
+[22/Jul/2025 00:18:52] "GET / HTTP/1.1" 302 0
+[22/Jul/2025 00:18:53] "GET /login/?next=/ HTTP/1.1" 200 1706
+[22/Jul/2025 00:18:53] "GET /login HTTP/1.1" 301 0
+[22/Jul/2025 00:18:53] "GET /login/ HTTP/1.1" 200 1706
+Not Found: /httpbin.org:443
+[22/Jul/2025 00:47:05] "CONNECT httpbin.org:443 HTTP/1.1" 404 1795
+Not Found: /http:/passport.baidu.com/
+[22/Jul/2025 01:31:06] "GET http://passport.baidu.com/ HTTP/1.1" 404 1829
+[22/Jul/2025 01:31:16] code 400, message Bad request syntax ('\x04\x01\x00Pg)§ê\x00')
+[22/Jul/2025 01:31:16] " Pg)§ê " 400 -
+[22/Jul/2025 01:31:27] code 400, message Bad request syntax ('\x05\x01\x00')
+[22/Jul/2025 01:31:27] " " 400 -
+[22/Jul/2025 02:45:24] "GET / HTTP/1.1" 302 0
+[22/Jul/2025 02:45:29,562] - Broken pipe from ('198.235.24.31', 65178)
+[22/Jul/2025 04:54:37] code 400, message Bad request version ('À\x13À')
+[22/Jul/2025 04:54:37] You're accessing the development server over HTTPS, but it only supports HTTP.
+[22/Jul/2025 05:47:41] "GET / HTTP/1.1" 302 0
+[22/Jul/2025 05:47:42] "GET /login/?next=/ HTTP/1.1" 200 1706
+[22/Jul/2025 05:50:06] "GET / HTTP/1.1" 302 0
+[22/Jul/2025 05:52:14] code 400, message Bad request syntax ('\x16\x03\x01\x00{\x01\x00\x00w\x03\x03\x04eö\x92\x04ê°üEÂ\x87pÛ[&ª\x16´Ï1')
+[22/Jul/2025 05:52:14] You're accessing the development server over HTTPS, but it only supports HTTP.
+[22/Jul/2025 05:53:03] code 400, message Bad request syntax ('SSH-2.0-Go')
+[22/Jul/2025 05:53:03] "SSH-2.0-Go" 400 -
+[22/Jul/2025 05:54:50] code 400, message Bad HTTP/0.9 request type ('\x16\x03\x01\x00{\x01\x00\x00w\x03\x03w\x8dï>¶¦\x08(#´Bs\x08{aÍ´:\xad\x9a\x9aìÉz\x14%~")oW¢\x00\x00\x1aÀ/À+À\x11À\x07À\x13À')
+[22/Jul/2025 05:54:50] You're accessing the development server over HTTPS, but it only supports HTTP.
+[22/Jul/2025 05:56:24] "GET / HTTP/1.1" 302 0
+[22/Jul/2025 05:56:25] "GET /login/?next=/ HTTP/1.1" 200 1706
+[22/Jul/2025 05:56:26] "GET / HTTP/1.1" 302 0
+[22/Jul/2025 05:56:27] "GET /login/?next=/ HTTP/1.1" 200 1706
+[22/Jul/2025 06:38:09] "GET / HTTP/1.1" 302 0
+[22/Jul/2025 06:38:09,297] - Broken pipe from ('205.210.31.100', 62844)
+Not Found: /google.com:443
+[22/Jul/2025 06:39:24] "CONNECT google.com:443 HTTP/1.1" 404 1791
+/home/OnLineDjangoChat/chatProject/chatApp/models.py changed, reloading.
+/usr/lib/python3/dist-packages/django/db/models/base.py:366: RuntimeWarning: Model 'chatApp.chatuser' was already registered. Reloading models is not advised as it can lead to inconsistencies, most notably with related models.
+  new_class._meta.apps.register_model(new_class._meta.app_label, new_class)
+Watching for file changes with StatReloader
+Performing system checks...
+
+Exception in thread django-main-thread:
+Traceback (most recent call last):
+  File "/usr/lib/python3.12/threading.py", line 1073, in _bootstrap_inner
+    self.run()
+  File "/usr/lib/python3.12/threading.py", line 1010, in run
+    self._target(*self._args, **self._kwargs)
+  File "/usr/lib/python3/dist-packages/django/utils/autoreload.py", line 64, in wrapper
+    fn(*args, **kwargs)
+  File "/usr/lib/python3/dist-packages/django/core/management/commands/runserver.py", line 133, in inner_run
+    self.check(display_num_errors=True)
+  File "/usr/lib/python3/dist-packages/django/core/management/base.py", line 485, in check
+    all_issues = checks.run_checks(
+                 ^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3/dist-packages/django/core/checks/registry.py", line 88, in run_checks
+    new_errors = check(app_configs=app_configs, databases=databases)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3/dist-packages/django/contrib/auth/checks.py", line 29, in check_user_model
+    if not isinstance(cls.REQUIRED_FIELDS, (list, tuple)):
+                      ^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'ChatUser' has no attribute 'REQUIRED_FIELDS'
+/home/OnLineDjangoChat/chatProject/chatProject/urls.py changed, reloading.
+/usr/lib/python3/dist-packages/django/db/models/base.py:366: RuntimeWarning: Model 'chatApp.chatuser' was already registered. Reloading models is not advised as it can lead to inconsistencies, most notably with related models.
+  new_class._meta.apps.register_model(new_class._meta.app_label, new_class)
+Watching for file changes with StatReloader
+Performing system checks...
+
+Exception in thread django-main-thread:
+Traceback (most recent call last):
+  File "/usr/lib/python3.12/threading.py", line 1073, in _bootstrap_inner
+    self.run()
+  File "/usr/lib/python3.12/threading.py", line 1010, in run
+    self._target(*self._args, **self._kwargs)
+  File "/usr/lib/python3/dist-packages/django/utils/autoreload.py", line 64, in wrapper
+    fn(*args, **kwargs)
+  File "/usr/lib/python3/dist-packages/django/core/management/commands/runserver.py", line 133, in inner_run
+    self.check(display_num_errors=True)
+  File "/usr/lib/python3/dist-packages/django/core/management/base.py", line 485, in check
+    all_issues = checks.run_checks(
+                 ^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3/dist-packages/django/core/checks/registry.py", line 88, in run_checks
+    new_errors = check(app_configs=app_configs, databases=databases)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3/dist-packages/django/contrib/auth/checks.py", line 29, in check_user_model
+    if not isinstance(cls.REQUIRED_FIELDS, (list, tuple)):
+                      ^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'ChatUser' has no attribute 'REQUIRED_FIELDS'
+Watching for file changes with StatReloader
+Performing system checks...
+
+System check identified no issues (0 silenced).
+July 22, 2025 - 09:57:58
+Django version 4.2.11, using settings 'chatProject.settings'
+Starting development server at http://0.0.0.0:8000/
+Quit the server with CONTROL-C.
+
+Not Found: /
+[22/Jul/2025 10:17:58] "GET / HTTP/1.1" 404 3674
+Not Found: /
+[22/Jul/2025 10:18:07] "GET / HTTP/1.1" 404 3674
+Not Found: /
+[22/Jul/2025 10:20:05] "GET / HTTP/1.1" 404 3674
+Not Found: /
+[22/Jul/2025 10:21:08] "GET / HTTP/1.1" 404 3674
+Not Found: /
+[22/Jul/2025 10:23:07] "GET / HTTP/1.1" 404 3674
+Not Found: /
+[22/Jul/2025 10:25:06] "GET / HTTP/1.1" 404 3674
+Not Found: /
+[22/Jul/2025 10:26:06] "GET / HTTP/1.1" 404 3674
+Not Found: /
+[22/Jul/2025 10:27:09] "GET / HTTP/1.1" 404 3674
+Not Found: /
+[22/Jul/2025 10:29:13] "GET / HTTP/1.1" 404 3674
+Not Found: /
+[22/Jul/2025 10:31:07] "GET / HTTP/1.1" 404 3674
+Not Found: /
+[22/Jul/2025 10:33:07] "GET / HTTP/1.1" 404 3674
+Not Found: /
+[22/Jul/2025 10:33:11] "GET / HTTP/1.1" 404 3674
+Not Found: /favicon.ico
+[22/Jul/2025 10:33:33] "GET /favicon.ico HTTP/1.1" 404 3725
+Not Found: /http:/api.ipify.org/
+[22/Jul/2025 10:33:41] "GET http://api.ipify.org/?format=json HTTP/1.1" 404 1818
+Not Found: /www.shadowserver.org:443
+[22/Jul/2025 10:33:44] "CONNECT www.shadowserver.org:443 HTTP/1.1" 404 1827
+Not Found: /
+[22/Jul/2025 10:35:21] "GET / HTTP/1.1" 404 3674
+Not Found: /
+[22/Jul/2025 10:37:06] "GET / HTTP/1.1" 404 3674
+Not Found: /
+[22/Jul/2025 10:38:07] "GET / HTTP/1.1" 404 3674
+Not Found: /
+[22/Jul/2025 10:39:08] "GET / HTTP/1.1" 404 3674
+Not Found: /
+[22/Jul/2025 10:41:07] "GET / HTTP/1.1" 404 3674
+Not Found: /
+[22/Jul/2025 10:43:06] "GET / HTTP/1.1" 404 3674
+Not Found: /
+[22/Jul/2025 10:44:07] "GET / HTTP/1.1" 404 3674
+Not Found: /
+[22/Jul/2025 10:45:20] "GET / HTTP/1.1" 404 3674
+Not Found: /
+[22/Jul/2025 10:47:09] "GET / HTTP/1.1" 404 3674
+Not Found: /
+[22/Jul/2025 10:49:06] "GET / HTTP/1.1" 404 3674
+Not Found: /
+[22/Jul/2025 10:50:07] "GET / HTTP/1.1" 404 3674
+Not Found: /
+[22/Jul/2025 10:51:08] "GET / HTTP/1.1" 404 3674
+Not Found: /
+[22/Jul/2025 10:53:10] "GET / HTTP/1.1" 404 3674
+Not Found: /
+[22/Jul/2025 10:55:07] "GET / HTTP/1.1" 404 3674
+Not Found: /
+[22/Jul/2025 10:56:08] "GET / HTTP/1.1" 404 3674
+Not Found: /
+[22/Jul/2025 10:58:08] "GET / HTTP/1.1" 404 3674
+Not Found: /
+[22/Jul/2025 11:00:15] "GET / HTTP/1.1" 404 3674
+Not Found: /
+[22/Jul/2025 11:02:09] "GET / HTTP/1.1" 404 3674
+Not Found: /
+[22/Jul/2025 11:04:08] "GET / HTTP/1.1" 404 3674
+Not Found: /
+[22/Jul/2025 11:05:08] "GET / HTTP/1.1" 404 3674
+Not Found: /
+[22/Jul/2025 11:07:08] "GET / HTTP/1.1" 404 3674
+Not Found: /
+[22/Jul/2025 11:08:08] "GET / HTTP/1.1" 404 3674
+Not Found: /
+[22/Jul/2025 11:09:09] "GET / HTTP/1.1" 404 3674
+Not Found: /
+[22/Jul/2025 11:10:09] "GET / HTTP/1.1" 404 3674
+Not Found: /
+[22/Jul/2025 11:12:08] "GET / HTTP/1.1" 404 3674
+Not Found: /
+[22/Jul/2025 11:13:08] "GET / HTTP/1.1" 404 3674
+Not Found: /
+[22/Jul/2025 11:14:09] "GET / HTTP/1.1" 404 3674
+Not Found: /
+[22/Jul/2025 11:16:09] "GET / HTTP/1.1" 404 3674
+Not Found: /
+[22/Jul/2025 11:17:11] "GET / HTTP/1.1" 404 3674
+Not Found: /
+[22/Jul/2025 11:20:23] "GET / HTTP/1.1" 404 3674
+Not Found: /
+[22/Jul/2025 11:22:09] "GET / HTTP/1.1" 404 3674
+Not Found: /
+[22/Jul/2025 11:23:10] "GET / HTTP/1.1" 404 3674
+Not Found: /
+[22/Jul/2025 11:25:10] "GET / HTTP/1.1" 404 3674
+Not Found: /
+[22/Jul/2025 11:26:11] "GET / HTTP/1.1" 404 3674
+/home/OnLineDjangoChat/chatProject/chatApp/models.py changed, reloading.
+Watching for file changes with StatReloader
+Performing system checks...
+
+System check identified no issues (0 silenced).
+July 22, 2025 - 11:27:57
+Django version 4.2.11, using settings 'chatProject.settings'
+Starting development server at http://0.0.0.0:8000/
+Quit the server with CONTROL-C.
+
+Not Found: /
+[22/Jul/2025 11:28:10] "GET / HTTP/1.1" 404 3674
+Watching for file changes with StatReloader
+Performing system checks...
+
+System check identified no issues (0 silenced).
+July 22, 2025 - 11:48:00
+Django version 4.2.11, using settings 'chatProject.settings'
+Starting development server at http://0.0.0.0:8000/
+Quit the server with CONTROL-C.
+
+Not Found: /google.com:443
+[22/Jul/2025 13:07:45] "CONNECT google.com:443 HTTP/1.1" 404 1791
+Not Found: /
+[22/Jul/2025 13:36:56] "GET / HTTP/1.1" 404 3807
+[22/Jul/2025 13:36:59,824] - Broken pipe from ('205.210.31.91', 63088)
+[22/Jul/2025 13:39:58,946] - Broken pipe from ('167.94.146.61', 44018)
+Not Found: /
+[22/Jul/2025 13:40:02] "GET / HTTP/1.1" 404 3807
+[22/Jul/2025 13:40:02,558] - Broken pipe from ('167.94.146.61', 44058)
+Not Found: /
+[22/Jul/2025 13:40:06] "GET / HTTP/1.1" 404 3807
+[22/Jul/2025 13:40:07] code 505, message Invalid HTTP version (2.0)
+[22/Jul/2025 13:40:07] "PRI * HTTP/2.0" 505 -
+Not Found: /favicon.ico
+[22/Jul/2025 13:40:11] "GET /favicon.ico HTTP/1.1" 404 3858
+[22/Jul/2025 13:40:12] code 505, message Invalid HTTP version (2.0)
+[22/Jul/2025 13:40:12] "PRI * HTTP/2.0" 505 -
+[22/Jul/2025 13:40:17] code 400, message Bad request version ('À\x14À')
+[22/Jul/2025 13:40:17] You're accessing the development server over HTTPS, but it only supports HTTP.
+Not Found: /login
+[22/Jul/2025 13:40:18] "GET /login HTTP/1.1" 404 3840
+Not Found: /
+[22/Jul/2025 14:25:58] "GET / HTTP/1.1" 404 3811
+Not Found: /api/v2/heartbeat
+[22/Jul/2025 15:25:49] "GET /api/v2/heartbeat HTTP/1.1" 404 3873
+Not Found: /
+[22/Jul/2025 15:25:49] "GET / HTTP/1.1" 404 3807
+Not Found: /
+[22/Jul/2025 16:05:59] "GET / HTTP/1.1" 404 3807
+[22/Jul/2025 16:45:39] code 400, message Bad request version ('À\x13À')
+[22/Jul/2025 16:45:39] You're accessing the development server over HTTPS, but it only supports HTTP.
+Not Found: /httpbin.org:443
+[22/Jul/2025 17:07:05] "CONNECT httpbin.org:443 HTTP/1.1" 404 1795
+Not Found: /
+[22/Jul/2025 18:10:30] "GET / HTTP/1.0" 404 3814
+[22/Jul/2025 18:10:36] code 400, message Bad HTTP/0.9 request type ('l\x00')
+[22/Jul/2025 18:10:36] "l          " 400 -
+Not Found: /nice ports,/Trinity.txt.bak
+[22/Jul/2025 18:10:36] "GET /nice%20ports%2C/Tri%6Eity.txt%2ebak HTTP/1.0" 404 3915
+[22/Jul/2025 18:10:36] code 400, message Bad request syntax ('\x05\x04\x00\x01\x02\x80\x05\x01\x00\x03')
+[22/Jul/2025 18:10:36] "  " 400 -
+[22/Jul/2025 18:10:41] code 400, message Bad request syntax ('\x04\x01\x00\x16\x7f\x00\x00\x01root\x00')
+[22/Jul/2025 18:10:41] "   root " 400 -
+Not Found: /
+[22/Jul/2025 18:10:41] "OPTIONS / HTTP/1.0" 404 3818
+[22/Jul/2025 18:10:41] code 400, message Bad request version ('RTSP/1.0')
+[22/Jul/2025 18:10:41] "OPTIONS / RTSP/1.0" 400 -
+[22/Jul/2025 18:10:46] code 400, message Bad request version ('\x00\x01\x97|\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00')
+[22/Jul/2025 18:10:46] "  (rþ          |                    " 400 -
+[22/Jul/2025 18:10:51] code 400, message Bad HTTP/0.9 request type ('\x00')
+[22/Jul/2025 18:10:51] "          versionbind   " 400 -
+[22/Jul/2025 18:10:51] code 400, message Bad request syntax ('HELP')
+[22/Jul/2025 18:10:51] "HELP" 400 -
+[22/Jul/2025 18:10:52] code 400, message Bad request syntax ('\x16\x03\x00\x00S\x01\x00\x00O\x03\x00?G×÷º,îê²`~ó\x00ý\x82{¹Õ\x96Èw\x9bæÄÛ<=Ûoï\x10n\x00\x00(\x00\x16\x00\x13\x00')
+[22/Jul/2025 18:10:52] You're accessing the development server over HTTPS, but it only supports HTTP.
+[22/Jul/2025 18:10:52] code 400, message Bad request version ('\x00/\x00')
+[22/Jul/2025 18:10:52] You're accessing the development server over HTTPS, but it only supports HTTP.
+[22/Jul/2025 18:10:52] code 400, message Bad request syntax ('\x00\x00\x00qj\x81n0\x81k¡\x03\x02\x01\x05¢\x03\x02\x01')
+[22/Jul/2025 18:10:52] "   qjn0k¡¢" 400 -
+[22/Jul/2025 18:10:57] code 400, message Bad request version ('0.12\x00')
+[22/Jul/2025 18:10:57] "   ¤ÿSMBr    @              @     PC NETWORK PROGRAM 1.0 MICROSOFT NETWORKS 1.03 MICROSOFT NETWORKS 3.0 LANMAN1.0 LM1.2X002 Samba NT LANMAN 1.0 NT LM 0.12 " 400 -
+[22/Jul/2025 18:10:57] code 400, message Bad request version ('SIP/2.0')
+[22/Jul/2025 18:10:57] "OPTIONS sip:nm SIP/2.0" 400 -
+[22/Jul/2025 18:11:02] code 400, message Bad HTTP/0.9 request type ('AMQP\x00\x00')
+[22/Jul/2025 18:11:02] "AMQP  	" 400 -
+Not Found: /devicedesc.xml
+[22/Jul/2025 18:11:02] "GET /devicedesc.xml HTTP/1.1" 404 3874
+[22/Jul/2025 18:11:02] code 400, message Bad request version ('\x00/\x00')
+[22/Jul/2025 18:11:02] You're accessing the development server over HTTPS, but it only supports HTTP.
+Not Found: /
+[22/Jul/2025 18:11:02] "GET / HTTP/1.1" 404 3807
+Not Found: /favicon.ico
+[22/Jul/2025 18:11:03] "GET /favicon.ico HTTP/1.1" 404 3858
+Not Found: /
+[22/Jul/2025 18:16:38] "GET / HTTP/1.1" 404 3807
+Not Found: /
+[22/Jul/2025 18:16:53] "GET / HTTP/1.1" 404 3807
+[22/Jul/2025 19:06:13] code 400, message Bad request syntax ('SSH-2.0-Go')
+[22/Jul/2025 19:06:13] "SSH-2.0-Go" 400 -
+Not Found: /httpbin.org:443
+[22/Jul/2025 19:34:46] "CONNECT httpbin.org:443 HTTP/1.1" 404 1795
+Not Found: /
+[22/Jul/2025 20:07:21] "GET / HTTP/1.1" 404 3807
+Not Found: /aaa9
+[22/Jul/2025 21:05:01] "GET /aaa9 HTTP/1.1" 404 3837
+Not Found: /aab8
+[22/Jul/2025 21:05:02] "GET /aab8 HTTP/1.1" 404 3837
+Not Found: /
+[22/Jul/2025 21:05:02] "GET / HTTP/1.1" 404 3807
+[22/Jul/2025 21:54:17] code 400, message Bad HTTP/0.9 request type ('\x16\x03\x01\x00{\x01\x00\x00w\x03\x03\x00H\x9e=\x83^¨´áXNÌñ`Ò?²]\x922S.\x9bÊm¼\x03âA\x1b×ì\x00\x00\x1aÀ/À+À\x11À\x07À\x13À')
+[22/Jul/2025 21:54:17] You're accessing the development server over HTTPS, but it only supports HTTP.
+[22/Jul/2025 21:54:17] code 400, message Bad HTTP/0.9 request type ('\x16\x03\x01\x00{\x01\x00\x00w\x03\x03³\x8e\'Ì\x89I\x10À=D9C\x92\x87¼\x90Wú\x9d:Q"ó«ñÑÜ\x1a¿Ñ:Ü\x00\x00\x1aÀ/À+À\x11À\x07À\x13À')
+[22/Jul/2025 21:54:17] You're accessing the development server over HTTPS, but it only supports HTTP.
+Not Found: /
+[22/Jul/2025 21:54:18] "GET / HTTP/1.1" 404 3807
+Not Found: /login
+[22/Jul/2025 21:54:18] "GET /login HTTP/1.1" 404 3840
+[22/Jul/2025 22:35:20] code 400, message Bad HTTP/0.9 request type ('\x16\x03\x01\x00þ\x01\x00\x00ú\x03\x03ôñû9¹tg0äóË¬tÚjá>\x04hÁß\x18M\x89¹#&~Æ\x82\x9bù')
+[22/Jul/2025 22:35:20] You're accessing the development server over HTTPS, but it only supports HTTP.
+Not Found: /
+[22/Jul/2025 22:35:23] "GET / HTTP/1.1" 404 3807
+[22/Jul/2025 23:24:58] code 400, message Bad HTTP/0.9 request type ('\x03\x00\x00/*à\x00\x00\x00\x00\x00Cookie:')
+[22/Jul/2025 23:24:58] "  /*à     Cookie: mstshash=Administr" 400 -
+Not Found: /
+[23/Jul/2025 00:32:47] "GET / HTTP/1.1" 404 3807
+[23/Jul/2025 00:42:25] code 400, message Bad request syntax ('SSH-2.0-Go')
+[23/Jul/2025 00:42:25] "SSH-2.0-Go" 400 -
+Not Found: /
+[23/Jul/2025 01:46:03] "GET / HTTP/1.1" 404 3807
+Not Found: /console
+[23/Jul/2025 01:46:11] "GET /console HTTP/1.1" 404 3846
+Not Found: /
+[23/Jul/2025 02:38:04] "GET / HTTP/1.1" 404 3807
+[23/Jul/2025 02:38:04,954] - Broken pipe from ('205.210.31.218', 62812)
+Not Found: /
+[23/Jul/2025 03:55:35] "GET / HTTP/1.1" 404 3807
+[23/Jul/2025 03:55:35,958] - Broken pipe from ('106.52.109.61', 23544)
+[23/Jul/2025 04:49:16,181] - Broken pipe from ('167.94.146.51', 58318)
+Not Found: /
+[23/Jul/2025 04:49:19] "GET / HTTP/1.1" 404 3807
+[23/Jul/2025 04:49:19,498] - Broken pipe from ('167.94.146.51', 58344)
+Not Found: /
+[23/Jul/2025 04:49:23] "GET / HTTP/1.1" 404 3807
+[23/Jul/2025 04:49:24] code 505, message Invalid HTTP version (2.0)
+[23/Jul/2025 04:49:24] "PRI * HTTP/2.0" 505 -
+Not Found: /favicon.ico
+[23/Jul/2025 04:49:28] "GET /favicon.ico HTTP/1.1" 404 3858
+[23/Jul/2025 04:49:28] code 505, message Invalid HTTP version (2.0)
+[23/Jul/2025 04:49:28] "PRI * HTTP/2.0" 505 -
+[23/Jul/2025 04:49:31] code 400, message Bad request version ('À\x14À')
+[23/Jul/2025 04:49:31] You're accessing the development server over HTTPS, but it only supports HTTP.
+Not Found: /wiki
+[23/Jul/2025 04:49:32] "GET /wiki HTTP/1.1" 404 3837
+Not Found: /
+[23/Jul/2025 06:03:26] "GET / HTTP/1.1" 404 3807
+[23/Jul/2025 06:06:17] code 400, message Bad request version ('À\x14À')
+[23/Jul/2025 06:06:17] You're accessing the development server over HTTPS, but it only supports HTTP.
+[23/Jul/2025 06:08:24] code 400, message Bad request syntax ('SSH-2.0-Go')
+[23/Jul/2025 06:08:24] "SSH-2.0-Go" 400 -
+[23/Jul/2025 06:09:15] code 400, message Bad request version ('À\x14À')
+[23/Jul/2025 06:09:15] You're accessing the development server over HTTPS, but it only supports HTTP.
+Watching for file changes with StatReloader
+Performing system checks...
+
+System check identified no issues (0 silenced).
+July 23, 2025 - 06:22:54
+Django version 4.2.11, using settings 'chatProject.settings'
+Starting development server at http://0.0.0.0:8000/
+Quit the server with CONTROL-C.
+
+Watching for file changes with StatReloader
+Performing system checks...
+
+System check identified no issues (0 silenced).
+July 23, 2025 - 07:02:37
+Django version 4.2.11, using settings 'chatProject.settings'
+Starting development server at http://0.0.0.0:8000/
+Quit the server with CONTROL-C.
+
