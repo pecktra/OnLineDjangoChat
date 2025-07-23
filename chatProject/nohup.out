@@ -2111,3 +2111,18 @@ Django version 4.2.11, using settings 'chatProject.settings'
 Starting development server at http://0.0.0.0:8000/
 Quit the server with CONTROL-C.
 
+/home/OnLineDjangoChat/chatProject/chatProject/settings.py changed, reloading.
+Watching for file changes with StatReloader
+Performing system checks...
+
+System check identified some issues:
+
+WARNINGS:
+?: (staticfiles.W004) The directory '/home/OnLineDjangoChat/chatProject/templates/static' in the STATICFILES_DIRS setting does not exist.
+
+System check identified 1 issue (0 silenced).
+July 23, 2025 - 07:07:24
+Django version 4.2.11, using settings 'chatProject.settings'
+Starting development server at http://0.0.0.0:8000/
+Quit the server with CONTROL-C.
+
