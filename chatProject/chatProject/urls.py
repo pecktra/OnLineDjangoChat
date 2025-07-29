@@ -18,9 +18,10 @@ from django.contrib import admin
 from django.urls import path
 # from chatApp.views import home,user_login,user_signup,user_logout
 from chatApp.anchor import login , chat_data ,live
-from chatApp.client import login ,lives
+from chatApp.client import logins ,lives
 # 导入静态文件模块，为了显示上传图片
 from django.conf.urls.static import static
+from django.views.generic.base import RedirectView
 from . import settings
 # from chatApp import views
 
@@ -55,16 +56,21 @@ urlpatterns = [
 
 
     #客户端
-    path('api/users/register/', login.register),#注册
-    path('api/users/user_login/', login.user_login),#登录
-    path('api/users/is_logged_in/', login.is_logged_in),#检测是否登录
-    path('api/users/logout/', login.logout),#退出登录
+    path('api/users/client_register/', logins.client_register),#注册
+    path('api/users/user_login/', logins.user_login),#登录
+    path('api/users/is_logged_in/', logins.is_logged_in),#检测是否登录
+    path('api/users/logout/', logins.logout),#退出登录
 
     path('api/live/get_all_lives/', lives.get_all_lives),#获取正在直播的直播间列表
     path('api/live/get_live_info/', lives.get_live_info),#获取单个直播间信息
     path('api/live/get_live_chat_history/', lives.get_live_chat_history),#获取当前直播间主播历史消息数据
     path('api/live/get_user_chat_history/', lives.get_user_chat_history),#获取当前直播间用户历史消息数据   只获取最后20条数据
+    path('', RedirectView.as_view(url='api/live/redirect_to_random_room/')),
     path('api/live/redirect_to_random_room/', lives.redirect_to_random_room),  # 获取当前直播间用户历史消息数据   只获取最后20条数据
+    # path('/', lives.redirect_to_random_room),  # 获取当前直播间用户历史消息数据   只获取最后20条数据
+
+    path('live/<str:room_name>/<str:room_id>/', lives.live_to_room, name='live_to_room'),
+    path('api/live/save_user_chat_history/', lives.save_user_chat_history),  # 获取当前直播间用户历史消息数据   只获取最后20条数据
 ]
 
 

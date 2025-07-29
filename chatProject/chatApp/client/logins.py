@@ -15,7 +15,7 @@ from rest_framework.decorators import api_view, permission_classes
 from django_redis import get_redis_connection
 
 @api_view(['POST'])
-def register(request):
+def client_register(request):
     """
     用户注册接口
     接受 username、password、email 参数，并对每个字段做详细限制：
@@ -26,10 +26,12 @@ def register(request):
     """
     username = request.data.get('username')
     password = request.data.get('password')
-    email = request.data.get('email')
+    # email = request.data.get('email')
 
     # 检查必填字段是否提供
-    if not username or not password or not email:
+    # if not username or not password or not email:
+    #     return Response({"code": 1, "message": "Username, password, and email are required."}, status=400)
+    if not username or not password:
         return Response({"code": 1, "message": "Username, password, and email are required."}, status=400)
 
     # 对 username 进行格式验证：3-30个字符，可包含字母、数字、下划线和中文字符
@@ -47,23 +49,23 @@ def register(request):
         return Response({"code": 1, "message": "Password must contain at least one letter and one number."}, status=400)
 
     # 对 email 进行格式验证
-    try:
-        validate_email(email)
-    except ValidationError:
-        return Response({"code": 1, "message": "Invalid email format."}, status=400)
+    # try:
+    #     validate_email(email)
+    # except ValidationError:
+    #     return Response({"code": 1, "message": "Invalid email format."}, status=400)
 
     # 检查用户名是否已存在
     if ChatUser.objects.filter(username=username).exists():
         return Response({"code": 1, "message": "Username already exists."}, status=400)
 
-    # 检查邮箱是否已注册
-    if ChatUser.objects.filter(email=email).exists():
-        return Response({"code": 1, "message": "Email is already registered."}, status=400)
+    # # 检查邮箱是否已注册
+    # if ChatUser.objects.filter(email=email).exists():
+    #     return Response({"code": 1, "message": "Email is already registered."}, status=400)
 
     # 对密码进行加密处理
     password_hash = make_password(password)
     # 创建新用户记录
-    user_account = ChatUser.objects.create(username=username, password=password_hash, email=email)
+    user_account = ChatUser.objects.create(username=username, password=password_hash, email="")
 
     # 返回注册成功信息，不生成 token
     return Response({

@@ -102,3 +102,14 @@ class ChatUser(AbstractBaseUser):
 
     def __str__(self):
         return self.username
+
+class ChatUserChatHistory(models.Model):
+    room_name = models.CharField(max_length=255)
+    uid = models.CharField(max_length=255, default='0')
+    username = models.CharField(max_length=255)
+    user_message = models.TextField()
+    send_date = models.DateTimeField()
+    identity = models.SmallIntegerField(default=0)  # 0: 游客，1: 正常用户
+
+    class Meta:
+        db_table = 'chatApp_chatuser_chat_history'  # 映射到正确的表名
