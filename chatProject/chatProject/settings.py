@@ -199,8 +199,13 @@ MEDIA_ROOT = os.path.join(BASE_DIR,'media')
 # 通道存储设置
 CHANNEL_LAYERS = {
     "default": {
-        "BACKEND": "channels.layers.InMemoryChannelLayer",
-    }
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [(f"redis://{REDIS_HOST}:{REDIS_PORT}/10")],  # Redis 地址
+            "capacity": 1500,  # 默认 100，生产环境建议调大
+            "expiry": 10,      # 消息过期时间（秒）
+        },
+    },
 }
 #JWT 相关的认证
 REST_FRAMEWORK = {

@@ -39,7 +39,6 @@ def get_all_lives(request):
                 character_name = user.get("character_name", "Unknown")
                 live_key = f"live_status:{uid}:{character_name}"
                 status_str = redis_client.get(live_key)
-                print(f"Redis Key: {live_key}, Status: {status_str}")
 
                 if status_str and status_str.decode('utf-8') == "start":
                     room_id = hashlib.md5(collection_name.encode('utf-8')).hexdigest()
@@ -156,7 +155,6 @@ def get_live_chat_history(request):
             is_user = data.get("is_user", False)
 
             sender_name = message_username if is_user else message.get("character_name", "ai")
-            print(sender_name)
             chat_info.append({
                 "is_user": is_user,
                 "live_message": live_message,
@@ -164,7 +162,7 @@ def get_live_chat_history(request):
                 "send_date": send_date
             })
 
-        print(chat_info)
+
         return Response({
             "code": 0,
             "data": {
@@ -262,9 +260,7 @@ def redirect_to_random_room(request):
 
 
 def live_to_room(request, room_name, room_id):
-    print("222222222222222")
-    print(room_name)
-    print(room_id)
+
     """渲染直播间页面"""
     return render(request, 'room_v3.html', {'room_name': room_name, 'room_id': room_id})
 

@@ -41,7 +41,7 @@ def get_live_status(request):
                     if character_name:
                         # 4. 使用 Redis 查询该角色的直播状态
                         live_key = f"live_status:{uid}:{character_name}"
-                        print(live_key)
+
                         status_str = redis_client.get(live_key)
 
                         # 如果 Redis 中没有找到状态，则默认为不直播

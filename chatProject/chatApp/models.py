@@ -113,3 +113,59 @@ class ChatUserChatHistory(models.Model):
 
     class Meta:
         db_table = 'chatApp_chatuser_chat_history'  # 映射到正确的表名
+
+class UserBalance(models.Model):
+    user_id = models.IntegerField(unique=True, verbose_name="用户ID")  # 用户ID，指向用户表
+    balance = models.DecimalField(max_digits=10, decimal_places=2, default=0.00, verbose_name="用户余额")
+    last_updated = models.DateTimeField(auto_now=True, verbose_name="最后更新时间")
+
+    class Meta:
+        db_table = 'user_balance'
+        verbose_name = '用户余额'
+        verbose_name_plural = '用户余额'
+
+    def __str__(self):
+        return f"User {self.user_id} Balance: {self.balance}"
+
+class RechargeRecord(models.Model):
+    user_id = models.IntegerField(verbose_name="用户ID")  # 关联用户ID
+    amount = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="充值金额")
+    recharge_date = models.DateTimeField(auto_now_add=True, verbose_name="充值时间")
+    status = models.CharField(max_length=20, choices=[('pending', 'Pending'), ('completed', 'Completed'), ('failed', 'Failed')], default='completed', verbose_name="充值状态")
+
+    class Meta:
+        db_table = 'recharge_records'
+        verbose_name = '充值记录'
+        verbose_name_plural = '充值记录'
+
+    def __str__(self):
+        return f"User {self.user_id} Recharge {self.amount} at {self.recharge_date}"
+
+class DonationRecord(models.Model):
+    user_id = models.IntegerField(verbose_name="用户ID")  # 赠送打赏的用户
+    anchor_id = models.IntegerField(verbose_name="主播ID")  # 被打赏的主播
+    amount = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="打赏金额")
+    donation_date = models.DateTimeField(auto_now_add=True, verbose_name="打赏时间")
+    status = models.CharField(max_length=20, choices=[('pending', 'Pending'), ('completed', 'Completed'), ('failed', 'Failed')], default='completed', verbose_name="打赏状态")
+
+    class Meta:
+        db_table = 'donation_records'
+        verbose_name = '打赏记录'
+        verbose_name_plural = '打赏记录'
+
+    def __str__(self):
+        return f"User {self.user_id} donated {self.amount} to Anchor {self.anchor_id} on {self.donation_date}"
+
+class AnchorBalance(models.Model):
+    anchor_id = models.IntegerField(unique=True, verbose_name="主播ID")  # 主播ID
+    total_donations = models.DecimalField(max_digits=10, decimal_places=2, default=0.00, verbose_name="主播收到的总打赏金额")
+    balance = models.DecimalField(max_digits=10, decimal_places=2, default=0.00, verbose_name="主播当前余额")
+    last_updated = models.DateTimeField(auto_now=True, verbose_name="最后更新时间")
+
+    class Meta:
+        db_table = 'anchor_balance'
+        verbose_name = '主播余额'
+        verbose_name_plural = '主播余额'
+
+    def __str__(self):
+        return f"Anchor {self.anchor_id} Total Donations: {self.total_donations} Balance: {self.balance}"
