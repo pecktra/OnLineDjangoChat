@@ -2,7 +2,7 @@ from rest_framework.permissions import BasePermission
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.exceptions import AuthenticationFailed
 from django_redis import get_redis_connection
-
+from google.oauth2 import id_token
 
 class IsAuthenticatedOrGuest(BasePermission):
     """
@@ -39,3 +39,4 @@ class IsAuthenticatedOrGuest(BasePermission):
         else:
             # 如果没有 token，则认为是游客身份
             return True
+

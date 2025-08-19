@@ -91,8 +91,8 @@ main {
 
 .scrollarea {
     overflow-y: auto;
-    max-height: 300px;
-    min-height: 300px;
+    max-height: 600px;
+    min-height: 600px;
     
 }
 

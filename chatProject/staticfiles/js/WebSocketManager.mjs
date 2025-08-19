@@ -47,7 +47,7 @@ export default class WebSocketManager {
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
-            console.log('消息保存成功');
+
         } catch (error) {
             console.error('保存消息失败:', error);
             // 可选：重试逻辑或用户提示
@@ -58,15 +58,13 @@ export default class WebSocketManager {
 
 
     connect() {
-        this.socket = new WebSocket(`ws://${window.location.host}/ws/chat/${this.roomId}/${this.roomName}/`);
+        this.socket = new WebSocket(`wss://${window.location.host}/ws/chat/${this.roomId}/${this.roomName}/`);
 
         this.socket.onopen = (e) => {
-            console.log('WebSocket连接成功');
             this.reconnectAttempts = 0; // 重置重连尝试次数
         };
 
         this.socket.onclose = (e) => {
-            console.log('WebSocket连接断开');
             this.handleReconnect();
         };
 
@@ -89,7 +87,7 @@ export default class WebSocketManager {
 
     handleMessage(e) {
         const data = JSON.parse(e.data);
-        console.log('收到消息:', data);
+
 
         switch (data.type) {
             case 'chat_live_message':
@@ -110,6 +108,8 @@ export default class WebSocketManager {
     }
 
     appendLiveMessage(msg) {
+        const messageContent = msg.is_user  ? msg.live_message : msg.live_message_html;
+
         return `
                 <div class="chat-message ${msg.is_user ? 'user-message' : 'ai-message'} ">
                     <div class="message-content">
@@ -117,7 +117,10 @@ export default class WebSocketManager {
                             <span class="sender-name">${msg.sender_name}</span>
                             <span class="message-time">${this.convertTo24Hour(msg.send_date)}</span>
                         </div>
-                        <p>${msg.live_message}</p>
+                        <div class="mes_text">
+                            ${messageContent}
+                        </div>
+
                     </div>
                 </div>
             `;
@@ -171,7 +174,7 @@ export default class WebSocketManager {
 
     sendMessage() {
         const message = this.chatInput.value.trim();
-        console.log(message)
+        
         if (message && this.socket.readyState === WebSocket.OPEN) {
             // this.socket.send(JSON.stringify({ message }));
             this.socket.send(JSON.stringify({

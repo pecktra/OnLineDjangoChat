@@ -41,6 +41,7 @@ def chat_data(request):
     uid = request.data.get("uid")
     character_name = request.data.get("character_name")
     data_str = request.data.get("data")  # 获取 data 字段
+    mes_html = request.data.get("mes_html")
 
 
 
@@ -96,7 +97,8 @@ def chat_data(request):
             "room_id": room_id,
             "room_name": room_name,
             "data_type": data_type,
-            "data": data
+            "data": data,
+            "mes_html":mes_html
         })
 
         # 准备转发数据
@@ -106,14 +108,14 @@ def chat_data(request):
             'is_user': data.get('is_user', False),
             'sender_name': data.get('name') if data.get('is_user', False) else character_name,
             'send_date': data.get('send_date', ''),
-            'live_message': data.get('mes', '')
+            'live_message': data.get('mes', ''),
+            'live_message_html': mes_html
+            
         }
 
 
         # 转发 WebSocket 消息
-        print("11111111111111")
-        print(send_data['live_message'])
-        print(room_id)
+
         if send_data['live_message']:
             sync_send_to_websocket(room_id, send_data)
 

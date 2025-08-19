@@ -4,11 +4,16 @@ import ChatLiveManager from './chat_live.mjs';
 import StreamerInfoManager from "./streamer.mjs";
 import ChatUserManager from "./chat_user.mjs";
 import WebSocketManager from "./WebSocketManager.mjs";
+import RewardManager from "./reward_manager.mjs";
+
+
 
 
 // 统一初始化函数
 async  function initializeApp() {
-
+    vhCheck({
+        cssVarName: '--vh'  // 可选，默认就是 --vh
+    });
     const room_name = window.GLOBAL_ROOM_NAME;
     const room_id = window.GLOBAL_ROOM_ID;
 
@@ -30,6 +35,11 @@ async  function initializeApp() {
     //主播用户消息端
     ChatUserManager.init(room_name);
 
+    //打赏
+    RewardManager.init()
+
+
+
 
 
 
@@ -40,8 +50,7 @@ async  function initializeApp() {
 }
 //初始化websocket
 function initWebSocket(room_id,room_name,userName) {
-    console.log("initWebSocket")
-    console.log(userName)
+
     const wsManager = new WebSocketManager(room_id,room_name,userName);
     wsManager.init();
 

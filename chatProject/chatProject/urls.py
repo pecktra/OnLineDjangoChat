@@ -18,7 +18,7 @@ from django.contrib import admin
 from django.urls import path
 # from chatApp.views import home,user_login,user_signup,user_logout
 from chatApp.anchor import login , chat_data ,live
-from chatApp.client import logins ,lives
+from chatApp.client import logins ,lives,subscription,follow_live
 from chatApp.balance import balance
 # 导入静态文件模块，为了显示上传图片
 from django.conf.urls.static import static
@@ -54,6 +54,7 @@ urlpatterns = [
     #主播端直播状态
     path('api/live/get_live_status/', live.get_live_status),
     path('api/live/change_live_status/', live.change_live_status),
+    path('api/live/add_room_info/', live.add_room_info),
 
 
     #客户端
@@ -62,13 +63,20 @@ urlpatterns = [
     path('api/users/is_logged_in/', logins.is_logged_in),#检测是否登录
     path('api/users/logout/', logins.logout),#退出登录
 
+    # Google 登录相关 URL
+    path('api/users/google_login_url/', logins.google_oauth2_url),  # 获取 Google 登录授权 URL
+    path('api/users/google_oauth2_callback/', logins.google_oauth2_callback),  # Google 登录回调处理
+    path('api/users/is_google_logged_in/', logins.is_google_logged_in),#检测是否谷歌登录
+    path('api/users/google_logout/', logins.google_logout),#退出登录
+
     path('api/live/get_all_lives/', lives.get_all_lives),#获取正在直播的直播间列表
     path('api/live/get_live_info/', lives.get_live_info),#获取单个直播间信息
     path('api/live/get_live_chat_history/', lives.get_live_chat_history),#获取当前直播间主播历史消息数据
     path('api/live/get_user_chat_history/', lives.get_user_chat_history),#获取当前直播间用户历史消息数据   只获取最后20条数据
     path('', RedirectView.as_view(url='api/live/redirect_to_random_room/')),
-    path('api/live/redirect_to_random_room/', lives.redirect_to_random_room),  # 获取当前直播间用户历史消息数据   只获取最后20条数据
-    # path('/', lives.redirect_to_random_room),  # 获取当前直播间用户历史消息数据   只获取最后20条数据
+    path('api/live/redirect_to_random_room/', lives.redirect_to_random_room),  
+    # path('/', lives.redirect_to_random_room),
+    path('api/live/pay_vip_coin/', lives.pay_vip_coin), #用户支付 VIP 钻石订阅vip直播间
 
     path('live/<str:room_name>/<str:room_id>/', lives.live_to_room, name='live_to_room'),
     path('api/live/save_user_chat_history/', lives.save_user_chat_history),  # 获取当前直播间用户历史消息数据   只获取最后20条数据
@@ -77,7 +85,16 @@ urlpatterns = [
     path('api/balance/get_user_donations/', balance.get_user_donations),# 获取用户的所有打赏记录
     path('api/balance/get_anchor_donations/', balance.get_anchor_donations),# 获取主播收到的所有打赏记录
     path('api/balance/get_user_total_donated/', balance.get_user_total_donated),# 获取用户的总打赏金额
-    path('api/balance/get_anchor_total_received/', balance.get_anchor_total_received)# 获取主播的总收到打赏金额
+    path('api/balance/get_anchor_total_received/', balance.get_anchor_total_received),# 获取主播的总收到打赏金额
+    path('api/balance/make_donation/', balance.make_donation),# 用户打赏主播接口
+
+    #订阅
+    path('api/subscription/subscribe_to_anchor/', subscription.subscribe_to_anchor),# 用户订阅主播
+    path('api/subscription/get_subscriptions/', subscription.get_subscriptions),# 用户订阅列表
+
+    #关注
+    path('api/follow_live/toggle_follow_room/', follow_live.toggle_follow_room)  # 用户关注直播间
+
 ]
 
 

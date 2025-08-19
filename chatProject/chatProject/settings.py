@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'corsheaders',#添加跨域
     'rest_framework',
     'rest_framework_simplejwt',
+    'social_django',
 ]
 
 MIDDLEWARE = [
@@ -107,7 +108,7 @@ DATABASES = {
         'NAME': 'Pecktra',                        # 数据库名称
         'USER': 'root',                      # 用户名
         'PASSWORD': 'Tura1050493761@',              # 密码
-        'HOST': '43.162.120.233',                   # 主机地址
+        'HOST': 'localhost',                   # 主机地址
         'PORT': '3306',                        # 端口号
         'OPTIONS': {
             'charset': 'utf8mb4',              # 推荐使用 utf8mb4 以支持表情符号
@@ -132,6 +133,13 @@ CACHES = {
     'session': {
         'BACKEND': 'django_redis.cache.RedisCache',
         'LOCATION': f'redis://{REDIS_HOST}:{REDIS_PORT}/1',  # 使用相同的 Redis 实例
+        'OPTIONS': {
+            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+        },
+    },
+    'subscribe': {
+        'BACKEND': 'django_redis.cache.RedisCache',
+        'LOCATION': f'redis://{REDIS_HOST}:{REDIS_PORT}/2',  # 使用相同的 Redis 实例
         'OPTIONS': {
             'CLIENT_CLASS': 'django_redis.client.DefaultClient',
         },
@@ -221,3 +229,24 @@ SIMPLE_JWT = {
     'ALGORITHM': 'HS256',                             # 设置 JWT 使用的加密算法
     'SIGNING_KEY': 'your-secret-key',                 # 设置 JWT 签名密钥
 }
+
+# Google OAuth2 配置
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '156625160093-sv5183vuj23cabk3lpk7msspmftcdhol.apps.googleusercontent.com'  # 你的 Client ID
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = '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'  # 你的 Client Secret
+SOCIAL_AUTH_GOOGLE_OAUTH2_REDIRECT_URI = 'https://pecktra-dev.roturalabs.com/api/users/google_oauth2_callback/'  # 回调 URL
+
+# 使用数据库存储会话数据（默认）
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'
+SESSION_COOKIE_AGE = 43200  # 会话有效期，单位为秒（1小时）
+SESSION_COOKIE_NAME = 'sessionid'  # 默认 session cookie 名
+SESSION_COOKIE_SECURE = True  # 只有在 HTTPS 请求中才会发送 session cookie
+SESSION_COOKIE_HTTPONLY = True  # 确保 JavaScript 无法访问 session cookie
+SESSION_COOKIE_SAMESITE = 'None'  # 配置 SameSite 属性，通常设置为 'Lax' 或 'Strict'
+SESSION_EXPIRE_AT_BROWSER_CLOSE = False  # 会话在浏览器关闭时过期（可以设置为 True）
+CORS_ORIGIN_ALLOW_ALL = True  # 或者具体允许的域名
+
+
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+    # 其他认证后端...
+]

@@ -83,25 +83,49 @@ class LiveManager {
 
         
         // 生成直播列表HTML
-        container.innerHTML = lives.map(live => `
+        container.innerHTML = lives.map(live => {
+            // 解析room_info
+            let roomInfo = null;
+            let diamondBadge = '';
+            
+            try {
+                roomInfo = live.room_info ? JSON.parse(live.room_info) : null;
+                
+                // 如果是VIP房间且钻石数量>0
+                if (roomInfo && roomInfo.room_type === 1 && roomInfo.coin_num > 0) {
+                    diamondBadge = `
+                        <span class="badge bg-primary ms-2 flex-shrink-0" 
+                            style="background-color: #3498db !important; min-width: 30px;">
+                            <i class="fas fa-gem me-1" style="font-size: 0.8em;"></i>
+                            vip ${roomInfo.coin_num}
+                        </span>
+                    `;
+                }
+            } catch (e) {
+                console.error('解析room_info失败:', e);
+            }
 
-    <a href="/live/${live.room_name}/${live.room_id}/" 
-       class="nav-link text-white d-flex align-items-center live-room text-nowrap" 
-       data-bs-toggle="tooltip" 
-       data-bs-placement="right" 
-       title="进入${live.username}的直播间"
-       data-room-id="${live.room_id}"
-       data-room-name="${live.room_name}"
-       style="min-width: 0;">  <!-- 添加这行防止flex溢出 -->
-        <svg class="bi me-2 flex-shrink-0" width="16" height="16">  <!-- 禁止图标压缩 -->
-            <use xlink:href="#people-circle"/>
-        </svg>
-        <span class="text-truncate flex-grow-1">  <!-- 文字超出显示省略号 -->
-            ${live.username} ${live.character_name}
-        </span>
+            return `
+            <a href="/live/${live.room_name}/${live.room_id}/" 
+            class="nav-link text-white d-flex align-items-center live-room text-nowrap" 
+            data-bs-toggle="tooltip" 
+            data-bs-placement="right" 
+            title="进入${live.username}的直播间"
+            data-room-id="${live.room_id}"
+            data-room-name="${live.room_name}"
+            style="min-width: 0;">
+                <svg class="bi me-2 flex-shrink-0" width="16" height="16">
+                    <use xlink:href="#people-circle"/>
+                </svg>
+                <span class="text-truncate flex-grow-1">
+                    ${live.username} ${live.character_name}
+                </span>
+                ${diamondBadge}
+            </a>
+            `;
+        }).join('');
 
-    </a>
-`).join('');
+
         // <span class="badge bg-primary ms-2 flex-shrink-0">  <!-- 禁止数字压缩 -->
         //     ${live.live_num}人
         // </span>
@@ -166,7 +190,7 @@ class LiveManager {
         this.renderLiveList(lives);
 
         // 如果需要轮询更新可以在这里添加
-        // this.startPolling();
+        this.startPolling();
     }
 
     /**
@@ -176,8 +200,9 @@ class LiveManager {
         // 每30秒刷新一次
         this.pollingTimer = setInterval(async () => {
             const lives = await this.fetchLiveList();
+
             this.renderLiveList(lives);
-        }, 30000);
+        }, 10000);
     }
 }
 

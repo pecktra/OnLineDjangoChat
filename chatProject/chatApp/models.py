@@ -2,7 +2,8 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser ,AbstractBaseUser, BaseUserManager
 import uuid
 import base64
-
+from datetime import timedelta
+from django.utils import timezone
 #
 # class ChatUser(AbstractUser):
 #     '''聊天用户模型'''
@@ -93,12 +94,16 @@ class ChatUser(AbstractBaseUser):
     img = models.CharField(max_length=100, blank=True)
     phone = models.CharField(max_length=11, blank=True)
 
-    # 使用 BaseUserManager 提供的默认管理器
-    objects = BaseUserManager()
+    # Google 登录相关字段
+    google_id = models.CharField(max_length=255, unique=True, null=True, blank=True)  # Google 用户 ID
+    avatar = models.URLField(max_length=255, blank=True, null=True)  # Google 头像 URL
+
+    # 使用默认的模型管理器
+    objects = models.Manager()
 
     # 登录字段
-    USERNAME_FIELD = 'username'  # 这是登录时使用的字段
-    REQUIRED_FIELDS = ['email']  # 注册时要求提供的字段（不包括用户名和密码）
+    USERNAME_FIELD = 'username'  # 登录时使用的字段
+    REQUIRED_FIELDS = ['email']  # 注册时必须提供的字段（不包括用户名和密码）
 
     def __str__(self):
         return self.username
@@ -115,7 +120,7 @@ class ChatUserChatHistory(models.Model):
         db_table = 'chatApp_chatuser_chat_history'  # 映射到正确的表名
 
 class UserBalance(models.Model):
-    user_id = models.IntegerField(unique=True, verbose_name="用户ID")  # 用户ID，指向用户表
+    user_id = models.IntegerField(unique=True, verbose_name="用户ID")  # 设置user_id为唯一字段
     balance = models.DecimalField(max_digits=10, decimal_places=2, default=0.00, verbose_name="用户余额")
     last_updated = models.DateTimeField(auto_now=True, verbose_name="最后更新时间")
 
@@ -126,6 +131,15 @@ class UserBalance(models.Model):
 
     def __str__(self):
         return f"User {self.user_id} Balance: {self.balance}"
+
+
+    def deduct_balance(self, amount):
+        """扣除用户余额"""
+        if self.balance >= amount:
+            self.balance -= amount
+            self.save()  # 保存更新后的余额
+            return True
+        return False
 
 class RechargeRecord(models.Model):
     user_id = models.IntegerField(verbose_name="用户ID")  # 关联用户ID
@@ -143,7 +157,7 @@ class RechargeRecord(models.Model):
 
 class DonationRecord(models.Model):
     user_id = models.IntegerField(verbose_name="用户ID")  # 赠送打赏的用户
-    anchor_id = models.IntegerField(verbose_name="主播ID")  # 被打赏的主播
+    anchor_id = models.CharField(max_length=225, verbose_name="主播ID")  # 确保字段是 CharField，并且 max_length 匹配数据库中的长度
     amount = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="打赏金额")
     donation_date = models.DateTimeField(auto_now_add=True, verbose_name="打赏时间")
     status = models.CharField(max_length=20, choices=[('pending', 'Pending'), ('completed', 'Completed'), ('failed', 'Failed')], default='completed', verbose_name="打赏状态")
@@ -157,7 +171,7 @@ class DonationRecord(models.Model):
         return f"User {self.user_id} donated {self.amount} to Anchor {self.anchor_id} on {self.donation_date}"
 
 class AnchorBalance(models.Model):
-    anchor_id = models.IntegerField(unique=True, verbose_name="主播ID")  # 主播ID
+    anchor_id = models.CharField(max_length=225, verbose_name="主播ID")  # 确保字段是 CharField，并且 max_length 匹配数据库中的长度
     total_donations = models.DecimalField(max_digits=10, decimal_places=2, default=0.00, verbose_name="主播收到的总打赏金额")
     balance = models.DecimalField(max_digits=10, decimal_places=2, default=0.00, verbose_name="主播当前余额")
     last_updated = models.DateTimeField(auto_now=True, verbose_name="最后更新时间")
@@ -169,3 +183,78 @@ class AnchorBalance(models.Model):
 
     def __str__(self):
         return f"Anchor {self.anchor_id} Total Donations: {self.total_donations} Balance: {self.balance}"
+
+# 用户订阅模型
+class Subscription(models.Model):
+    STATUS_CHOICES = [
+        ('active', 'Active'),
+        ('expired', 'Expired'),
+    ]
+
+    id = models.AutoField(primary_key=True)
+    user = models.ForeignKey(ChatUser, on_delete=models.SET_NULL, null=True, blank=True)
+    anchor = models.ForeignKey(Anchor, on_delete=models.SET_NULL, null=True, blank=True)
+    diamonds_paid = models.DecimalField(max_digits=10, decimal_places=2)
+    subscription_date = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ['user', 'anchor']
+        db_table = 'subscription'  # 显式指定表名
+
+    def __str__(self):
+        return f"{self.user.username} subscribed to {self.anchor.username}"
+
+
+
+#用户关注/取消关注模型
+class UserFollowedRoom(models.Model):
+    user_id = models.IntegerField()  # 用户ID
+    room_name = models.CharField(max_length=255)  # 直播间ID
+    followed_at = models.DateTimeField(auto_now_add=True)  # 关注时间
+    status = models.BooleanField(default=True)  # 关注状态，True 为关注，False 为取消关注
+
+
+
+    class Meta:
+        db_table = 'user_followed_room'  # 显式指定表名
+        constraints = [
+            models.UniqueConstraint(fields=['user_id', 'room_name'], name='unique_user_room')
+        ]
+
+    def __str__(self):
+        return f"User {self.user_id} follows room {self.room_name} (status: {self.status})"
+
+class RoomInfo(models.Model):
+    # 房间类型的选择项
+    ROOM_TYPE_CHOICES = (
+        (0, 'Free'),  # 免费房间
+        (1, 'VIP'),   # VIP房间
+        (2, '1v1'),   # 一对一房间
+    )
+
+    uid = models.CharField(max_length=255, verbose_name="用户ID")
+    character_name = models.CharField(max_length=255, verbose_name="角色名称")
+    title = models.CharField(max_length=255, verbose_name="房间标题")
+    coin_num = models.IntegerField(verbose_name="钻石数量")
+    room_type = models.SmallIntegerField(choices=ROOM_TYPE_CHOICES, default=0, verbose_name="房间类型")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="房间创建时间")
+    updated_at = models.DateTimeField(auto_now=True, verbose_name="房间最后更新时间")
+
+    class Meta:
+        db_table = 'room_info'  # 设置表名
+
+    def __str__(self):
+        return f"Room: {self.title} (UID: {self.uid}, Character: {self.character_name})"
+
+class VipSubscriptionRecord(models.Model):
+    user_id = models.IntegerField()  # 存储用户ID，不使用外键
+    anchor_id = models.CharField(max_length=255)  # 存储主播ID，不使用外键
+    room_name = models.CharField(max_length=255)  # 订阅的房间名称
+    pay_coin_num = models.DecimalField(max_digits=10, decimal_places=2)  # 支付的钻石数量
+    subscription_date = models.DateTimeField(auto_now_add=True)  # 订阅时间
+
+    class Meta:
+        db_table = 'vip_subscription_record'  # 显式指定表名
+
+    def __str__(self):
+        return f"User {self.user_id} subscribed to Room {self.room_name} with {self.pay_coin_num} coins"

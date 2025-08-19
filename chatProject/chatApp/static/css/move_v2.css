@@ -1,0 +1,188 @@
+/* 按钮样式（电脑端和手机端通用） */
+.mobile-only {
+    display: none !important; /* 默认隐藏 */
+}
+
+/* 电脑端 total-chat 样式 */
+.total-chat {
+    display: flex;
+    flex: 1;
+}
+
+
+/* 移动端适配样式 */
+@media (max-width: 768px) {
+    main {
+        position: relative;
+        overflow: visible !important; /* 防止裁剪内容 */
+        display: flex !important; /* 使用 flex 布局 */
+        flex-direction: column; /* 垂直排列 */
+        height: 100vh; /* 占满屏幕 */
+        min-height: 100vh; /* 应对浏览器地址栏 */
+        width: 100%;
+        box-sizing: border-box;
+
+    }
+
+
+
+    .total-chat {
+        display: flex !important; /* 确保显示 */
+        flex-direction: column; /* 垂直排列 */
+        height: 100vh; /* 占满 main 的高度 */
+    }
+
+    .chat-header {
+        display: none !important; /* 隐藏聊天头部 */
+    }
+
+    .nav-sidebar {
+        width: 100% !important; /* 覆盖宽度设置 */
+        max-width: 100%;
+        height: calc(100vh - env(safe-area-inset-bottom, 20px)) !important; /* 适配 iPhone 地址栏 */
+        min-height: calc(100vh - env(safe-area-inset-bottom, 20px)) !important;
+        position: absolute;
+        top: 0;
+        left: 0;
+        box-sizing: border-box;
+        overflow: visible !important; /* 防止内容裁剪 */
+        display: none !important; /* 默认隐藏 */
+    }
+
+    /* 显示导航时 */
+    .show-nav .nav-sidebar {
+        display: flex !important; /* 显示导航 */
+    }
+
+    .show-nav .total-chat {
+        display: none !important; /* 隐藏 total-chat（包含 live-container 和 chat-panel） */
+    }
+
+    .live-container {
+        flex: 0 0 50%; /* 占70%屏幕高度 */
+        width: 100% !important; /* 占满宽度 */
+        max-width: 100%;
+        height: 50vh !important; /* 明确高度 */
+        min-height: 50vh !important;
+        position: relative; /* 相对定位 */
+        box-sizing: border-box;
+        overflow-y: auto !important; /* 允许滚动 */
+        display: flex !important; /* 保持 flex 布局 */
+        flex-direction: column;
+    }
+
+    /* 调整 .live-container 内部的 .streamer-info 和 .chat-area */
+    .live-container .streamer-info {
+        flex: 0 0 10% !important; /* 占 .live-container 高度的 10% */
+        min-height: 10% !important;
+        padding: 0.5rem !important; /* 减小内边距以适应小高度 */
+    }
+
+    .live-container .chat-area {
+        flex: 0 0 90% !important; /* 占 .live-container 高度的 90% */
+        min-height: 90% !important;
+        overflow-y: auto !important; /* 确保可滚动 */
+    }
+
+    .chat-panel {
+        flex: 0 0 50%; /* 占30%屏幕高度 */
+        width: 100% !important; /* 占满宽度 */
+        max-width: 100%;
+        height: 50vh !important; /* 明确高度 */
+        min-height: 50vh !important;
+        position: relative; /* 相对定位 */
+        box-sizing: border-box;
+        overflow: hidden !important; /* 防止内容溢出 */
+        display: flex !important; /* 显示并使用 flex 布局 */
+        flex-direction: column;
+    }
+
+    /* 确保 chat-panel 内部内容显示 */
+    .chat-panel .chat-content {
+        flex-grow: 1; /* 占据剩余空间 */
+        overflow-y: auto !important; /* 允许滚动 */
+        display: flex !important; /* 确保显示 */
+        flex-direction: column;
+        width: 100%;
+        padding-bottom: 60px; /* 为 chat-input 留出空间 */
+        background-color: #1a1a1a; /* 与 user_chat.css 一致 */
+    }
+
+    /* 显示聊天区域时 */
+    .show-chat .total-chat {
+        display: flex !important; /* 显示 total-chat（包含 live-container 和 chat-panel） */
+        flex-direction: column; /* 确保垂直排列 */
+        height: 100vh; /* 占满屏幕 */
+    }
+
+    .show-chat .nav-sidebar {
+        display: none !important; /* 隐藏导航 */
+    }
+
+    /* 覆盖 nav-sidebar 内部的固定宽度 */
+    .nav-sidebar .d-flex.flex-column {
+        width: 100% !important; /* 覆盖 style="width: 280px;" */
+        max-width: 100%;
+    }
+
+    /* 按钮样式 */
+    .mobile-only {
+        display: inline-flex !important; /* 在移动端显示 */
+    }
+
+    .close-nav, .close-chat, .switch-to-nav, .switch-to-chat {
+        background: #007bff;
+        border: none;
+        border-radius: 50%;
+        width: 24px;
+        height: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        padding: 0;
+        z-index: 10; /* 确保按钮在内容上方 */
+        pointer-events: auto; /* 确保可点击 */
+    }
+
+    .close-nav svg, .close-chat svg, .switch-to-nav svg, .switch-to-chat svg {
+        stroke: white;
+    }
+
+    .close-nav:hover, .close-chat:hover, .switch-to-nav:hover, .switch-to-chat:hover {
+        background: #0056b3;
+    }
+
+    .mobile-switches {
+        display: flex !important; /* 确保切换按钮容器显示 */
+        padding: 10px;
+        gap: 10px;
+        position: fixed;
+        top: 10px;
+        right: 10px;
+        z-index: 1000; /* 高优先级 */
+    }
+
+    /* 确保聊天输入框在 iPhone Safari 可见 */
+    .chat-input {
+        position: fixed !important; /* 固定在屏幕底部 */
+        bottom: env(safe-area-inset-bottom, 20px) !important; /* 适配 iPhone 地址栏 */
+        width: 100% !important; /* 占满宽度 */
+        background-color: #1a1a1a; /* 与 user_chat.css 一致 */
+        padding: 0.75rem 1rem;
+        box-sizing: border-box;
+        z-index: 1000 !important; /* 高优先级防止遮挡 */
+        display: flex !important;
+    }
+
+    .input-group {
+        background-color: #000000;
+        padding: 0.5rem;
+        border-radius: 6px;
+        transform: translateY(-120%); /* 基于自身高度向上移动10% */
+    }
+
+    .form-control, .input-group-append, .btn {
+        display: inline-flex !important; /* 强制显示 */
+    }
+}

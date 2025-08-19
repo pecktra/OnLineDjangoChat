@@ -1,6 +1,6 @@
 /* 右侧聊天面板容器 */
 .chat-panel {
-    flex: 0 0 25%;
+    flex: 0 0 30%;
     background-color: #1a1a1a;
     display: flex;
     flex-direction: column;
@@ -11,6 +11,7 @@
     box-sizing: border-box;
     position: relative;
     overflow: hidden;
+    display: flex !important;
 }
 
 /* 聊天头部区域 */

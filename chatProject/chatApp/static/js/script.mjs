@@ -24,14 +24,6 @@
 
 
     });
-    // // 在你的 JavaScript 文件中
-    // document.querySelectorAll('.nav-link').forEach(link => {
-    //     link.addEventListener('click', function(e) {
-    //         // 移除所有 .nav-link 的 .active 类
-    //         document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
-    //         // 移除聚焦
-    //         this.blur();
-    //     });
-    // });
+
 
 })();

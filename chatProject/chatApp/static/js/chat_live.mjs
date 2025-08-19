@@ -96,6 +96,7 @@ static processMessages(messages) {
     return chatInfo.map(message => ({
         is_user: message.is_user,
         live_message: message.live_message,
+        live_message_html: message.live_message_html,
         sender_name: message.sender_name,
         send_date: this.convertTo24Hour(message.send_date)
     }));
@@ -137,13 +138,35 @@ static processMessages(messages) {
     /**
      * 渲染消息到聊天区域
      */
+    // static renderMessages(messages) {
+
+    //     const chatArea = document.querySelector('.chat-area');
+    //     if (!chatArea) return;
+
+    //     chatArea.innerHTML = messages.map(msg => {
+
+    //         return `
+    //             <div class="chat-message ${msg.is_user ? 'user-message' : 'ai-message'} ">
+    //                 <div class="message-content">
+    //                     <div class="message-header">
+    //                         <span class="sender-name">${msg.sender_name}</span>
+    //                         <span class="message-time">${msg.send_date}</span>
+    //                     </div>
+    //                     <p>${msg.is_user ? msg.live_message : marked.parse(msg.live_message)}</p>
+    //                 </div>
+    //             </div>
+    //         `;
+    //     }).join('');
+
+    //     chatArea.scrollTop = chatArea.scrollHeight;
+    // }
     static renderMessages(messages) {
 
         const chatArea = document.querySelector('.chat-area');
         if (!chatArea) return;
 
         chatArea.innerHTML = messages.map(msg => {
-
+            const messageContent = msg.live_message_html === "" ? msg.live_message : msg.live_message_html;
             return `
                 <div class="chat-message ${msg.is_user ? 'user-message' : 'ai-message'} ">
                     <div class="message-content">
@@ -151,7 +174,9 @@ static processMessages(messages) {
                             <span class="sender-name">${msg.sender_name}</span>
                             <span class="message-time">${msg.send_date}</span>
                         </div>
-                        <p>${msg.live_message}</p>
+                        <div class="mes_text">
+                            ${messageContent}
+                        </div>
                     </div>
                 </div>
             `;
@@ -159,7 +184,6 @@ static processMessages(messages) {
 
         chatArea.scrollTop = chatArea.scrollHeight;
     }
-
 
     /**
      * 初始化历史消息

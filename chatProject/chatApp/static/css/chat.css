@@ -3,21 +3,91 @@
     display: flex;
     flex-direction: column;
     /* 设置宽度为50% */
-    width: 60%;
+    width: 70%;
     /* 设置高度为100%视口高度 */
     height: 100vh;
     overflow: hidden;
 
 }
+
+
+
+/* 其他 CSS 保持不变，仅展示修改和新增的部分 */
 .streamer-info {
     flex: 0 0 20%;
     background-color: #000000;
     padding: 1rem;
     border-bottom: 1px solid rgba(0, 0, 0, .1);
     display: flex;
-    align-items: center;
+    flex-direction: row;
     justify-content: space-between;
+    align-items: flex-start;
 }
+
+.streamer-left {
+    display: flex;
+    flex-direction: column;
+}
+
+/* 增强 streamer-title 样式 */
+.streamer-title {
+    text-align: left;
+    width: 100%;
+}
+
+/* 增强 badge 样式 */
+.streamer-title .badge {
+    font-size: 0.85rem; /* 稍大字体，突出标题 */
+    font-family: 'Roboto', sans-serif; /* 与 #streamerName 一致 */
+    font-weight: 500; /* 中等字重 */
+    color: #ffffff; /* 白色文字 */
+    background: linear-gradient(90deg, #0d6efd, #6610f2); /* 蓝色到紫色渐变 */
+    padding: 0.4em 0.8em; /* 稍大内边距，增加空间感 */
+    border-radius: 12px; /* 更圆润的边角 */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* 轻微阴影 */
+    max-width: 200px; /* 保留最大宽度 */
+    display: inline-block;
+    transition: transform 0.2s ease, opacity 0.2s ease; /* 平滑动画 */
+}
+
+/* 显示时的动画效果（当移除 d-none 时触发） */
+.streamer-title:not(.d-none) .badge {
+    animation: titleIn 0.3s ease-out forwards;
+}
+
+/* 悬停效果 */
+.streamer-title .badge:hover {
+    transform: scale(1.02); /* 轻微放大 */
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3); /* 阴影加深 */
+}
+
+/* 标题显示动画 */
+@keyframes titleIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 /* 主播详情区域 */
 .streamer-details {
     display: flex;
@@ -56,22 +126,15 @@
     flex-shrink: 0; /* 防止头像被压缩 */
 }
 
-/* 响应式调整 */
-@media (max-width: 576px) {
-    .streamer-details img.rounded-circle {
-        width: 40px !important;
-        height: 40px !important;
-        min-width: 40px;
-        min-height: 40px;
-        border-width: 2px;
-    }
-}
 
 
-/* 按钮容器（让两个按钮水平排列） */
+
+/* 按钮容器（让两个按钮垂直排列） */
 .streamer-actions {
-    display: flex;
-    gap: 0.5rem; /* 按钮间距 */
+  display: flex;
+  flex-direction: column; /* 垂直排列 */
+  gap: 10px; /* 按钮间距 */
+  width: fit-content; /* 宽度自适应按钮 */
 }
 
 /* 分享按钮样式 */
@@ -316,17 +379,7 @@
     background-color: rgba(13, 110, 253, 0.25); /* 悬停背景加深 */
 }
 
-/* 响应式调整 */
-@media (max-width: 576px) {
-    #streamerName {
-        font-size: 1rem;
-    }
 
-    #viewerCount {
-        font-size: 0.8rem;
-        padding: 0.15rem 0.4rem;
-    }
-}
 
 
 
