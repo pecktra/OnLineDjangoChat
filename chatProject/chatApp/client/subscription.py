@@ -31,8 +31,9 @@ def subscribe_to_anchor(request):
         except Exception:
             return JsonResponse({"code": 1, "message": "Invalid amount format."}, status=400)
 
-        if amount <= 0:
-            return JsonResponse({"code": 1, "message": "Amount must be greater than 0."}, status=400)
+        # 改动点：允许 amount = 0
+        if amount < 0:
+            return JsonResponse({"code": 1, "message": "Amount must be greater than or equal to 0."}, status=400)
 
         # 获取用户和余额
         user = ChatUser.objects.filter(id=user_id).first()
@@ -121,7 +122,7 @@ def subscribe_to_anchor(request):
             "code": 1,
             "message": f"Internal server error: {str(e)}"
         }, status=500)
-
+    
 # 获取用户的所有有效订阅记录接口
 @api_view(['GET'])
 def get_subscriptions(request):
