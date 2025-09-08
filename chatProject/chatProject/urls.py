@@ -20,6 +20,7 @@ from django.urls import path
 from chatApp.anchor import login , chat_data ,live
 from chatApp.client import logins ,lives,subscription,follow_live
 from chatApp.balance import balance
+from chatApp.payment import payment
 # 导入静态文件模块，为了显示上传图片
 from django.conf.urls.static import static
 from django.views.generic.base import RedirectView
@@ -55,6 +56,7 @@ urlpatterns = [
     path('api/live/get_live_status/', live.get_live_status),
     path('api/live/change_live_status/', live.change_live_status),
     path('api/live/add_room_info/', live.add_room_info),
+    path('api/live/check_api_limit/', live.check_api_limit),
 
 
     #客户端
@@ -73,12 +75,16 @@ urlpatterns = [
     path('api/live/get_live_info/', lives.get_live_info),#获取单个直播间信息
     path('api/live/get_live_chat_history/', lives.get_live_chat_history),#获取当前直播间主播历史消息数据
     path('api/live/get_user_chat_history/', lives.get_user_chat_history),#获取当前直播间用户历史消息数据   只获取最后20条数据
-    path('', RedirectView.as_view(url='api/live/redirect_to_random_room/')),
+    # path('', RedirectView.as_view(url='api/live/redirect_to_random_room/')),
+    path('', lives.home_view, name='home'),  # Root path renders room_v3.html
+    path('live/<str:room_id>/', lives.live_to_room, name='live_to_room'),
+
     path('api/live/redirect_to_random_room/', lives.redirect_to_random_room),  
+    
     # path('/', lives.redirect_to_random_room),
     path('api/live/pay_vip_coin/', lives.pay_vip_coin), #用户支付 VIP 钻石订阅vip直播间
 
-    path('live/<str:room_name>/<str:room_id>/', lives.live_to_room, name='live_to_room'),
+
     path('api/live/save_user_chat_history/', lives.save_user_chat_history),  # 获取当前直播间用户历史消息数据   只获取最后20条数据
 
     #打赏
@@ -93,8 +99,13 @@ urlpatterns = [
     path('api/subscription/get_subscriptions/', subscription.get_subscriptions),# 用户订阅列表
 
     #关注
-    path('api/follow_live/toggle_follow_room/', follow_live.toggle_follow_room)  # 用户关注直播间
+    path('api/follow_live/toggle_follow_room/', follow_live.toggle_follow_room), # 用户关注直播间
+    path('api/follow_live/get_followed_rooms/', follow_live.get_followed_rooms),  # 用户关注直播间列表
 
+    #支付
+    path('api/payment/process_recharge/', payment.process_recharge),  # 充值
+    path('api/payment/payment_callback/', payment.payment_callback),  # 回调
+    path('api/payment/check_payment_status/<str:order_id>/', payment.check_payment_status)  # 查询订单状态
 ]
 
 

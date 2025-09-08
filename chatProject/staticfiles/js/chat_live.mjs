@@ -4,10 +4,10 @@
 class ChatLiveManager {
     /**
      * 获取并处理历史消息
-     * @param {string} room_name 直播间ID
+     * @param {string} room_id 直播间ID
      * @returns {Promise<Array>} 处理后的消息数组
      */
-    static async fetchChatHistory(room_name) {
+    static async fetchChatHistory(room_id) {
         try {
             // 模拟数据 - 实际替换为真实API请求
             // const mockResponse = {
@@ -67,7 +67,7 @@ class ChatLiveManager {
             // };
 
             // 正式环境请取消注释以下代码 ▼
-            const response = await fetch(`/api/live/get_live_chat_history/?room_name=${encodeURIComponent(room_name)}`, {
+            const response = await fetch(`/api/live/get_live_chat_history/?room_id=${encodeURIComponent(room_id)}`, {
                 method: 'GET',
                 headers: { 'Content-Type': 'application/json' }, // 如果后端不要求此头，可移除
             });
@@ -188,8 +188,8 @@ static processMessages(messages) {
     /**
      * 初始化历史消息
      */
-    static async init(room_name) {
-        const messages = await this.fetchChatHistory(room_name);
+    static async init(room_id) {
+        const messages = await this.fetchChatHistory(room_id);
         this.renderMessages(messages);
     }
 }

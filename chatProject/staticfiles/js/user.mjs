@@ -1,7 +1,7 @@
 
 
 class UserManager {
-    static async checkLogin() {
+    static async checkLogin(room_id) {
         try {
             const response = await fetch('/api/users/is_google_logged_in/');
             const data = await response.json();
@@ -17,7 +17,8 @@ class UserManager {
             // };
             window.GLOBAL_USER_NAME = data?.data?.user_info?.uname
             window.GLOBAL_USER_ID = data?.data?.user_info?.uid
-            this.updateUI(data.data.user_info);
+
+            this.updateUI(room_id,data.data.user_info);
 
 
         } catch (error) {
@@ -26,11 +27,14 @@ class UserManager {
         }
     }
 
-    static updateUI(userInfo) {
+    static updateUI(room_id,userInfo) {
         document.getElementById('username').textContent = userInfo.uname;
         document.getElementById('googleLoginLink').style.display = userInfo.status ? 'none' : 'block';
         document.getElementById('logoutLink').style.display = userInfo.status ? 'block' : 'none';
-        document.getElementById('diamond').textContent = userInfo.coin_num;
+        if(room_id != "None"){
+            document.getElementById('diamond').textContent = userInfo.coin_num;
+        }
+        
     }
 
     static async logout() {
@@ -100,6 +104,110 @@ class UserManager {
             console.error('Google login error:', error);
         }
     }
+
+
+    // static async loadFollows() {
+    //     // 检查用户是否登录
+    //     if (!window.GLOBAL_USER_ID || window.GLOBAL_USER_ID === 'null') {
+    //         alert('please log in');
+    //         return
+    //     }
+
+    //     // Manually show the modal
+    //     const modalElement = document.getElementById('followsModal');
+    //     const modal = new bootstrap.Modal(modalElement);
+    //     modal.show();
+
+    //     try {
+    //         const response = await fetch('/api/follow_live/get_followed_rooms/', {
+    //             method: 'GET',
+    //             headers: {
+    //                 'Content-Type': 'application/json'
+    //             }
+    //         });
+    //         const result = await response.json();
+    //         const tableBody = document.getElementById('followsTable');
+    //         if (result.code === 0) {
+                
+    //             tableBody.innerHTML = ''; // Clear existing content
+
+    //             if (result.data.length === 0) {
+    //                 tableBody.innerHTML = '<tr><td colspan="2">暂无关注房间</td></tr>';
+    //             } else {
+    //                 result.data.forEach(room => {
+    //                     const row = document.createElement('tr');
+    //                     row.innerHTML = `
+    //                         <td>${room.room_name}</td>
+    //                         <td>${new Date(room.followed_at).toLocaleString('zh-CN')}</td>
+
+    //                     `;
+    //                     tableBody.appendChild(row);
+    //                 });
+    //             }
+    //         } else {
+    //             tableBody.innerHTML = '<tr><td colspan="2">暂无关注房间</td></tr>';
+    //         }
+    //     } catch (error) {
+    //         console.error('加载关注列表失败:', error);
+    //         alert('无法加载关注列表');
+    //     }
+    // }
+
+
+
+
+
+    // static async loadSubscriptions() {
+    //     // 检查用户是否登录
+    //     if (!window.GLOBAL_USER_ID || window.GLOBAL_USER_ID === 'null') {
+    //         alert('please log in');
+    //         return
+    //     }
+    //     // Manually show the modal
+    //     const modalElement = document.getElementById('subscriptionsModal');
+    //     const modal = new bootstrap.Modal(modalElement, { backdrop: 'static' });
+    //     modal.show();
+
+    //     try {
+    //         const response = await fetch('/api/subscription/get_subscriptions/', {
+    //             method: 'GET',
+    //             headers: {
+    //                 'Content-Type': 'application/json'
+    //             }
+    //         });
+    //         const result = await response.json();
+    //         const tableBody = document.getElementById('subscriptionsTable');
+    //         if (result.code === 0) {
+                
+    //             tableBody.innerHTML = ''; // Clear existing content
+
+    //             if (result.data.subscriptions.length === 0) {
+    //                 tableBody.innerHTML = '<tr><td colspan="5">暂无订阅</td></tr>';
+    //             } else {
+    //                 result.data.subscriptions.forEach(sub => {
+    //                     const row = document.createElement('tr');
+    //                     row.innerHTML = `
+    //                         <td>${sub.anchor_id}</td>
+    //                         <td>${sub.anchor_name}</td>
+    //                         <td>${sub.diamonds_paid}</td>
+    //                         <td>${new Date(sub.subscription_date).toLocaleString('zh-CN')}</td>
+    //                         <td>${new Date(sub.subscription_end_date).toLocaleString('zh-CN')}</td>
+    //                     `;
+    //                     tableBody.appendChild(row);
+    //                 });
+    //             }
+    //         } else {
+    //             tableBody.innerHTML = '<tr><td colspan="5">暂无订阅</td></tr>';
+    //         }
+    //     } catch (error) {
+    //         console.error('加载订阅列表失败:', error);
+    //         alert('无法加载订阅列表');
+    //     }
+    // }
+
+
+
+
 
 
 }

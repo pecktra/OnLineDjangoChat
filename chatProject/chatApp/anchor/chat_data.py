@@ -6,6 +6,7 @@ from django.conf import settings
 from pymongo import MongoClient
 import json
 import hashlib
+from chatApp.models import RoomInfo
 from django_redis import get_redis_connection  # 获取 Redis 连接
 
 # 建立 MongoDB 连接
@@ -40,15 +41,18 @@ def chat_data(request):
     username = request.data.get("username")
     uid = request.data.get("uid")
     character_name = request.data.get("character_name")
+    character_date = request.data.get("character_date")
     data_str = request.data.get("data")  # 获取 data 字段
     mes_html = request.data.get("mes_html")
-
-
-
-
+    isNewCreated = request.data.get("isNewCreated",None)
 
     # 确保传递的参数都存在
-    if not username or not uid or not character_name or not data_str:
+    if not username or not uid or not character_name  or not character_date or not data_str:
+        print(username)
+        print(uid)
+        print(character_name)
+        print(character_date)
+        print(data_str)
         return Response({"code": 1, "message": "缺少必填参数"}, status=400)
 
     try:
@@ -80,20 +84,21 @@ def chat_data(request):
             data_type = "unknown"
 
         # 生成 room_id 和 room_name
-        room_id = hashlib.md5(f"{uid}_{character_name}".encode('utf-8')).hexdigest()
-        room_name = f"{uid}_{character_name}"
+        # room_id = hashlib.md5(f"{uid}_{character_name}_{character_date}".encode('utf-8')).hexdigest()
+        # 短hash 使用SHA1然后取前12个字符（比MD5短）
+        room_id = hashlib.sha1(f"{uid}_{character_name}_{character_date}".encode('utf-8')).hexdigest()[:16]
+        room_name = f"{uid}_{character_name}_{character_date}"
 
-        # 检查 Redis 是否已经有该 room_name
-        live_key = f"live_status:{uid}:{character_name}"
-        if not redis_client.exists(live_key):
-            redis_client.set(live_key, "stop")  # 默认设置为 'stop'，表示直播未开始
 
+        ## 每次重置下播时间
+        redis_client.setex(room_id, 7 * 24 * 60 * 60, "start")
         # MongoDB 插入数据
-        collection = db[room_name]
+        collection = db[room_id]
         collection.insert_one({
             "username": username,
             "uid": uid,
             "character_name": character_name,
+            "character_date": character_date,
             "room_id": room_id,
             "room_name": room_name,
             "data_type": data_type,
@@ -112,6 +117,26 @@ def chat_data(request):
             'live_message_html': mes_html
             
         }
+
+
+        #如果是创建房间，则放入mysql
+        if isNewCreated:
+            # 检查是否已经存在相同的房间（根据 room_id查找）
+            if RoomInfo.objects.filter(room_id = room_id).exists():
+                return Response({"code": 1, "message": "Room with the given uid and character_name already exists."}, status=400)
+
+            # 创建房间记录
+            room_info = RoomInfo(
+                uid=uid,
+                user_name=username,
+                room_id=room_id,
+                room_name=room_name,
+                character_name=character_name,
+                character_date=character_date,
+                is_info=0
+            )
+            room_info.save()
+
 
 
         # 转发 WebSocket 消息

@@ -143,6 +143,13 @@ CACHES = {
         'OPTIONS': {
             'CLIENT_CLASS': 'django_redis.client.DefaultClient',
         },
+    },
+    'chat-limit': {
+        'BACKEND': 'django_redis.cache.RedisCache',
+        'LOCATION': f'redis://{REDIS_HOST}:{REDIS_PORT}/3',  # 使用相同的 Redis 实例
+        'OPTIONS': {
+            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+        },
     }
 }
 
@@ -250,3 +257,7 @@ AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
     # 其他认证后端...
 ]
+
+#支付key
+NOWPAYMENTS_API_KEY="11DRDE4-48EMM3N-PJTWM1X-9YFQMMR" #apikey
+NOWPAYMENTS_IPN_SECRET_KEY ="kfM7xk+QXZOCsg9E1qKbDAY3F3jYnW2g" #ipn

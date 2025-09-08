@@ -2,13 +2,10 @@ body {
     min-height: 100vh;
 }
 
-
-
 main {
     display: flex;
     flex-wrap: nowrap;
     height: 100vh;
-
     max-height: 100vh;
     overflow-x: auto;
     overflow-y: hidden;
@@ -91,9 +88,9 @@ main {
 
 .scrollarea {
     overflow-y: auto;
-    max-height: 600px;
-    min-height: 600px;
-    
+    flex: 1; /* 占据剩余空间 */
+    max-height: calc(100vh - 300px); /* 动态计算最大高度，避免覆盖下拉菜单 */
+    margin-bottom: 3rem; /* 为下拉菜单预留空间 */
 }
 
 .scrollarea::-webkit-scrollbar {
@@ -128,6 +125,188 @@ main {
     -moz-user-select: none;
     user-select: none;
 }
+
+.modal-content {
+    max-height: 400px; /* 固定模态框高度 */
+    overflow-y: auto; /* 模态框整体可滚动 */
+}
+
+.modal-table-container {
+    max-height: 300px; /* 表格容器高度，确保表头和内容可滚动 */
+    overflow-y: auto;
+}
+
+.nav {
+    flex-shrink: 0; /* 导航列表不扩展，占据最小空间 */
+}
+
+.dropdown-menu {
+    z-index: 1050; /* 确保下拉菜单在模态框之上 */
+}
+
+.nav-sidebar {
+
+    height: 100vh;
+
+}
+
+.dropdown {
+    position: absolute;
+    bottom: 1rem; /* 距离底部 1rem */
+    width: calc(100% - 2rem); /* 考虑左右内边距 1rem + 1rem */
+    padding: 0 1rem; /* 与 .nav-sidebar 内边距一致 */
+    box-sizing: border-box;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+       .live-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            margin-bottom: 15px;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+            transition: all 0.3s ease;
+        }
+        .live-card:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-2px);
+        }
+        .user-header {
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .user-info {
+            display: flex;
+            align-items: center;
+        }
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #ff8a00, #e52e71);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-weight: bold;
+        }
+        .room-list {
+            padding: 0;
+            max-height: 0;
+            overflow-y: hidden; /* 修改为 overflow-y */
+            transition: max-height 0.3s ease;
+        }
+
+        .room-list.expanded {
+            max-height: 500px;
+            overflow-y: auto; /* 展开时启用垂直滚动条 */
+        }
+        .room-item {
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            text-decoration: none;
+            color: white;
+            transition: background 0.2s ease;
+        }
+        .room-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        .room-icon {
+            margin-right: 12px;
+            color: #ff8a00;
+        }
+        .room-info {
+            flex: 1;
+            min-width: 0;
+        }
+        .room-title {
+            font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .room-details {
+            font-size: 0.85em;
+            opacity: 0.8;
+            margin-top: 3px;
+        }
+        .badge {
+            background-color: #3498db !important;
+            min-width: 30px;
+        }
+        .subscription-info {
+            font-size: 0.9em;
+            opacity: 0.8;
+            margin-top: 5px;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+        .toggle-icon {
+            transition: transform 0.3s ease;
+        }
+        .toggle-icon.expanded {
+            transform: rotate(180deg);
+        }
+
+
+
+
+
+        /* 订阅 */
+        /* 滚动条样式 */
+        .room-list::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .room-list::-webkit-scrollbar-track {
+            background: #343a40; /* 与 scrollarea 一致 */
+            border-radius: 4px;
+        }
+
+        .room-list::-webkit-scrollbar-thumb {
+            background: #495057; /* 与 scrollarea 一致 */
+            border-radius: 4px;
+        }
+
+        .room-list::-webkit-scrollbar-thumb:hover {
+            background: #6c757d; /* 与 scrollarea 一致 */
+        }
+
+
+
+
+
+
+
+
+
 
 @media (min-width: 768px) {
     .bd-placeholder-img-lg {

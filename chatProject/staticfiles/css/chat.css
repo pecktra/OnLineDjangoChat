@@ -61,6 +61,55 @@
     box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3); /* 阴影加深 */
 }
 
+
+
+
+
+
+/* 增强 streamer-title 样式 */
+.streamer-describe {
+    text-align: left;
+    width: 100%;
+}
+
+/* 增强 badge 样式 */
+.streamer-describe .badge {
+    font-size: 0.85rem; /* 稍大字体，突出标题 */
+    font-family: 'Roboto', sans-serif; /* 与 #streamerName 一致 */
+    font-weight: 500; /* 中等字重 */
+    color: #ffffff; /* 白色文字 */
+    background: linear-gradient(90deg, #868d97, #664f8c); /* 蓝色到紫色渐变 */
+    padding: 0.4em 0.8em; /* 稍大内边距，增加空间感 */
+    border-radius: 12px; /* 更圆润的边角 */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* 轻微阴影 */
+    max-width: 200px; /* 保留最大宽度 */
+    display: inline-block;
+    transition: transform 0.2s ease, opacity 0.2s ease; /* 平滑动画 */
+}
+
+/* 显示时的动画效果（当移除 d-none 时触发） */
+.streamer-describe:not(.d-none) .badge {
+    animation: describeIn 0.3s ease-out forwards;
+}
+
+/* 悬停效果 */
+.streamer-describe .badge:hover {
+    transform: scale(1.02); /* 轻微放大 */
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3); /* 阴影加深 */
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
 /* 标题显示动画 */
 @keyframes titleIn {
     from {
@@ -72,7 +121,17 @@
         transform: translateY(0);
     }
 }
-
+/* 标题显示动画 */
+@keyframes describeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
 
 
 

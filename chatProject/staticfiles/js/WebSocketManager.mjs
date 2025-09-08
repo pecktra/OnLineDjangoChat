@@ -31,6 +31,11 @@ export default class WebSocketManager {
 
     // 新增方法：保存聊天记录到服务器
     async saveChatHistory(message) {
+        // 检查登录
+        if (!window.GLOBAL_USER_ID || window.GLOBAL_USER_ID === 'null') {
+            alert('please log in');
+            return;
+        }
         try {
             const response = await fetch('/api/live/save_user_chat_history/', {
                 method: 'POST',
@@ -38,6 +43,7 @@ export default class WebSocketManager {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
+                    room_id:this.roomId,
                     room_name: this.roomName,
                     username: this.userName,
                     user_message: message
@@ -173,6 +179,11 @@ export default class WebSocketManager {
     }
 
     sendMessage() {
+        // 检查登录
+        if (!window.GLOBAL_USER_ID || window.GLOBAL_USER_ID === 'null') {
+            alert('please log in');
+            return;
+        }
         const message = this.chatInput.value.trim();
         
         if (message && this.socket.readyState === WebSocket.OPEN) {

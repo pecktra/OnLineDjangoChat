@@ -22,7 +22,7 @@ class RewardManager {
     static checkLoginBeforeReward() {
         // 检查用户是否登录
         if (!window.GLOBAL_USER_ID || window.GLOBAL_USER_ID === 'null') {
-            alert('请先登录');
+            alert('please log in');
             setTimeout(() => {
                 document.activeElement?.blur(); // 强制移除当前焦点元素
             }, 0);

@@ -1,0 +1,116 @@
+{% extends 'room_v3.html' %}
+{% load static %}
+{{ block.super }}
+{% block content %}
+    <!--中间live聊天-->
+<div class="total-chat" >
+    <div class="live-container">
+            <div class="mobile-switches">
+                <button class="switch-to-nav mobile-only" title="显示导航">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="3" y1="12" x2="21" y2="12"></line>
+                        <line x1="3" y1="6" x2="21" y2="6"></line>
+                        <line x1="3" y1="18" x2="21" y2="18"></line>
+                    </svg>
+                </button>
+
+            </div>
+    <div class="streamer-info">
+        <div class="streamer-left">
+            <div class="streamer-details d-flex align-items-center">
+                <!-- 主播头像 -->
+                <div class="position-relative me-3">
+                    <img src="{% static 'svg/person-circle.svg' %}" alt="主播头像"
+                        class="rounded-circle border border-3 border-primary">
+                </div>
+
+                <div>
+                    <h5 class="mb-0">
+                        <!-- <i class="bi bi-person-check-fill text-primary me-2"></i> -->
+                        <span id="streamerName">loading...</span>
+                    </h5>
+                    <!-- <p class="mb-0 text-muted">
+                        <i class="bi bi-people-fill me-2"></i>
+                        <span id="viewerCount">0</span>人观看
+                    </p> -->
+                </div>
+            </div>
+            <!-- 房间标题 -->
+            <div class="streamer-title mt-2 d-none">
+                <span class="badge text-truncate d-inline-block" style="max-width: 800px;"></span>
+            </div>
+            <!-- 房间描述 -->
+            <div class="streamer-describe mt-2 d-none">
+                <span class="badge text-truncate d-inline-block" style="max-width: 800px;"></span>
+            </div>
+        </div>
+
+        <div class="streamer-actions">
+            <!-- <button class="btn btn-primary follow-btn follow2-btn">favourite</button>
+            <button class="btn btn-primary follow-btn subscription-btn">subscription</button>
+            <button class="btn btn-primary follow-btn reward-btn">tip</button> -->
+            <span class="action-icon follow2-btn">
+                <svg viewBox="0 0 24 24" class="star-icon">
+                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                </svg>
+            </span>
+            <span class="action-icon subscription-btn">
+                <svg viewBox="0 0 24 24" class="heart-icon">
+                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+                </svg>
+            </span>
+            <span class="action-icon reward-btn">
+                <svg viewBox="0 0 24 24" class="dollar-icon">
+                    <path d="M12 22c.55 0 1-.45 1-1v-2h2c.55 0 1-.45 1-1s-.45-1-1-1h-1.09c.47-.66.74-1.43.74-2.25 0-1.93-1.57-3.5-3.5-3.5H9v-2h4c.55 0 1-.45 1-1s-.45-1-1-1h-2V3c0-.55-.45-1-1-1s-1 .45-1 1v2H7c-.55 0-1 .45-1 1s.45 1 1 1h2v2H5c-.55 0-1 .45-1 1s.45 1 1 1h1.09c-.47.66-.74 1.43-.74 2.25 0 1.93 1.57 3.5 3.5 3.5h2v2c0 .55.45 1 1 1z" />
+                </svg>
+            </span>
+        </div>
+        </div>
+            <!-- 动态聊天区域 -->
+            <div class="chat-area" id="chatArea">
+                <!-- 这里会被JavaScript动态填充 -->
+                <div class="text-center py-4 text-muted">
+                    <div class="spinner-border spinner-border-sm" role="status"></div>
+                    <span>loading...</span>
+                </div>
+            </div>
+        </div>
+
+    <!--右侧聊天-->
+    <div class="chat-panel">
+        <div class="chat-header">
+            <div class="live-user-header">
+                <img src="{% static 'svg/person-circle.svg' %}" alt="">
+                <span id="streamerName1">黑猫警长</span>
+            </div>
+            <!-- 钻石收益区域 -->
+            <div class="diamond-display" style="display: flex; align-items: center; background: rgba(255,215,0,0.1); padding: 5px 10px; border-radius: 16px; margin-left: 15px;">
+                <!-- 钻石图标 -->
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="#FFD700" style="margin-right: 6px;">
+                    <path d="M12 1.5L6 9H18L12 1.5ZM6 9L1 15H23L18 9H6ZM1 15L6 21H18L23 15H1ZM12 15L9 9H15L12 15Z"/>
+                </svg>
+                <!-- 钻石数量 -->
+                <span id="diamond" class="diamond-count" style="font-weight: bold; color: #FFD700;">0</span>
+                <!-- “+”按钮 -->
+                <button id="open-pay-modal" style="margin-left: 8px; background: none; border: none; color: #FFD700; font-size: 16px; cursor: pointer;">+</button>
+            </div>
+        {% include 'pay.html' %}
+
+        </div>
+        <div class="chat-content">
+            <div class="text-center py-4 loading-container">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">loading...</span>
+                </div>
+                <div class="mt-2 text-muted">loading...</div>
+            </div>
+        </div>
+        <div class="input-group">
+            <label for="chatMessageInput"></label><input type="text" class="form-control" id="chatMessageInput" placeholder="输入消息" />
+            <div class="input-group-append">
+                <button class="btn btn-success" id="chatMessageSend" type="button">send</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,332 @@
+用户端：
+1、获取谷歌授权url
+URL：/api/users/google_login_url/
+Method：get
+Body:
+	{
+
+	}
+Response:
+	Success：
+		{
+			"code":0,
+			"data": {
+                                     "authorization_url": authorization_url
+                                   }
+		}
+	error:
+		{
+			"code":1
+		}
+
+2、Google 登录回调处理
+URL：api/users/google_oauth2_callback/
+Method：get
+Body:
+	{
+              code:code  访问令牌
+	}
+Response:
+	Success：
+		{
+                       成功之后 会跳转到首页			 
+                }
+            }
+		}
+	error:
+		{
+			"code":1
+		}
+3、Google 登录检测登录状态
+URL：/api/users/is_google_logged_in/
+Method：get
+Body:
+	{
+
+	}
+Response:
+	Success：
+		{
+		""code": 0,
+                "message": "User is authenticated via Google",
+                "data": {
+                    "user_info": {
+                        "uid": user.id,
+                        "status": True,  # 用户已登录
+                        "uname": google_name,  # 使用 Google 的 email 作为用户名
+                        "google_id": google_id,
+                        "google_email": google_email
+                     
+                        
+                   "code": 1,
+                   "message": "User is not authenticated via Google, using guest mode",
+                  "data": {
+                      "user_info": {
+                      "uid": None,
+                      "status": False,  # 用户未登录
+                      "uname": 游客xxx,  # 返回生成的游客用户名
+                      "google_id": None,
+                     "google_email": None
+            }
+        }
+		}
+	error:
+		{
+			"code":1
+		}
+
+4、用户打赏主播接口
+URL：/api/balance/make_donation/
+Method：post
+Body:
+	{
+         user_id：user_id用户ID
+         anchor_id：anchor_id主播ID
+         amount：amount 打赏金额
+	}
+Response:
+	Success：
+		 {
+        {
+    "code": 0,
+    "message": "Donation successful.",
+    "data": {
+        "donation_id": 4,
+        "user_name": "yi zhao",
+        "anchor_name": "jliu",
+        "amount": 10.0,
+        "donation_date": "2025-08-15T15:17:21.167424Z",
+        "remaining_balance": 960.0
+    }
+}
+}
+
+        
+		}
+	error:
+		{
+			"code":1
+		}
+		
+5、获取用户的所有打赏记录
+URL：/api/balance/get_user_donations/
+Method：get
+Body:
+	{
+         user_id：user_id用户ID
+
+	}
+Response:
+	Success：
+{
+    "code": 0,
+    "data": {
+        "user_donations": [
+            {
+                "donation_id": 4,
+                "anchor_name": "jliu",
+                "donation_amount": 10.0,
+                "donation_date": "2025-08-15T15:17:21Z"
+            },
+            {
+                "donation_id": 3,
+                "anchor_name": "jliu",
+                "donation_amount": 10.0,
+                "donation_date": "2025-08-15T15:14:44Z"
+            },
+            {
+                "donation_id": 2,
+                "anchor_name": "jliu",
+                "donation_amount": 10.0,
+                "donation_date": "2025-08-15T15:14:27Z"
+            },
+            {
+                "donation_id": 1,
+                "anchor_name": "jliu",
+                "donation_amount": 10.0,
+                "donation_date": "2025-08-15T15:11:29Z"
+            }
+        ]
+    }
+
+	error:
+		{
+			"code":1
+		}
+6、获取主播收到的所有打赏记录
+URL：/api/balance/get_anchor_donations/
+Method：get
+Body:
+	{
+        anchor_id：anchor_id 主播id
+	}
+
+Response:
+	Success：
+{
+    "code": 0,
+    "data": {
+        "anchor_donations": [
+            {
+                "donation_id": 4,
+                "user_name": "yi zhao",
+                "donation_amount": 10.0,
+                "donation_date": "2025-08-15T15:17:21Z"
+            },
+            {
+                "donation_id": 3,
+                "user_name": "yi zhao",
+                "donation_amount": 10.0,
+                "donation_date": "2025-08-15T15:14:44Z"
+            },
+            {
+                "donation_id": 2,
+                "user_name": "yi zhao",
+                "donation_amount": 10.0,
+                "donation_date": "2025-08-15T15:14:27Z"
+            },
+            {
+                "donation_id": 1,
+                "user_name": "yi zhao",
+                "donation_amount": 10.0,
+                "donation_date": "2025-08-15T15:11:29Z"
+            }
+        ]
+    }
+}
+	error:
+		{
+			"code":1
+		}
+		
+7、获取用户的总打赏金额
+URL：/api/balance/get_user_total_donated/
+Method：get
+Body:
+	{
+             user_id：user_id 用户id
+	}
+
+Response:
+	Success：
+{
+    "code": 0,
+    "data": {
+        "total_donated": 40.0
+    }
+}
+	error:
+		{
+			"code":1
+		}		
+
+8、获取主播的总收到打赏金额
+URL：/api/balance/get_anchor_total_received/
+Method：get
+Body:
+	{
+        anchor_id：anchor_id 主播id
+
+	}
+
+Response:
+	Success：
+{
+    "code": 0,
+    "data": {
+        "total_received": 40.0
+    }
+}
+	error:
+		{
+			"code":1
+		}		
+
+9、用户订阅主播接口，扣除用户的钻石余额，订阅时间为一个月
+URL：/api/subscription/subscribe_to_anchor/
+Method：post
+Body:
+	{
+        anchor_id：anchor_id 主播id
+        user_id: user_id  用户id
+        amount:amount 订阅花费
+	}
+
+Response:
+	Success：
+{
+    "code": 0,
+    "message": "Subscription successful",
+    "data": {
+        "user_id": 6,
+        "anchor_id": "qwWaYqUnT6qJLr_7iRlQoA",
+        "subscription_date": "2025-08-15 16:03:50",
+        "diamonds_paid": 10.0,
+        "expiry_date": "2025-09-14 16:03:50"
+    }
+}
+	error:
+		{
+			"code":1
+		}		
+
+9、 用户订阅列表
+URL：/api/subscription/get_subscriptions/
+Method：get
+Body:
+	{
+
+        user_id: user_id  用户id
+
+	}
+
+Response:
+	Success：
+{
+    "code": 0,
+    "message": "Active subscriptions retrieved successfully",
+    "data": {
+        "subscriptions": [
+            {
+                "anchor_id": "qwWaYqUnT6qJLr_7iRlQoA",
+                "diamonds_paid": 10.0,
+                "subscription_date": "2025-08-15 16:36:30",
+                "subscription_end_date": "2025-09-14 16:36:30"
+            }
+        ]
+    }
+}
+	error:
+		{
+			"code":1
+		}	
+
+10、 用户关注/取消关注直播间
+URL：/api/follow_live/toggle_follow_room/
+Method：post
+Body:
+	{
+
+        user_id: user_id  用户id
+		room_id:room_id 房间id
+        room_name:room_name 房间名称
+		follow_status:bool ,true是关注，false是取消关注
+	}
+
+Response:
+	Success：
+{
+ {
+    "code": 0,
+    "message": "Followed the room successfully",
+    "data": {
+        "user_id": "6",
+        "room_id": "gGAlOXloThS9r8d5HgeBzg_Tina",
+        "status": true ,true是关注，false是取消关注
+    }
+}
+}
+	error:
+		{
+			"code":1
+		}

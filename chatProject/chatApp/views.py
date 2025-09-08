@@ -10,6 +10,12 @@ def room_test(request):
     return render(request, 'room_v3.html')
 
 
+
+
+@csrf_exempt
+def room_live(request):
+    return render(request, 'live.html', {'room_id': ''})
+
 # @csrf_exempt
 # @login_required
 # def home(request):

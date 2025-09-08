@@ -3,7 +3,7 @@
 <html>
 
 <head>
-    <title>Pecktra</title>
+    <title >Pecktra</title>
     <meta charset="utf-8">
 
     
@@ -14,6 +14,8 @@
     <link rel="stylesheet" type="text/css" href="{% static 'css/chat.css' %}">
     <link rel="stylesheet" type="text/css" href="{% static 'css/user_chat.css' %}">
     <link rel="stylesheet" type="text/css" href="{% static 'css/move_v2.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/home.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/streamer.css' %}">
     <!-- Bootstrap Icons -->
     <!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"> -->
     <link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap-icons.css' %}">
@@ -59,14 +61,11 @@
 </svg>
 <main>
     <!--左侧导航-->
-
-
-
 		<div class="d-flex flex-column flex-shrink-0 p-3 text-white bg-dark nav-sidebar" style="width: 280px;">
 
             
                 <div class="d-flex align-items-center justify-content-between">
-                    <a href="/api/live/redirect_to_random_room" class="d-flex align-items-center text-white text-decoration-none">
+                    <a href="/" class="d-flex align-items-center text-white text-decoration-none">
                         <svg class="bi me-2" width="40" height="32"><use xlink:href="#bootstrap"/></svg>
                         <span class="fs-4">Pecktra</span>
                     </a>
@@ -85,6 +84,19 @@
 						Home
 					</a>
 				</li>
+            <li>
+                <a href="#" class="nav-link text-white follows-link" data-bs-toggle="tooltip" data-bs-placement="right" title="Follows">
+                    <svg class="bi me-2" width="16" height="16"><use xlink:href="#people-circle"/></svg>
+                    Favourite
+                </a>
+            </li>
+            <li>
+                <a href="#" class="nav-link text-white subscriptions-link" data-bs-toggle="tooltip" data-bs-placement="right" title="Subscriptions">
+                    <svg class="bi me-2" width="16" height="16"><use xlink:href="#grid"/></svg>
+                    Subscriptions
+                </a>
+            </li>
+
 			</ul>
 			<hr>
 			<h6 class="text-white mb-2">Lives</h6>
@@ -106,7 +118,7 @@
 					<strong id="username">Loading...</strong>
 				</a>
 				<ul class="dropdown-menu dropdown-menu-dark text-small shadow" aria-labelledby="dropdownUser1">
-					<li><a class="dropdown-item" href="#" id="profileLink">Profile</a></li>
+					<li><a class="dropdown-item" href="http://43.162.120.233:8001/" id="profileLink">Become a anchor</a></li>
 					<li><hr class="dropdown-divider"></li>
 					<li><a class="dropdown-item" href="#" id="logoutLink">Sign out</a></li>
 					<li><a class="dropdown-item" href="#" id="googleLoginLink" >Sign in with Google</a></li>
@@ -114,98 +126,30 @@
 			</div>
 		</div>
 
-    <!--中间live聊天-->
-<div class="total-chat">
-    <div class="live-container">
-            <div class="mobile-switches">
-                <button class="switch-to-nav mobile-only" title="显示导航">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <line x1="3" y1="12" x2="21" y2="12"></line>
-                        <line x1="3" y1="6" x2="21" y2="6"></line>
-                        <line x1="3" y1="18" x2="21" y2="18"></line>
-                    </svg>
-                </button>
-                <!-- <button class="switch-to-chat mobile-only" title="显示聊天">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
-                    </svg>
-                </button> -->
-            </div>
-<div class="streamer-info">
-    <div class="streamer-left">
-        <div class="streamer-details d-flex align-items-center">
-            <!-- 主播头像 -->
-            <div class="position-relative me-3">
-                <img src="{% static 'svg/person-circle.svg' %}" alt="主播头像"
-                     class="rounded-circle border border-3 border-primary">
-            </div>
 
-            <div>
-                <h5 class="mb-0">
-                    <!-- <i class="bi bi-person-check-fill text-primary me-2"></i> -->
-                    <span id="streamerName">黑猫警长</span>
-                </h5>
-                <!-- <p class="mb-0 text-muted">
-                    <i class="bi bi-people-fill me-2"></i>
-                    <span id="viewerCount">0</span>人观看
-                </p> -->
-            </div>
-        </div>
-        <!-- 房间标题 -->
-        <div class="streamer-title mt-2 d-none">
-            <span class="badge text-truncate d-inline-block" style="max-width: 800px;"></span>
-        </div>
-    </div>
 
-    <div class="streamer-actions">
-        <button class="btn btn-primary follow-btn follow2-btn">关注</button>
-        <button class="btn btn-primary follow-btn subscription-btn">订阅</button>
-        <button class="btn btn-primary follow-btn reward-btn">打赏</button>
-    </div>
-</div>
-        <!-- 动态聊天区域 -->
-        <div class="chat-area" id="chatArea">
-            <!-- 这里会被JavaScript动态填充 -->
-            <div class="text-center py-4 text-muted">
-                <div class="spinner-border spinner-border-sm" role="status"></div>
-                <span>正在加载聊天记录...</span>
-            </div>
-        </div>
-    </div>
 
-    <!--右侧聊天-->
-    <div class="chat-panel">
-        <div class="chat-header">
-            <div class="live-user-header">
-                <img src="{% static 'svg/person-circle.svg' %}" alt="">
-                <span id="streamerName1">黑猫警长</span>
-            </div>
-            <!-- 钻石收益区域 -->
-            <div class="diamond-display" style="display: flex; align-items: center; background: rgba(255,215,0,0.1); padding: 5px 10px; border-radius: 16px; margin-left: 15px;">
-                <!-- 钻石图标 -->
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="#FFD700" style="margin-right: 6px;">
-                    <path d="M12 1.5L6 9H18L12 1.5ZM6 9L1 15H23L18 9H6ZM1 15L6 21H18L23 15H1ZM12 15L9 9H15L12 15Z"/>
-                </svg>
-                <!-- 钻石数量 -->
-                <span id="diamond" class="diamond-count" style="font-weight: bold; color: #FFD700;">0</span>
-            </div>
-        </div>
-        <div class="chat-content">
-            <div class="text-center py-4 loading-container">
-                <div class="spinner-border text-primary" role="status">
-                    <span class="visually-hidden">加载中...</span>
-                </div>
-                <div class="mt-2 text-muted">正在加载消息...</div>
-            </div>
-        </div>
-        <div class="input-group">
-            <label for="chatMessageInput"></label><input type="text" class="form-control" id="chatMessageInput" placeholder="输入消息" />
-            <div class="input-group-append">
-                <button class="btn btn-success" id="chatMessageSend" type="button">发送</button>
-            </div>
-        </div>
-    </div>
-</div>
+
+
+
+
+
+
+
+
+
+
+
+
+{% block content %}
+
+{% endblock %}
+
+
+
+
+
+
 
 
 </main>
@@ -239,12 +183,80 @@
   </div>
 </div>
 
+    <!-- Follows Modal -->
+    <div class="modal fade" id="followsModal" tabindex="-1" aria-labelledby="followsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="followsModalLabel">我的关注</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="关闭"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="modal-table-container">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>房间名称</th>
+                                    <th>关注时间</th>
+
+                                </tr>
+                            </thead>
+                            <tbody id="followsTable">
+                                <tr><td colspan="2">加载中...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">关闭</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+    <!-- Subscriptions Modal -->
+    <div class="modal fade" id="subscriptionsModal" tabindex="-1" aria-labelledby="subscriptionsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="subscriptionsModalLabel">我的订阅</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="关闭"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="modal-table-container">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>主播ID</th>
+                                    <th>主播名称</th>
+                                    <th>支付钻石</th>
+                                    <th>订阅时间</th>
+                                    <th>订阅结束时间</th>
+                                </tr>
+                            </thead>
+                            <tbody id="subscriptionsTable">
+                                <tr><td colspan="5">加载中...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">关闭</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
 
 
 <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script> -->
 <script>
   // 将 room_id 暴露为全局变量
-  window.GLOBAL_ROOM_NAME = "{{ room_name }}";
+
   window.GLOBAL_ROOM_ID = "{{ room_id }}";
 
 
@@ -263,7 +275,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     const main = document.querySelector('main');
     const navSidebar = document.querySelector('.nav-sidebar');
-    const totalChat = document.querySelector('.total-chat');
+    // const totalChat = document.querySelector('.total-chat');
     const closeNavBtn = document.querySelector('.close-nav');
     const closeChatBtn = document.querySelector('.close-chat');
     const switchToNavBtn = document.querySelector('.switch-to-nav');
@@ -274,7 +286,15 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error('Section is undefined');
             return;
         }
-        [navSidebar, totalChat].forEach(el => {
+        // [navSidebar, totalChat].forEach(el => {
+        //     if (el) {
+        //         const displayValue = (el === section) ? 'flex' : 'none';
+        //         el.style.setProperty('display', displayValue, 'important');
+        //     } else {
+        //         console.error('Element is undefined:', el);
+        //     }
+        // });
+        [navSidebar].forEach(el => {
             if (el) {
                 const displayValue = (el === section) ? 'flex' : 'none';
                 el.style.setProperty('display', displayValue, 'important');
@@ -282,74 +302,120 @@ document.addEventListener('DOMContentLoaded', () => {
                 console.error('Element is undefined:', el);
             }
         });
-
         // 如果显示聊天区域，滚动到最新消息
-        if (section === totalChat) {
-            const chatContainer = document.querySelector('.chat-content');
-            if (chatContainer) {
-                chatContainer.scrollTop = chatContainer.scrollHeight;
-            }
-        }
+        // if (section === totalChat) {
+        //     const chatContainer = document.querySelector('.chat-content');
+        //     if (chatContainer) {
+        //         chatContainer.scrollTop = chatContainer.scrollHeight;
+        //     }
+        // }
     }
 
-    // 仅在手机端（<= 768px）应用切换逻辑
-    if (window.innerWidth <= 768) {
-        // 默认显示聊天区域
-        showSection(totalChat);
+    // // 仅在手机端（<= 768px）应用切换逻辑
+    // if (window.innerWidth <= 768) {
+    //     // 默认显示聊天区域
+    //     showSection(totalChat);
 
-        if (closeNavBtn) {
-            closeNavBtn.addEventListener('click', (event) => {
-                event.preventDefault();
-                event.stopPropagation();
-                showSection(totalChat);
-            });
-        }
+    //     if (closeNavBtn) {
+    //         closeNavBtn.addEventListener('click', (event) => {
+    //             event.preventDefault();
+    //             event.stopPropagation();
+    //             showSection(totalChat);
+    //         });
+    //     }
 
-        if (closeChatBtn) {
-            closeChatBtn.addEventListener('click', (event) => {
-                event.preventDefault();
-                event.stopPropagation();
-                showSection(totalChat);
-            });
-        }
+    //     if (closeChatBtn) {
+    //         closeChatBtn.addEventListener('click', (event) => {
+    //             event.preventDefault();
+    //             event.stopPropagation();
+    //             showSection(totalChat);
+    //         });
+    //     }
 
-        if (switchToNavBtn) {
-            switchToNavBtn.addEventListener('click', (event) => {
-                event.preventDefault();
-                event.stopPropagation();
-                showSection(navSidebar);
-            });
-        }
+    //     if (switchToNavBtn) {
+    //         switchToNavBtn.addEventListener('click', (event) => {
+    //             event.preventDefault();
+    //             event.stopPropagation();
+    //             showSection(navSidebar);
+    //         });
+    //     }
 
-        if (switchToChatBtn) {
-            switchToChatBtn.addEventListener('click', (event) => {
-                event.preventDefault();
-                event.stopPropagation();
-                showSection(totalChat);
-            });
-        }
+    //     if (switchToChatBtn) {
+    //         switchToChatBtn.addEventListener('click', (event) => {
+    //             event.preventDefault();
+    //             event.stopPropagation();
+    //             showSection(totalChat);
+    //         });
+    //     }
 
-        // Fallback binding for mobile devices
-        setTimeout(() => {
-            const fallbackSwitchToNavBtn = document.querySelector('.switch-to-nav');
-            const fallbackSwitchToChatBtn = document.querySelector('.switch-to-chat');
-            if (fallbackSwitchToNavBtn && !fallbackSwitchToNavBtn.onclick) {
-                fallbackSwitchToNavBtn.addEventListener('click', (event) => {
-                    event.preventDefault();
-                    event.stopPropagation();
-                    showSection(navSidebar);
-                });
-            }
-            if (fallbackSwitchToChatBtn && !fallbackSwitchToChatBtn.onclick) {
-                fallbackSwitchToChatBtn.addEventListener('click', (event) => {
-                    event.preventDefault();
-                    event.stopPropagation();
-                    showSection(totalChat);
-                });
-            }
-        }, 1000);
-    }
+    //     // Fallback binding for mobile devices
+    //     setTimeout(() => {
+    //         const fallbackSwitchToNavBtn = document.querySelector('.switch-to-nav');
+    //         const fallbackSwitchToChatBtn = document.querySelector('.switch-to-chat');
+    //         if (fallbackSwitchToNavBtn && !fallbackSwitchToNavBtn.onclick) {
+    //             fallbackSwitchToNavBtn.addEventListener('click', (event) => {
+    //                 event.preventDefault();
+    //                 event.stopPropagation();
+    //                 showSection(navSidebar);
+    //             });
+    //         }
+    //         if (fallbackSwitchToChatBtn && !fallbackSwitchToChatBtn.onclick) {
+    //             fallbackSwitchToChatBtn.addEventListener('click', (event) => {
+    //                 event.preventDefault();
+    //                 event.stopPropagation();
+    //                 showSection(totalChat);
+    //             });
+    //         }
+    //     }, 1000);
+    // }
 });
+
+
+
+
+
+
+
+
+
+
+
+
+// 获取按钮和拟态框元素
+    if(window.GLOBAL_ROOM_ID != "None"){
+        const openPayModalBtn = document.getElementById('open-pay-modal');
+        const payModal = document.getElementById('pay-modal');
+        const closePayModalBtn = document.getElementById('close-pay-modal');
+
+        // 点击“+”按钮显示拟态框
+        openPayModalBtn.addEventListener('click', () => {
+            payModal.style.display = 'block';
+        });
+
+        // 点击“取消”按钮关闭拟态框
+        closePayModalBtn.addEventListener('click', () => {
+            payModal.style.display = 'none';
+        });
+
+        // 可选：点击背景关闭拟态框
+        payModal.addEventListener('click', (e) => {
+            if (e.target === payModal) {
+                payModal.style.display = 'none';
+            }
+        })
+    }
+
+
+
+
+
+
+
+
+
+
+
+
 
     </script>
 </body>

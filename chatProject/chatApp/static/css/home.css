@@ -1,0 +1,169 @@
+.homepage-container {
+    flex: 1;
+    height: 100vh;
+    flex-direction: column;
+ 
+}
+
+.homepage-header {
+    height: 30%;
+    background: linear-gradient(135deg, #1a1a1a 0%, #2c2c2c 100%);
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 20px;
+}
+
+.homepage-header h1 {
+    font-size: 2.5rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+}
+
+.homepage-header p.lead {
+    font-size: 1.25rem;
+    margin-bottom: 1rem;
+}
+
+.homepage-lives {
+    height: 70%;
+    overflow-y: auto;
+    padding: 20px;
+    background: #121212;
+}
+
+.home-live-card-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 20px;
+    justify-items: center;
+}
+
+.home-live-card {
+    width: 100%;
+    max-width: 250px;
+    height: 280px;
+    background: linear-gradient(135deg, #2c3e50 0%, #4a5568 100%);
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+}
+
+.home-live-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+.home-user-header {
+    display: flex;
+    align-items: center;
+    padding: 15px;
+    background: rgba(0, 0, 0, 0.1);
+}
+
+.home-user-info {
+    display: flex;
+    align-items: center;
+    flex: 1;
+}
+
+.home-user-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #3498db;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-right: 10px;
+}
+
+.home-user-info div {
+    color: #ffffff;
+}
+
+.home-user-info .username {
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.home-room-list {
+    padding: 15px;
+}
+
+.home-room-item {
+    display: flex;
+    align-items: center;
+    color: #ffffff;
+    text-decoration: none;
+}
+
+.home-room-icon {
+    margin-right: 10px;
+    color: #3498db;
+}
+
+/* .home-room-info .room-title {
+    font-size: 1rem;
+    font-weight: 500;
+    margin-bottom: 5px;
+} */
+.home-room-info .room-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #ffffff;
+    margin-bottom: 8px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 3; /* 标题最多三行 */
+    -webkit-box-orient: vertical;
+}
+
+.home-room-info .room-description {
+    font-size: 0.8rem;
+    color: #b0b0b0;
+    margin-bottom: 8px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 3; /* 描述最多三行 */
+    -webkit-box-orient: vertical;
+}
+
+
+
+
+
+
+.home-room-info .home-live-info {
+    font-size: 0.9rem;
+    color: #b0b0b0;
+}
+
+.badge.bg-primary {
+    background-color: #3498db !important;
+    font-size: 0.85rem;
+}
+
+@media (max-width: 768px) {
+    .home-live-card-container {
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    }
+    .home-live-card {
+        max-width: 100%;
+    }
+    .homepage-header h1 {
+        font-size: 2rem;
+    }
+    .homepage-header p.lead {
+        font-size: 1rem;
+    }
+}

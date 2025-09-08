@@ -1,6 +1,6 @@
 
 export default class ChatUserManager {
-    static async fetchChatHistory(room_name) {
+    static async fetchChatHistory(room_id) {
         // 模拟数据
         // const mockData = {
         //     code: 0,
@@ -27,7 +27,7 @@ export default class ChatUserManager {
         //         ]
         //     }
         // };
-        const response = await fetch(`/api/live/get_user_chat_history/?room_name=${encodeURIComponent(room_name)}`, {
+        const response = await fetch(`/api/live/get_user_chat_history/?room_id=${encodeURIComponent(room_id)}`, {
             method: 'GET',
             headers: { 'Content-Type': 'application/json' }, // 如果后端不要求此头，可移除
         });
@@ -36,9 +36,9 @@ export default class ChatUserManager {
         return mockData.data.chat_info;
     }
 
-    static async init(room_name) {
+    static async init(room_id) {
         try {
-            const messages = await this.fetchChatHistory(room_name);
+            const messages = await this.fetchChatHistory(room_id);
             this.renderMessages(messages);
 
             // // 模拟实时消息更新

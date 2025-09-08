@@ -5,7 +5,7 @@ import StreamerInfoManager from "./streamer.mjs";
 import ChatUserManager from "./chat_user.mjs";
 import WebSocketManager from "./WebSocketManager.mjs";
 import RewardManager from "./reward_manager.mjs";
-
+import PayManager from "./pay.mjs";
 
 
 
@@ -14,31 +14,68 @@ async  function initializeApp() {
     vhCheck({
         cssVarName: '--vh'  // 可选，默认就是 --vh
     });
-    const room_name = window.GLOBAL_ROOM_NAME;
+
     const room_id = window.GLOBAL_ROOM_ID;
 
 
     // 1. 用户认证模块
-    await UserManager.checkLogin();
+    await UserManager.checkLogin(room_id);
     UserManager.bindLogoutEvent();
+
+
     
     
 
     //直播模块
     LiveManager.init();
+    LiveManager.initFollowsButton();
+    LiveManager.initSubscriptionsButton();
+    let is_home = false; // Use let instead of const
+
+    if (room_id == "None") {
+        is_home = true; // Reassign to true inside the block
+        await LiveManager.loadHome(is_home);
+        LiveManager.initHomeButton(is_home)
+        LiveManager.initRedirectHomeButton()
+        return;
+    }
+    LiveManager.initHomeButton(is_home)
+    LiveManager.initRedirectHomeButton()
+
+
+    // 根据 room_id 控制显示
+    // const homepageContainer = document.getElementById('homepageContainer');
+    // const totalChat = document.querySelector('.total-chat');
+    // if (!room_id) {
+    //     if (homepageContainer) homepageContainer.style.display = 'flex';
+    //     if (totalChat) totalChat.style.display = 'none';
+    //     await LiveManager.loadHome();
+    //     return;
+    // } else {
+    //     if (totalChat) totalChat.style.display = 'flex';
+    //     if (homepageContainer) homepageContainer.style.display = 'none';
+    // }
+
+
+
+
 
     //主播历史聊天
-    ChatLiveManager.init(room_name);
+    ChatLiveManager.init(room_id);
 
     //主播信息端
-    StreamerInfoManager.init(room_name)
+    await StreamerInfoManager.init(room_id)
+
+
+
     //主播用户消息端
-    ChatUserManager.init(room_name);
+    ChatUserManager.init(room_id);
 
     //打赏
     RewardManager.init()
 
-
+    //支付
+    PayManager.init('pay-modal', 'pay-form', 'close-pay-modal')
 
 
 
@@ -46,6 +83,8 @@ async  function initializeApp() {
     // 3. 全局工具提示初始化（只需要初始化静态元素）
     initStaticTooltips();
     const userName = window.GLOBAL_USER_NAME;
+    const room_name = window.GLOBAL_ROOM_NAME;
+
     initWebSocket(room_id,room_name,userName);
 }
 //初始化websocket

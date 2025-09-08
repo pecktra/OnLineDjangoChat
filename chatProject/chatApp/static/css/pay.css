@@ -1,0 +1,195 @@
+/* 拟态框容器 */
+.modal-pay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #000;
+    z-index: 1000;
+    transition: opacity 0.3s ease-in-out;
+}
+
+/* 拟态框内容 */
+.modal-content-pay {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    padding: 20px;
+}
+
+/* 支付包装器 */
+.payment-wrapper {
+    width: 100%;
+    height: 100%;
+    padding: 80px 20px 80px; /* 增加顶部内边距，调整标题位置 */
+    box-sizing: border-box;
+    color: #fff;
+}
+
+/* 品牌名称 */
+.brand-logo {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    font-size: 32px; /* 增大字体 */
+    font-weight: 600;
+    color: #888; /* 改为灰色 */
+}
+
+/* 标题容器 */
+.title-container {
+    text-align: center;
+    margin-bottom: 60px; /* 增加底部间距，移动标题向下 */
+}
+.payment-wrapper h2 {
+    margin: 0 0 5px;
+    font-size: 36px;
+    font-weight: 700;
+    color: #fff;
+}
+.payment-wrapper .subtitle {
+    margin: 0;
+    color: #aaa;
+    font-size: 16px;
+}
+
+/* 计划容器 */
+
+.plans {
+    display: flex;
+    justify-content: center ;/* 改为 居中 */
+    align-items: stretch;
+    gap: 60px; /* 保持最小间距 */
+    margin-bottom: 40px;
+    flex-wrap: wrap;
+}
+
+/* 计划卡片 */
+.plan-card {
+    background: #2d2d2d; /* 灰色卡片 */
+    padding: 20px;
+    border-radius: 12px;
+    border: 1px solid #444;
+    flex: 1; /* 保持弹性布局 */
+    min-width: 200px; /* 最小宽度 */
+    max-width: 200px; /* 最小宽度 */
+    min-height: 300px; /* 保持高度 */
+    transition: all 0.2s ease-in-out;
+    position: relative;
+    text-align: center;
+    cursor: pointer; /* 指示可点击 */
+    
+}
+/* 计划卡片 - 受欢迎的样式 */
+.plan-card.popular {
+    position: relative; /* 确保 ::before 定位生效 */
+}
+.plan-card.popular::before {
+    content: "最受欢迎";
+    position: absolute;
+    top: -10px;
+    right: 10px;
+    background: #FFD700;
+    color: #000;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    z-index: 1; /* 确保文字在边框之上 */
+}
+
+
+
+
+
+/* 选中状态 */
+.plan-card.selected {
+    border-color: #FFD700; /* 仅在选中时显示黄色边框 */
+}
+
+/* 覆盖非选中状态的边框 */
+.plan-card:not(.selected) {
+    border-color: #444; /* 恢复默认边框颜色 */
+}
+.plan-card:hover {
+    background: #333;
+    border-color: #555;
+}
+.plan-card h3 {
+    margin: 0 0 80px; /* 增加底部间距 */
+    font-size: 20px;
+    color: #fff;
+}
+.plan-card .price {
+    margin: 0 0 80px; /* 增加底部间距 */
+    font-size: 28px;
+    font-weight: 700;
+    color: #FFD700;
+}
+.plan-card .diamonds {
+    margin: 0 0 80px; /* 保持现有间距，或根据需要调整 */
+    font-size: 16px;
+    color: #aaa;
+}
+
+/* 按钮容器 */
+.button-container {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    right: 20px;
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    max-width: 900px;
+    margin: 0 auto;
+}
+.cancel-button, .confirm-button {
+    flex: 1;
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.cancel-button {
+    background: #555;
+    color: #fff;
+}
+.cancel-button:hover {
+    background: #666;
+}
+.confirm-button {
+    background: linear-gradient(90deg, #FFD700, #ffca28);
+    color: #000;
+    font-weight: 600;
+}
+.confirm-button:hover {
+    background: linear-gradient(90deg, #ffca28, #FFD700);
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .plans {
+        flex-direction: column;
+        align-items: center;
+    }
+    .plan-card {
+        width: 80%;
+        max-width: none;
+        min-height: 250px; /* 移动端调整高度 */
+    }
+    .button-container {
+        position: relative;
+        bottom: auto;
+        left: auto;
+        right: auto;
+        flex-direction: column;
+    }
+    .cancel-button, .confirm-button {
+        width: 100%;
+    }
+}

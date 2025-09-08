@@ -1,0 +1,34 @@
+/* 图标样式 */
+.action-icon {
+    display: inline-flex !important; /* 强制显示 */
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    cursor: pointer; /* 显示点击光标 */
+    fill: white !important; /* 默认白色 */
+    background: none;
+    border: none;
+    padding: 0;
+    pointer-events: auto !important; /* 确保图标可点击 */
+}
+
+.action-icon svg {
+    width: 24px;
+    height: 24px;
+}
+
+/* 关注图标（星形） */
+.follow2-btn.favourited {
+    fill: #ffc107 !important; /* 黄色 */
+}
+
+/* 订阅图标（心形） */
+.subscription-btn.subscribed {
+    fill: #dc3545 !important; /* 红色 */
+}
+
+/* 打赏图标（美元） */
+.reward-btn {
+    fill: white !important; /* 始终白色 */
+}
