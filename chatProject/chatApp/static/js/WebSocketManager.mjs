@@ -64,7 +64,7 @@ export default class WebSocketManager {
 
 
     connect() {
-        this.socket = new WebSocket(`wss://${window.location.host}/ws/chat/${this.roomId}/${this.roomName}/`);
+        this.socket = new WebSocket(`wss://${window.location.host}/ws/chat/${this.roomId}/`);
 
         this.socket.onopen = (e) => {
             this.reconnectAttempts = 0; // 重置重连尝试次数
