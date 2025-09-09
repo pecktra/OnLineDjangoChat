@@ -53,13 +53,13 @@ def subscribe_to_anchor(request):
             return JsonResponse({"code": 1, "message": "Anchor not found."}, status=404)
 
         # 获取或创建主播余额
-        anchor_balance, _ = AnchorBalance.objects.get_or_create(
-            anchor_id=anchor.uid,
-            defaults={'balance': Decimal('0.00'), 'total_received': Decimal('0.00')}
-        )
+#         anchor_balance, _ = AnchorBalance.objects.get_or_create(
+#             anchor_id=anchor.uid,
+#             defaults={'balance': Decimal('0.00'), 'total_received': Decimal('0.00')}
+#         )
 
         # 计算 crypto_amount（1:5）
-        crypto_amount = amount / Decimal('5')
+#         crypto_amount = amount / Decimal('5')
 
         # Redis key
         redis_client = get_redis_connection('subscribe')
@@ -71,26 +71,26 @@ def subscribe_to_anchor(request):
             }, status=400)
 
         with transaction.atomic():
-            # 扣除用户余额
-            user_balance.balance -= amount
-            user_balance.save()
+            # 暂时不用扣费逻辑
+#             user_balance.balance -= amount
+#             user_balance.save()
 
-            # 更新主播余额
-            anchor_balance.balance += amount
-            anchor_balance.total_received += amount
-            anchor_balance.save()
+            # 暂时不用主播余额逻辑
+#             anchor_balance.balance += amount
+#             anchor_balance.total_received += amount
+#             anchor_balance.save()
 
-            # 创建支出记录
-            expenditure_record = PaymentExpenditureRecord.objects.create(
-                user_id=user.id,
-                anchor_id=anchor.uid,
-                payment_type='subscription',
-                payment_source='subscription',
-                amount=amount,
-                currency='USD',
-                crypto_amount=crypto_amount,
-                crypto_currency='USDT'
-            )
+            # 暂时不用支出记录
+#             expenditure_record = PaymentExpenditureRecord.objects.create(
+#                 user_id=user.id,
+#                 anchor_id=anchor.uid,
+#                 payment_type='subscription',
+#                 payment_source='subscription',
+#                 amount=amount,
+#                 currency='USD',
+#                 crypto_amount=crypto_amount,
+#                 crypto_currency='USDT'
+#             )
 
             # 保存订阅信息到 Redis（过期30天）
             subscription_date = timezone.now()
@@ -122,7 +122,7 @@ def subscribe_to_anchor(request):
             "code": 1,
             "message": f"Internal server error: {str(e)}"
         }, status=500)
-    
+        
 # 获取用户的所有有效订阅记录接口
 @api_view(['GET'])
 def get_subscriptions(request):
