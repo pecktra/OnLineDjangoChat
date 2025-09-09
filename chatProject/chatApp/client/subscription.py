@@ -40,12 +40,12 @@ def subscribe_to_anchor(request):
         if not user:
             return JsonResponse({"code": 1, "message": "User not found."}, status=404)
 
-        user_balance = UserBalance.objects.filter(user_id=user_id).first()
-        if not user_balance:
-            return JsonResponse({"code": 1, "message": "User balance not found."}, status=404)
+#         user_balance = UserBalance.objects.filter(user_id=user_id).first()
+#         if not user_balance:
+#             return JsonResponse({"code": 1, "message": "User balance not found."}, status=404)
 
-        if user_balance.balance < amount:
-            return JsonResponse({"code": 1, "message": "Insufficient balance."}, status=400)
+#         if user_balance.balance < amount:
+#             return JsonResponse({"code": 1, "message": "Insufficient balance."}, status=400)
 
         # 获取主播
         anchor = Anchor.objects.filter(uid=anchor_uid).first()
