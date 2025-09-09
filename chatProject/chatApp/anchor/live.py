@@ -187,11 +187,11 @@ def check_api_limit(request):
     # 获取今天的日期
     today = timezone.now().date().strftime('%Y-%m-%d')
     redis_key = uid+":"+today
-    value = int(redis_chat_limit_client.get(redis_key))
+    value = redis_chat_limit_client.get(redis_key)
     if value is None:
         redis_chat_limit_client.set(redis_key, 1, ex=2*24*60*60)  # 没有就说明今天没有聊天
         return Response({"code": 0, "message": "true"}, status=200)
-    
+    value = int(value)
     if int(value) < chat_limit:
         redis_chat_limit_client.set(redis_key, value+1, ex=2*24*60*60)
         return Response({"code": 0, "message": "true"}, status=200)
