@@ -58,13 +58,6 @@ urlpatterns = [
     path('api/live/add_room_info/', live.add_room_info),
     path('api/live/check_api_limit/', live.check_api_limit),
 
-
-    #客户端
-    path('api/users/client_register/', logins.client_register),#注册
-    path('api/users/user_login/', logins.user_login),#登录
-    path('api/users/is_logged_in/', logins.is_logged_in),#检测是否登录
-    path('api/users/logout/', logins.logout),#退出登录
-
     # Google 登录相关 URL
     path('api/users/google_login_url/', logins.google_oauth2_url),  # 获取 Google 登录授权 URL
     path('api/users/google_oauth2_callback/', logins.google_oauth2_callback),  # Google 登录回调处理

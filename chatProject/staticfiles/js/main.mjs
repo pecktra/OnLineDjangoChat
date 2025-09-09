@@ -30,16 +30,18 @@ async  function initializeApp() {
     LiveManager.init();
     LiveManager.initFollowsButton();
     LiveManager.initSubscriptionsButton();
+    LiveManager.initRoomButton()
     let is_home = false; // Use let instead of const
 
     if (room_id == "None") {
         is_home = true; // Reassign to true inside the block
         await LiveManager.loadHome(is_home);
-        LiveManager.initHomeButton(is_home)
+        // LiveManager.initHomeButton(is_home)
         LiveManager.initRedirectHomeButton()
         return;
     }
-    LiveManager.initHomeButton(is_home)
+    // LiveManager.initHomeButton(is_home)
+
     LiveManager.initRedirectHomeButton()
 
 

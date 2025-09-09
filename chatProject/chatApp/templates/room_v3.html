@@ -84,6 +84,13 @@
 						Home
 					</a>
 				</li>
+
+				<li>
+					<a href="#" class="nav-link text-white room-link" data-bs-toggle="tooltip" data-bs-placement="right" title="Room">
+						<svg class="bi me-2" width="16" height="16"><use xlink:href="#table"/></svg>
+						Universes
+					</a>
+				</li>
             <li>
                 <a href="#" class="nav-link text-white follows-link" data-bs-toggle="tooltip" data-bs-placement="right" title="Follows">
                     <svg class="bi me-2" width="16" height="16"><use xlink:href="#people-circle"/></svg>
@@ -99,7 +106,7 @@
 
 			</ul>
 			<hr>
-			<h6 class="text-white mb-2">Lives</h6>
+			<h6 class="text-white mb-2">Live Universes</h6>
 			<div class="scrollarea" id="liveListContainer">
 				<!-- 静态占位内容可以保留作为加载状态 -->
 				<div class="text-center py-3 text-white" id="loadingIndicator">
@@ -118,7 +125,7 @@
 					<strong id="username">Loading...</strong>
 				</a>
 				<ul class="dropdown-menu dropdown-menu-dark text-small shadow" aria-labelledby="dropdownUser1">
-					<li><a class="dropdown-item" href="http://43.162.120.233:8001/" id="profileLink">Become a anchor</a></li>
+					<li><a class="dropdown-item" href={{ build_universe_url }} id="profileLink">Build Universe</a></li>
 					<li><hr class="dropdown-divider"></li>
 					<li><a class="dropdown-item" href="#" id="logoutLink">Sign out</a></li>
 					<li><a class="dropdown-item" href="#" id="googleLoginLink" >Sign in with Google</a></li>
@@ -159,23 +166,28 @@
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title">打赏主播</h5>
+        <h5 class="modal-title">Tip the streamer</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
         <form id="rewardForm">
           <div class="mb-3">
-            <label for="rewardAmount" class="form-label">打赏金额</label>
+            <label for="rewardAmount" class="form-label">Donation amount</label>
             <div class="input-group">
-              <span class="input-group-text">¥</span>
+              <span class="input-group-text">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="#FFD700" style="margin-right: 6px;">
+                    <path d="M12 1.5L6 9H18L12 1.5ZM6 9L1 15H23L18 9H6ZM1 15L6 21H18L23 15H1ZM12 15L9 9H15L12 15Z"/>
+                </svg>
+                
+              </span>
               <input type="number" class="form-control" id="rewardAmount" 
                      min="1" step="1" required>
             </div>
           </div>
 
           <div class="d-flex justify-content-between">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
-            <button type="submit" class="btn btn-primary">确认打赏</button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">cancel</button>
+            <button type="submit" class="btn btn-primary">Confirm</button>
           </div>
         </form>
       </div>
@@ -310,6 +322,16 @@ document.addEventListener('DOMContentLoaded', () => {
         //     }
         // }
     }
+
+    // 获取 Home 链接并添加点击事件
+        const homeLink = document.querySelector('.home-link');
+        if (homeLink) {
+            homeLink.addEventListener('click', (e) => {
+                e.preventDefault(); // 阻止默认跳转
+                window.location.href = '/'; // 跳转到主页
+            });
+        }
+
 
     // // 仅在手机端（<= 768px）应用切换逻辑
     // if (window.innerWidth <= 768) {

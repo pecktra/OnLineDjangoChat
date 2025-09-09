@@ -89,14 +89,14 @@ def process_recharge(request):
     try:
         response = requests.post(
             f"{NOWPAYMENTS_API_URL}/payment",
-            headers={"x-api-key": NOWPAYMENTS_API_KEY},
+            headers={"x-api-key": settings.NOWPAYMENTS_API_KEY},
             json={
                 "price_amount": float(crypto_amount),
                 "price_currency": currency,
                 "pay_currency": crypto_currency.lower(),
                 "order_id": order_id,
                 "order_description": f"Recharge {crypto_amount} USDT for user {user_id}",
-                "ipn_callback_url": "https://pecktra-dev.roturalabs.com/api/payment/payment_callback/"
+                "ipn_callback_url": settings.NOWPAYMENTS_IPN_CALLBACK_URL
             }
         )
         response.raise_for_status()
@@ -178,7 +178,7 @@ def payment_callback(request):
         received_signature = request.headers.get('x-nowpayments-sig')
         sorted_payload = json.dumps(data, separators=(',', ':'), sort_keys=True)
         computed_signature = hmac.new(
-            key=IPN_SECRET_KEY.encode('utf-8'),
+            key=settings.IPN_SECRET_KEY.encode('utf-8'),
             msg=sorted_payload.encode('utf-8'),
             digestmod=hashlib.sha512
         ).hexdigest()

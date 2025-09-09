@@ -213,77 +213,145 @@ class LiveManager {
      * 渲染直播列表到DOM
      * @param {Array} lives 直播列表数据
      */
-    static renderLiveList(lives) {
-        const container = document.getElementById('liveListContainer');
-        if (!container) {
-            console.warn('Live broadcast list container not found');
-            return;
-        }
+    // static renderLiveList(lives) {
+    //     const container = document.getElementById('liveListContainer');
+    //     if (!container) {
+    //         console.warn('Live broadcast list container not found');
+    //         return;
+    //     }
 
-        // 清空加载状态
-        container.innerHTML = '';
+    //     // 清空加载状态
+    //     container.innerHTML = '';
 
-        if (lives.length === 0) {
-            container.innerHTML = this.getEmptyTemplate();
-            return;
-        }
+    //     if (lives.length === 0) {
+    //         container.innerHTML = this.getEmptyTemplate();
+    //         return;
+    //     }
 
         
-        // 生成直播列表HTML
-        container.innerHTML = lives.map(live => {
-            // 解析room_info
-            let roomInfo = null;
-            let diamondBadge = '';
+    //     // 生成直播列表HTML
+    //     container.innerHTML = lives.map(live => {
+    //         // 解析room_info
+    //         let roomInfo = null;
+    //         let diamondBadge = '';
             
-            try {
-                roomInfo = live.room_info ? live.room_info : null;
+    //         try {
+    //             roomInfo = live.room_info ? live.room_info : null;
                 
-                // 如果是VIP房间且钻石数量>0
-                if (roomInfo && roomInfo.room_type === 1 && roomInfo.coin_num > 0) {
-                    diamondBadge = `
-                        <span class="badge bg-primary ms-2 flex-shrink-0" 
-                            style="background-color: #3498db !important; min-width: 30px;">
-                            <i class="fas fa-gem me-1" style="font-size: 0.8em;"></i>
-                            vip ${roomInfo.coin_num}
-                        </span>
-                    `;
-                }
-            } catch (e) {
-                console.error('Failed to parse room_info:', e);
-            }
+    //             // 如果是VIP房间且钻石数量>0
+    //             if (roomInfo && roomInfo.room_type === 1 && roomInfo.coin_num > 0) {
+    //                 diamondBadge = `
+    //                     <span class="badge bg-primary ms-2 flex-shrink-0" 
+    //                         style="background-color: #3498db !important; min-width: 30px;">
+    //                         <i class="fas fa-gem me-1" style="font-size: 0.8em;"></i>
+    //                         vip ${roomInfo.coin_num}
+    //                     </span>
+    //                 `;
+    //             }
+    //         } catch (e) {
+    //             console.error('Failed to parse room_info:', e);
+    //         }
 
-            return `
-            <a href="/live/${live.room_id}/" 
-            class="nav-link text-white d-flex align-items-center live-room text-nowrap" 
-            data-bs-toggle="tooltip" 
-            data-bs-placement="right" 
-            title="Join ${live.username} Livestream"
-            data-room-id="${live.room_id}"
-            data-room-name="${live.room_name}"
-            style="min-width: 0;">
-                <svg class="bi me-2 flex-shrink-0" width="16" height="16">
-                    <use xlink:href="#people-circle"/>
-                </svg>
-                <span class="text-truncate flex-grow-1">
-                    ${live.username} ${live.character_name}
-                </span>
+    //         return `
+    //         <a href="/live/${live.room_id}/" 
+    //         class="nav-link text-white d-flex align-items-center live-room text-nowrap" 
+    //         data-bs-toggle="tooltip" 
+    //         data-bs-placement="right" 
+    //         title="Join ${live.username} Livestream"
+    //         data-room-id="${live.room_id}"
+    //         data-room-name="${live.room_name}"
+    //         style="min-width: 0;">
+    //             <svg class="bi me-2 flex-shrink-0" width="16" height="16">
+    //                 <use xlink:href="#people-circle"/>
+    //             </svg>
+    //             <span class="text-truncate flex-grow-1">
+    //                 ${live.username} ${live.character_name}
+    //             </span>
+    //             ${diamondBadge}
+    //         </a>
+    //         `;
+    //     }).join('');
+
+
+    //     // <span class="badge bg-primary ms-2 flex-shrink-0">  <!-- 禁止数字压缩 -->
+    //     //     ${live.live_num}人
+    //     // </span>
+    //     // 初始化动态生成的工具提示
+    //     this.initDynamicTooltips();
+    //     // 绑定点击事件
+    //     this.bindLiveRoomEvents();
+    // }
+
+
+static renderLiveList(livesInfo) {
+    const container = document.getElementById('liveListContainer');
+    if (!container) {
+        console.warn('Live broadcast list container not found');
+        return;
+    }
+
+    // 清空容器
+    container.innerHTML = '';
+
+    if (livesInfo.length === 0) {
+        container.innerHTML = this.getEmptyTemplate();
+        return;
+    }
+
+    // 生成直播列表HTML
+    livesInfo.forEach(liveInfo => {
+        const userCard = document.createElement('div');
+        userCard.className = 'live-card';
+
+        // 用户头部信息
+        const userHeader = document.createElement('div');
+        userHeader.className = 'user-header';
+
+        const userInfoDiv = document.createElement('div');
+        userInfoDiv.className = 'user-info';
+
+        // 钻石徽章逻辑
+        let diamondBadge = '';
+        try {
+            if (liveInfo.room_type === 1 && liveInfo.coin_num > 0) {
+                diamondBadge = `
+                    <span class="badge bg-primary ms-2 flex-shrink-0">
+                        <i class="fas fa-gem me-1" style="font-size: 0.8em;"></i>
+                        vip ${liveInfo.coin_num}
+                    </span>
+                `;
+            }
+        } catch (e) {
+            console.error('room_info error:', e);
+        }
+
+        // 包裹在链接中
+        userInfoDiv.innerHTML = `
+            <a href="/live/${liveInfo.room_id}/" 
+               class="nav-link text-white d-flex align-items-center live-room text-nowrap" 
+               data-bs-toggle="tooltip" 
+               data-bs-placement="right" 
+               title="Join ${liveInfo.username} Livestream"
+               data-room-id="${liveInfo.room_id}"
+               data-room-name="${liveInfo.room_name}"
+               style="min-width: 0;">
+                <div class="user-avatar">${liveInfo.username ? liveInfo.username.charAt(0).toUpperCase() : 'U'}</div>
+                <div class="text-truncate flex-grow-1">
+                    ${liveInfo.username} ${liveInfo.character_name}
+                </div>
                 ${diamondBadge}
             </a>
-            `;
-        }).join('');
+        `;
 
-
-        // <span class="badge bg-primary ms-2 flex-shrink-0">  <!-- 禁止数字压缩 -->
-        //     ${live.live_num}人
-        // </span>
-        // 初始化动态生成的工具提示
-        this.initDynamicTooltips();
-        // 绑定点击事件
-        this.bindLiveRoomEvents();
+        userHeader.appendChild(userInfoDiv);
+        userCard.appendChild(userHeader);
+        container.appendChild(userCard);
+    });
+}
 
 
 
-    }
+
 
     /**
      * 空状态模板
@@ -433,6 +501,15 @@ class LiveManager {
             });
         }
     }
+    static initRoomButton() {
+        const roomLink = document.querySelector('.room-link');
+        if (roomLink) {
+            roomLink.addEventListener('click', async () => {
+                await this.loadRoom();
+            });
+        }
+    }
+
 
     static initRedirectHomeButton() {
         // 检查当前路径是否为根路径
@@ -451,13 +528,15 @@ class LiveManager {
         sessionStorage.setItem('but_value', 'live');
         const lives = await this.fetchLiveList();
         this.renderLiveList(lives);
-
         if(is_home){
             this.renderLiveList_home(lives);
         }
-
     }
-
+    static async loadRoom(is_home) {
+        sessionStorage.setItem('but_value', 'live');
+        const lives = await this.fetchLiveList();
+        this.renderLiveList(lives);
+    }
     static async redirectHome() {
         sessionStorage.setItem('but_value', 'live');
         const lives = await this.fetchLiveList();

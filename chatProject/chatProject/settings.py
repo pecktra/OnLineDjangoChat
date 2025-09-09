@@ -9,9 +9,16 @@ https://docs.djangoproject.com/en/5.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
-
+import os
 from pathlib import Path
 from datetime import timedelta
+from dotenv import load_dotenv
+
+# 加载 .env 文件
+load_dotenv()
+
+
+build_universe_url = os.getenv('build_universe_url', '')  # 默认值可选
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -238,9 +245,9 @@ SIMPLE_JWT = {
 }
 
 # Google OAuth2 配置
-SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '156625160093-sv5183vuj23cabk3lpk7msspmftcdhol.apps.googleusercontent.com'  # 你的 Client ID
-SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = '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'  # 你的 Client Secret
-SOCIAL_AUTH_GOOGLE_OAUTH2_REDIRECT_URI = 'https://pecktra-dev.roturalabs.com/api/users/google_oauth2_callback/'  # 回调 URL
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = os.getenv("SOCIAL_AUTH_GOOGLE_OAUTH2_KEY")
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = os.getenv("SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET")
+SOCIAL_AUTH_GOOGLE_OAUTH2_REDIRECT_URI = os.getenv("SOCIAL_AUTH_GOOGLE_OAUTH2_REDIRECT_URI")
 
 # 使用数据库存储会话数据（默认）
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'
@@ -259,5 +266,6 @@ AUTHENTICATION_BACKENDS = [
 ]
 
 #支付key
-NOWPAYMENTS_API_KEY="11DRDE4-48EMM3N-PJTWM1X-9YFQMMR" #apikey
-NOWPAYMENTS_IPN_SECRET_KEY ="kfM7xk+QXZOCsg9E1qKbDAY3F3jYnW2g" #ipn
+NOWPAYMENTS_API_KEY = os.getenv("NOWPAYMENTS_API_KEY")
+NOWPAYMENTS_IPN_SECRET_KEY = os.getenv("NOWPAYMENTS_IPN_SECRET_KEY")
+NOWPAYMENTS_IPN_CALLBACK_URL = os.getenv("NOWPAYMENTS_IPN_CALLBACK_URL")

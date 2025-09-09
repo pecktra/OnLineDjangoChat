@@ -326,7 +326,7 @@ def google_oauth2_callback(request):
         request.session.save()  # 显式保存会话
 
 
-        redirect_url = request.META.get('HTTP_REFERER','https://pecktra-dev.roturalabs.com/')
+        redirect_url = request.META.get('HTTP_REFERER','/')
 
 
         # 重定向到上一个页面
@@ -400,8 +400,17 @@ def is_google_logged_in(request):
 def google_logout(request):
     """
     退出 Google 登录
-    清除当前用户的会话信息，并重定向到首页或登录页。
+    如果用户已登录，则清除会话并退出；
+    如果未登录，则提示“Please login first”。
     """
+
+    # 判断是否有登录信息
+    if not request.session.get("user_id"):
+        return Response({
+            "code": 1,
+            "message": "Please login first"
+        })
+
     # 调用 Django 的 logout 方法来退出当前用户
     logout(request._request)
 
@@ -412,5 +421,5 @@ def google_logout(request):
     request.session['user_id'] = None
     request.session.save()  # 显式保存会话
 
-    # 重定向到首页或登录页
-    return redirect('https://pecktra-dev.roturalabs.com/')  # 修改为你希望重定向的 URL
+    # 已登录 → 退出成功后重定向
+    return redirect('/')

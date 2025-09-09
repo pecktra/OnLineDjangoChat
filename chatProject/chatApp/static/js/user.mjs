@@ -39,25 +39,13 @@ class UserManager {
 
     static async logout() {
         try {
-            const response = await fetch('/api/users/login_out/', {
-                method: 'get',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                credentials: 'same-origin'  // 确保携带cookie
-            });
 
-            const data = await response.json();
-
-            if (data.code === 0) {
-                this.showGuestUI();
-                // 可以添加登出成功后的回调或页面跳转
-                window.location.reload(); // 刷新页面更新状态
-            } else {
-                console.error('Logout failed:', data.message);
-            }
+            const response = await fetch('/api/users/google_logout/');
+            window.location.href = '/';
+            
         } catch (error) {
-            console.error('Logout error:', error);
+            console.log('Logout failed:', error);
+
         }
     }
     //退出登录

@@ -1,3 +1,4 @@
+
 /* 图标样式 */
 .action-icon {
     display: inline-flex !important; /* 强制显示 */
@@ -11,6 +12,7 @@
     border: none;
     padding: 0;
     pointer-events: auto !important; /* 确保图标可点击 */
+    position: relative; /* 为伪元素定位 */
 }
 
 .action-icon svg {
@@ -26,9 +28,35 @@
 /* 订阅图标（心形） */
 .subscription-btn.subscribed {
     fill: #dc3545 !important; /* 红色 */
+    cursor: default !important; /* 已订阅时显示默认光标 */
 }
 
-/* 打赏图标（美元） */
+/* 打赏图标（礼物） */
 .reward-btn {
     fill: white !important; /* 始终白色 */
+}
+
+/* 悬停提示文字 */
+.action-icon:hover::after {
+    content: attr(data-tooltip); /* 使用 data-tooltip 属性作为文字 */
+    position: absolute;
+    left: calc(100% + 8px); /* 显示在图标右侧，增加间距 */
+    top: 50%;
+    transform: translateY(-50%);
+    background: #343a40; /* 深色背景 */
+    color: white !important; /* 白色文字 */
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    white-space: nowrap;
+    z-index: 1000; /* 确保在其他元素上方 */
+    opacity: 1; /* 确保可见 */
+    visibility: visible; /* 确保显示 */
+}
+
+/* 默认隐藏提示文字 */
+.action-icon::after {
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s ease, visibility 0.2s ease; /* 平滑过渡 */
 }

@@ -386,7 +386,7 @@ static initFollowButton(live_info, follow_info) {
         }
 
         const newStatus = !follow_info.follow_status;
-        const confirmMsg = newStatus ? '确定要关注该主播吗？' : '确定要取消关注该主播吗？';
+        const confirmMsg = newStatus ? 'Are you sure you want to follow this streamer?' : 'Are you sure you want to unfollow this streamer?';
         
         if (!confirm(confirmMsg)) return;
         

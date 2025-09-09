@@ -17,7 +17,7 @@ from django.db import transaction
 from datetime import timedelta
 from django.contrib.auth import get_user
 from django.http import JsonResponse
-
+import chatProject.settings as setting
 
 # 获取 Redis 连接
 redis_client = get_redis_connection('default')
@@ -323,12 +323,12 @@ def redirect_to_random_room(request):
 def live_to_room(request,  room_id):
 
     """渲染直播间页面"""
-    return render(request, 'live.html', {'room_id': room_id})
+    return render(request, 'live.html', {'room_id': room_id , "build_universe_url":setting.build_universe_url})
 
 
 
 def home_view(request):
-    return render(request, 'home.html', {'room_id': None})
+    return render(request, 'home.html', {'room_id': None, "build_universe_url":setting.build_universe_url})
 
 
 @api_view(['POST'])

@@ -1,0 +1,13 @@
+__pycache__/
+*.pyc
+*.py[cod]
+*.sqlite3
+*.log
+media/
+env/
+venv/
+backup.sql
+*.deb
+*.txt
+nohup.out
+.env
