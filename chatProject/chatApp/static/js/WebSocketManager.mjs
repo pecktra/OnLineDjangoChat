@@ -33,7 +33,11 @@ export default class WebSocketManager {
     async saveChatHistory(message) {
         // 检查登录
         if (!window.GLOBAL_USER_ID || window.GLOBAL_USER_ID === 'null') {
-            alert('please log in');
+            alert('please log in first');
+            const googleLoginLink = document.getElementById('googleLoginLink');
+            if (googleLoginLink) {
+                googleLoginLink.click()
+            }
             return;
         }
         try {
@@ -181,7 +185,11 @@ export default class WebSocketManager {
     sendMessage() {
         // 检查登录
         if (!window.GLOBAL_USER_ID || window.GLOBAL_USER_ID === 'null') {
-            alert('please log in');
+            alert('please log in first');
+            const googleLoginLink = document.getElementById('googleLoginLink');
+            if (googleLoginLink) {
+                googleLoginLink.click()
+            }
             return;
         }
         const message = this.chatInput.value.trim();

@@ -43,9 +43,16 @@ class PayManager {
                 return;
             }
 
+            // 检查用户是否登录
             if (!window.GLOBAL_USER_ID || window.GLOBAL_USER_ID === 'null') {
-                alert('please log in');
-                return;
+                alert('please log in first');
+                
+                const googleLoginLink = document.getElementById('googleLoginLink');
+                if (googleLoginLink) {
+                    googleLoginLink.click()
+                }
+
+                return
             }
 
             const payload = {

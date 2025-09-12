@@ -77,6 +77,7 @@ class UserManager {
     }
 
     static async handleGoogleLogin() {
+
         try {
             // 1. 获取 Google 登录 URL
             const response = await fetch('/api/users/google_login_url/');
@@ -97,7 +98,7 @@ class UserManager {
     // static async loadFollows() {
     //     // 检查用户是否登录
     //     if (!window.GLOBAL_USER_ID || window.GLOBAL_USER_ID === 'null') {
-    //         alert('please log in');
+    //         alert('please log in first');
     //         return
     //     }
 
@@ -148,7 +149,7 @@ class UserManager {
     // static async loadSubscriptions() {
     //     // 检查用户是否登录
     //     if (!window.GLOBAL_USER_ID || window.GLOBAL_USER_ID === 'null') {
-    //         alert('please log in');
+    //         alert('please log in first');
     //         return
     //     }
     //     // Manually show the modal
@@ -201,6 +202,7 @@ class UserManager {
 }
 // 直接绑定点击事件
 document.addEventListener('DOMContentLoaded', () => {
+    console.log("333")
     const googleLoginLink = document.getElementById('googleLoginLink');
     if (googleLoginLink) {
         googleLoginLink.addEventListener('click', async (e) => {

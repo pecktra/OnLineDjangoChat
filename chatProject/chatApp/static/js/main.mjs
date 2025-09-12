@@ -21,7 +21,7 @@ async  function initializeApp() {
     // 1. 用户认证模块
     await UserManager.checkLogin(room_id);
     UserManager.bindLogoutEvent();
-
+    // await UserManager.initGoogleLogin()
 
     
     

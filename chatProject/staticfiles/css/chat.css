@@ -15,7 +15,7 @@
 /* 其他 CSS 保持不变，仅展示修改和新增的部分 */
 .streamer-info {
     flex: 0 0 20%;
-    background-color: #000000;
+    background-color: #1a1a1a;
     padding: 1rem;
     border-bottom: 1px solid rgba(0, 0, 0, .1);
     display: flex;
@@ -258,7 +258,7 @@
 
 .chat-area {
     flex: 0 0 80%;
-    background-color: #000000;
+    background-color: #1a1a1a;
     display: flex;
     flex-direction: column;
     overflow-y: auto;
@@ -352,8 +352,8 @@
 
 /* 用户消息 */
 .user-message {
-    background: white;
-    border: 1px solid #e1e5eb;
+    /* background: white; */
+    border: 1px solid #303233;
     margin-left: auto;
     border-top-right-radius: 0;
     min-width: 200px;
@@ -362,8 +362,8 @@
 
 /* AI消息 */
 .ai-message {
-    background: white;
-    border: 1px solid #e1e5eb;
+    /* background: white; */
+    border: 1px solid #303233;
     margin-right: auto;
     border-bottom-left-radius: 4px;
     width: fit-content; /* 关键属性 */

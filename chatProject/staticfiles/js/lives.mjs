@@ -91,6 +91,8 @@ class LiveManager {
                         
                         const roomItem = document.createElement('a');
                         roomItem.href = `/live/${room.room_id}/`;
+
+                        roomItem.target = '_blank';
                         roomItem.className = 'room-item';
                         roomItem.innerHTML = `
                             <div class="room-icon">
@@ -135,6 +137,7 @@ class LiveManager {
             const liveCard = document.createElement('a');
             liveCard.className = 'home-live-card';
             liveCard.href = `/live/${live.room_id}/`;
+            liveCard.target = '_blank';
             liveCard.setAttribute('data-room-id', live.room_id);
             liveCard.setAttribute('data-room-name', live.room_name );
 
@@ -334,6 +337,7 @@ static renderLiveList(livesInfo) {
                title="Join ${liveInfo.username} Livestream"
                data-room-id="${liveInfo.room_id}"
                data-room-name="${liveInfo.room_name}"
+               target="_blank"  
                style="min-width: 0;">
                 <div class="user-avatar">${liveInfo.username ? liveInfo.username.charAt(0).toUpperCase() : 'U'}</div>
                 <div class="text-truncate flex-grow-1">
@@ -432,7 +436,13 @@ static renderLiveList(livesInfo) {
 
         // 检查用户是否登录
         if (!window.GLOBAL_USER_ID || window.GLOBAL_USER_ID === 'null') {
-            alert('please log in');
+            alert('please log in first');
+            
+            const googleLoginLink = document.getElementById('googleLoginLink');
+            if (googleLoginLink) {
+                googleLoginLink.click()
+            }
+
             return
         }
 
@@ -462,7 +472,13 @@ static renderLiveList(livesInfo) {
     static async loadSubscriptions() {
         // 检查用户是否登录
         if (!window.GLOBAL_USER_ID || window.GLOBAL_USER_ID === 'null') {
-            alert('please log in');
+            alert('please log in first');
+            
+            const googleLoginLink = document.getElementById('googleLoginLink');
+            if (googleLoginLink) {
+                googleLoginLink.click()
+            }
+
             return
         }
         sessionStorage.setItem('but_value', 'subscription');

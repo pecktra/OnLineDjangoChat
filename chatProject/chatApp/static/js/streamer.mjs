@@ -265,7 +265,11 @@ static initSubscriptionButton(subscription_info) {
     static async handleSubscription(subscription_info) {
         // 检查登录
         if (!window.GLOBAL_USER_ID || window.GLOBAL_USER_ID === 'null') {
-            alert('please log in');
+            alert('please log in first');
+            const googleLoginLink = document.getElementById('googleLoginLink');
+            if (googleLoginLink) {
+                googleLoginLink.click()
+            }
             return;
         }
 
@@ -381,7 +385,11 @@ static initFollowButton(live_info, follow_info) {
     static async toggleFollow(live_info,follow_info) {
         // 检查登录
         if (!window.GLOBAL_USER_ID || window.GLOBAL_USER_ID === 'null') {
-            alert('please log in');
+            alert('please log in first');
+            const googleLoginLink = document.getElementById('googleLoginLink');
+            if (googleLoginLink) {
+                googleLoginLink.click()
+            }
             return;
         }
 

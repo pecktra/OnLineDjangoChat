@@ -1,4 +1,4 @@
-@import url('./dialog-polyfill.css');
+@import url('../../lib/dialog-polyfill.css');
 @import url('./popup-safari-fix.css');
 
 dialog {

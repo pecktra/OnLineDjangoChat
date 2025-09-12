@@ -65,7 +65,7 @@
 
 
     /*Default Theme, will be changed by ToolCool Color Picker*/
-    --SmartThemeBodyColor: rgb(11, 11, 11);
+    --SmartThemeBodyColor: rgb(220, 220, 210);
     --SmartThemeEmColor: rgb(145, 145, 145);
     --SmartThemeUnderlineColor: rgb(188, 231, 207);
     --SmartThemeQuoteColor: rgb(225, 138, 36);
@@ -133,11 +133,35 @@
     box-sizing: border-box;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    /* text-shadow: 0px 0px calc(var(--shadowWidth) * 1px) var(--SmartThemeShadowColor);  文本阴影*/ 
-    text-shadow: none;
+    text-shadow: 0px 0px calc(var(--shadowWidth) * 1px) var(--SmartThemeShadowColor);
 }
 
+html {
+    /*fix for chrome flickering on blurred divs*/
+    -webkit-transform: translateZ(0);
+    -webkit-backface-visibility: hidden;
+    -webkit-perspective: 1000;
+}
 
+body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    /*fallback for JS load*/
+    height: 100vh;
+    height: 100dvh;
+    /*defaults as 100%, then reassigned via JS as pixels, will work on PC and Android*/
+    /*height: calc(var(--doc-height) - 1px);*/
+    background-color: var(--SmartThemeBlurTintColor);
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-size: cover;
+    font-family: var(--mainFontFamily);
+    font-size: var(--mainFontSize);
+    color: var(--SmartThemeBodyColor);
+    overflow: hidden;
+    color-scheme: only light;
+}
 
 ::-webkit-scrollbar {
     width: 0.7rem;
