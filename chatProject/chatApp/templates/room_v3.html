@@ -79,13 +79,18 @@
                 </div>
 			<hr>
 			<ul class="nav nav-pills flex-column mb-auto">
-				<li>
+				<!-- <li>
 					<a href="/api/live/redirect_to_random_room" class="nav-link text-white home-link" data-bs-toggle="tooltip" data-bs-placement="right" title="Home">
 						<svg class="bi me-2" width="16" height="16"><use xlink:href="#speedometer2"/></svg>
 						Home
 					</a>
+				</li> -->
+				<li>
+					<a href="#" class="nav-link text-white build-universe" data-bs-toggle="tooltip" data-bs-placement="right" title="Build Universe">
+						<svg class="bi me-2" width="16" height="16"><use xlink:href="#speedometer2"/></svg>
+						Build Universe
+					</a>
 				</li>
-
 				<li>
 					<a href="#" class="nav-link text-white room-link" data-bs-toggle="tooltip" data-bs-placement="right" title="Room">
 						<svg class="bi me-2" width="16" height="16"><use xlink:href="#table"/></svg>
@@ -120,9 +125,8 @@
 				<!-- 动态内容将由JavaScript填充 -->
 			</div>
 			<hr>
-			<div class="dropdown">
+			<!-- <div class="dropdown">
 				<a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
-					<!-- <img src="https://github.com/mdo.png" alt="" width="32" height="32" class="rounded-circle me-2" id="userAvatar"> -->
 					<strong id="username">Loading...</strong>
 				</a>
 				<ul class="dropdown-menu dropdown-menu-dark text-small shadow" aria-labelledby="dropdownUser1">
@@ -131,7 +135,11 @@
 					<li><a class="dropdown-item" href="#" id="logoutLink">Sign out</a></li>
 					<li><a class="dropdown-item" href="#" id="googleLoginLink" >Sign in with Google</a></li>
 				</ul>
-			</div>
+			</div> -->
+            <div class="auth-buttons">
+                <a href="#" class="btn btn-primary" id="googleLoginLink" style="display: none;">Sign in with Google</a>
+                <a href="#" class="btn btn-secondary" id="logoutLink" style="display: none;">Sign out</a>
+            </div>
 		</div>
 
 
@@ -330,6 +338,15 @@ document.addEventListener('DOMContentLoaded', () => {
             homeLink.addEventListener('click', (e) => {
                 e.preventDefault(); // 阻止默认跳转
                 window.location.href = '/'; // 跳转到主页
+            });
+        }
+
+    // 获取 Home 链接并添加点击事件
+        const BuildUniverseLink = document.querySelector('.build-universe');
+        if (BuildUniverseLink) {
+            BuildUniverseLink.addEventListener('click', (e) => {
+                e.preventDefault(); // 阻止默认跳转
+                window.open("{{ build_universe_url }}", "_blank") // 跳转st
             });
         }
 

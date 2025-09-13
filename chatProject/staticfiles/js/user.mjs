@@ -28,7 +28,7 @@ class UserManager {
     }
 
     static updateUI(room_id,userInfo) {
-        document.getElementById('username').textContent = userInfo.uname;
+        // document.getElementById('username').textContent = userInfo.uname;
         document.getElementById('googleLoginLink').style.display = userInfo.status ? 'none' : 'block';
         document.getElementById('logoutLink').style.display = userInfo.status ? 'block' : 'none';
         if(room_id != "None"){
@@ -60,7 +60,7 @@ class UserManager {
     }
 
     static showGuestUI() {
-        document.getElementById('username').textContent = 'Guest';
+        // document.getElementById('username').textContent = 'Guest';
         document.getElementById('logoutLink').style.display = 'none';
         document.getElementById('googleLoginLink').style.display = 'block';
     }
