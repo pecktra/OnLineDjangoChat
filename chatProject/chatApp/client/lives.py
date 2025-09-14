@@ -35,11 +35,12 @@ def get_all_lives(request):
     """
     # 获取所有 key
     keys = redis_client.keys('*')  # '*' 匹配所有 key
-
-    # 转换为字符串列表
     keys = [key.decode('utf-8') if isinstance(key, bytes) else key for key in keys]
+
+    # 查询 RoomInfo
     room_infos = RoomInfo.objects.filter(room_id__in=keys)
-    # 组织结果
+
+    # 构建原始直播间数据
     live_status_list = []
     if room_infos:
         for room_info in room_infos:
@@ -52,12 +53,33 @@ def get_all_lives(request):
                 "character_name": room_info.character_name,
                 "character_date": room_info.character_date,
                 "room_info": {
-                        "title": room_info.title if room_info.title is not None and room_info.title != "" else "",
-                        "describe" :room_info.describe if room_info.describe is not None and room_info.describe != "" else "",
-                        "coin_num": room_info.coin_num if room_info.coin_num is not None else 0,
-                        "room_type": room_info.room_type if room_info.room_type is not None and room_info.room_type != "" else 0
-                    }
+                    "title": room_info.title if room_info.title else "",
+                    "describe": room_info.describe if room_info.describe else "",
+                    "coin_num": room_info.coin_num if room_info.coin_num is not None else 0,
+                    "room_type": room_info.room_type if room_info.room_type else 0
+                }
             })
+
+    # -----------------------------
+    # 新增排序逻辑：按最近 AI 回复时间排序
+    # -----------------------------
+    for live in live_status_list:
+        room_id = live["room_id"]
+        last_ai_doc = db.messages.find_one(
+            {"room_id": room_id, "type": "ai"},
+            sort=[("datetime", -1)]  # DESCENDING
+        )
+        live["last_ai_reply"] = last_ai_doc["datetime"] if last_ai_doc else None
+
+    # 排序：先有 AI 回复的排前面，再按 character_date 降序
+    live_status_list.sort(
+        key=lambda x: (
+            x["last_ai_reply"] is None,  # None 的排后面
+            x["last_ai_reply"] if x["last_ai_reply"] else x["character_date"]
+        ),
+        reverse=True
+    )
+
     return Response({
         "code": 0,
         "data": {"lives_info": live_status_list}

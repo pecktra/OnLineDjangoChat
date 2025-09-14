@@ -251,7 +251,7 @@ SOCIAL_AUTH_GOOGLE_OAUTH2_REDIRECT_URI = os.getenv("SOCIAL_AUTH_GOOGLE_OAUTH2_RE
 
 # 使用数据库存储会话数据（默认）
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'
-SESSION_COOKIE_AGE = 43200  # 会话有效期，单位为秒（1小时）
+SESSION_COOKIE_AGE = 7 * 24 * 60 * 60  # 会话有效期，单位为秒（1小时）
 SESSION_COOKIE_NAME = 'sessionid'  # 默认 session cookie 名
 SESSION_COOKIE_SECURE = True  # 只有在 HTTPS 请求中才会发送 session cookie
 SESSION_COOKIE_HTTPONLY = True  # 确保 JavaScript 无法访问 session cookie
