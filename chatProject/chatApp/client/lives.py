@@ -61,20 +61,23 @@ def get_all_lives(request):
             })
 
     # -----------------------------
-    # 新增排序逻辑：按最近 AI 回复时间排序
+    # 新增排序逻辑：按 send_date 排最新 AI 回复
     # -----------------------------
     for live in live_status_list:
         room_id = live["room_id"]
         last_ai_doc = db.messages.find_one(
             {"room_id": room_id, "type": "ai"},
-            sort=[("datetime", -1)]  # DESCENDING
+            sort=[("send_date", -1)]  # 用 send_date 排序，最新的排前面
         )
-        live["last_ai_reply"] = last_ai_doc["datetime"] if last_ai_doc else None
+        live["last_ai_reply"] = last_ai_doc["send_date"] if last_ai_doc else None
 
-    # 排序：先有 AI 回复的排前面，再按 character_date 降序
+    # 排序逻辑：
+    # 1. 有 last_ai_reply 的排前面
+    # 2. 再按 send_date 降序
+    # 3. 如果没有 AI 回复，就按 character_date 降序
     live_status_list.sort(
         key=lambda x: (
-            x["last_ai_reply"] is None,  # None 的排后面
+            x["last_ai_reply"] is None,  # None 的放最后
             x["last_ai_reply"] if x["last_ai_reply"] else x["character_date"]
         ),
         reverse=True
