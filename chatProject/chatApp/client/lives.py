@@ -18,6 +18,7 @@ from datetime import timedelta
 from django.contrib.auth import get_user
 from django.http import JsonResponse
 import chatProject.settings as setting
+from datetime import datetime
 
 # 获取 Redis 连接
 redis_client = get_redis_connection('default')
@@ -26,68 +27,78 @@ redis_client = get_redis_connection('default')
 client = MongoClient(settings.MONGO_URI)
 db = client[settings.MONGO_DB_NAME]
 
-# 直播间相关 API
+
+def parse_send_date(send_date_str):
+    """
+    将 MongoDB 中的 send_date 字符串解析为 datetime 对象
+    例如 "September 12, 2025 10:30pm" 或 "2025-09-12 22:30:00"
+    """
+    if not send_date_str:
+        return None
+    try:
+        return datetime.strptime(send_date_str, "%B %d, %Y %I:%M%p")
+    except ValueError:
+        try:
+            return datetime.strptime(send_date_str, "%Y-%m-%d %H:%M:%S")
+        except ValueError:
+            return None
+
 @api_view(['GET'])
 def get_all_lives(request):
     """
     获取正在直播的直播间列表
     GET /api/live/get_all_lives
+    按最近 AI 回复时间 (data.send_date) 降序排序，没有 AI 回复的排后面
+    从 Redis 获取 uid，查询 RoomInfo 获取 room_id，直接查询 MongoDB
     """
-    # 获取所有 key
-    keys = redis_client.keys('*')  # '*' 匹配所有 key
-    keys = [key.decode('utf-8') if isinstance(key, bytes) else key for key in keys]
+    # 1. 获取 Redis 中所有 uid
+    uids = [key.decode('utf-8') if isinstance(key, bytes) else key for key in redis_client.keys('*')]
 
-    # 查询 RoomInfo
-    room_infos = RoomInfo.objects.filter(room_id__in=keys)
+    # 2. 查询 RoomInfo 获取 room_id
+    room_infos = RoomInfo.objects.filter(room_id__in=uids)
 
-    # 构建原始直播间数据
     live_status_list = []
-    if room_infos:
-        for room_info in room_infos:
-            live_status_list.append({
-                "room_id": room_info.room_id,
-                "room_name": room_info.room_name,
-                "uid": room_info.uid,
-                "username": room_info.user_name,
-                "live_num": 0,
-                "character_name": room_info.character_name,
-                "character_date": room_info.character_date,
-                "room_info": {
-                    "title": room_info.title if room_info.title else "",
-                    "describe": room_info.describe if room_info.describe else "",
-                    "coin_num": room_info.coin_num if room_info.coin_num is not None else 0,
-                    "room_type": room_info.room_type if room_info.room_type else 0
-                }
-            })
-
-    # -----------------------------
-    # 新增排序逻辑：按 send_date 排最新 AI 回复
-    # -----------------------------
-    for live in live_status_list:
-        room_id = live["room_id"]
-        last_ai_doc = db.messages.find_one(
-            {"room_id": room_id, "type": "ai"},
-            sort=[("send_date", -1)]  # 用 send_date 排序，最新的排前面
+    for room_info in room_infos:
+        collection_name = room_info.room_id  # 每个房间对应的集合名
+        # 查询对应集合中最新 AI 回复
+        last_ai_doc = db[collection_name].find_one(
+            {"data_type": "ai"},
+            sort=[("data.send_date", -1)]
         )
-        live["last_ai_reply"] = last_ai_doc["send_date"] if last_ai_doc else None
 
-    # 排序逻辑：
-    # 1. 有 last_ai_reply 的排前面
-    # 2. 再按 send_date 降序
-    # 3. 如果没有 AI 回复，就按 character_date 降序
+        send_date_str = None
+        if last_ai_doc and "data" in last_ai_doc:
+            send_date_str = last_ai_doc["data"].get("send_date")
+
+        live_status_list.append({
+            "room_id": room_info.room_id,
+            "room_name": room_info.room_name,
+            "uid": room_info.uid,
+            "username": room_info.user_name,
+            "live_num": 0,
+            "character_name": room_info.character_name,
+            "character_date": room_info.character_date,
+            "room_info": {
+                "title": room_info.title or "",
+                "describe": room_info.describe or "",
+                "coin_num": room_info.coin_num if room_info.coin_num is not None else 0,
+                "room_type": room_info.room_type or 0
+            },
+            "last_ai_reply": send_date_str
+        })
+
+    # 4. 排序：按 last_ai_reply 降序，无 AI 回复的排后面
     live_status_list.sort(
         key=lambda x: (
-            x["last_ai_reply"] is None,  # None 的放最后
-            x["last_ai_reply"] if x["last_ai_reply"] else x["character_date"]
-        ),
-        reverse=True
+            x["last_ai_reply"] is None,
+            -(parse_send_date(x["last_ai_reply"]).timestamp() if x["last_ai_reply"] else 0)
+        )
     )
 
     return Response({
         "code": 0,
         "data": {"lives_info": live_status_list}
     })
-
 
 @api_view(['GET'])
 def get_live_info(request):
