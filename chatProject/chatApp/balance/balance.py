@@ -16,14 +16,14 @@ def get_user_donations(request):
     user_id = request.GET.get('user_id')  # 从查询参数中获取 user_id
 
     if not user_id:
-        return Response({"code": 1, "message": "Missing user_id parameter."}, status=400)
+        return Response({"code": 1, "message": "Missing user_id parameter."}, status=200)
 
     try:
         # 查询用户的所有打赏记录
         donations = DonationRecord.objects.filter(user_id=user_id).order_by('-donation_date')
 
         if not donations:
-            return Response({"code": 1, "message": "No donations found for this user."}, status=404)
+            return Response({"code": 1, "message": "No donations found for this user."}, status=200)
 
         donation_data = []
         for donation in donations:
@@ -62,7 +62,7 @@ def get_anchor_donations(request):
     anchor_id = request.GET.get('anchor_id')
 
     if not anchor_id:
-        return Response({"code": 1, "message": "Missing anchor_id parameter."}, status=400)
+        return Response({"code": 1, "message": "Missing anchor_id parameter."}, status=200)
 
     try:
         # 查询主播收到的所有打赏记录
@@ -72,7 +72,7 @@ def get_anchor_donations(request):
         ).order_by('-payment_date')
 
         if not donations.exists():
-            return Response({"code": 1, "message": "No donations found for this anchor."}, status=404)
+            return Response({"code": 1, "message": "No donations found for this anchor."}, status=200)
 
         donation_data = []
         for donation in donations:
@@ -107,14 +107,14 @@ def get_user_total_donated(request):
     user_id = request.GET.get('user_id')  # 从查询参数中获取 user_id
 
     if not user_id:
-        return Response({"code": 1, "message": "Missing user_id parameter."}, status=400)
+        return Response({"code": 1, "message": "Missing user_id parameter."}, status=200)
 
     try:
         # 查询该用户的总打赏金额
         total_donated = DonationRecord.objects.filter(user_id=user_id).aggregate(Sum('amount'))['amount__sum']
 
         if total_donated is None:
-            return Response({"code": 1, "message": "No donations found for this user."}, status=404)
+            return Response({"code": 1, "message": "No donations found for this user."}, status=200)
 
         return Response({
             "code": 0,
@@ -134,29 +134,22 @@ def get_anchor_total_received(request):
     GET /api/donations/anchor/total/?anchor_id=<anchor_id>
     """
     anchor_id = request.GET.get('anchor_id')
-    
+
     if not anchor_id:
-        return Response({"code": 1, "message": "Missing anchor_id parameter."}, status=400)
+        return Response({"code": 1, "message": "Missing anchor_id parameter."}, status=200)
 
-    try:
-        # 查询该主播的总收到打赏金额（只统计 donation 类型）
-        total_received = PaymentExpenditureRecord.objects.filter(
-            anchor_id=anchor_id,
-            payment_type='donation'
-        ).aggregate(Sum('amount'))['amount__sum']
+    # 查询该主播的总收到打赏金额（只统计 donation 类型）
+    total_received = PaymentExpenditureRecord.objects.filter(
+        anchor_id=anchor_id,
+        payment_type='donation'
+    ).aggregate(Sum('amount'))['amount__sum'] or 0  # 如果是 None 就用 0
 
-        if total_received is None:
-            return Response({"code": 1, "message": "No donations found for this anchor."}, status=404)
-
-        return Response({
-            "code": 0,
-            "data": {
-                "total_received": total_received
-            }
-        })
-
-    except Exception as e:
-        return Response({"code": 1, "message": f"Internal server error: {str(e)}"}, status=500)
+    return Response({
+        "code": 0,
+        "data": {
+            "total_received": total_received
+        }
+    })
 
 @api_view(['POST'])
 def make_donation(request):
