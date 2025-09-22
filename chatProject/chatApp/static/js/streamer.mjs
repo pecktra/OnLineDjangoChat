@@ -27,7 +27,7 @@ class StreamerInfoManager {
             method: 'GET',
             headers: { 'Content-Type': 'application/json' }, // 如果后端不要求此头，可移除
         });
-        
+
         if (!response.ok) throw new Error('Network error');
         const data = await response.json();
         window.GLOBAL_ANCHOR_ID = data?.data?.live_info?.uid
@@ -94,7 +94,7 @@ class StreamerInfoManager {
         if (!confirmed) {
             return false;
         }
-        
+
         try {
             // 调用支付接口
             const response = await fetch('/api/live/pay_vip_coin/', {
@@ -111,7 +111,7 @@ class StreamerInfoManager {
                     amount: vip_info.amount
                 })
             });
-            
+
             const data = await response.json();
             if (data.code === 0) {
                 alert('支付成功');
@@ -143,7 +143,7 @@ class StreamerInfoManager {
 
             // 名字
             const nameEl = document.getElementById('streamerName');
-            if (nameEl) nameEl.textContent = data.username;
+            if (nameEl) nameEl.textContent = data.character_name;
 
             // 名字
             const nameEl1 = document.getElementById('streamerName1');
@@ -169,7 +169,7 @@ class StreamerInfoManager {
                     titleEl.classList.remove('d-none');
                     const titleBadge = titleEl.querySelector('span');
                     titleBadge.textContent = title;
-                    
+
                     // 设置徽章样式
                     titleBadge.className = 'badge text-truncate d-inline-block';
                 } else {
@@ -188,7 +188,7 @@ class StreamerInfoManager {
                     describeEl.classList.remove('d-none');
                     const describeBadge = describeEl.querySelector('span');
                     describeBadge.textContent = describe;
-                    
+
                     // 设置徽章样式
                     describeBadge.className = 'badge text-truncate d-inline-block';
                 } else {
@@ -223,7 +223,7 @@ class StreamerInfoManager {
     //         subBtn.textContent = 'subscription';
     //         subBtn.classList.add('btn-primary');
     //         subBtn.classList.remove('btn-secondary');
-            
+
     //         // 绑定点击事件
     //         subBtn.addEventListener('click', () => {
     //             this.handleSubscription(subscription_info);
@@ -395,9 +395,9 @@ static initFollowButton(live_info, follow_info) {
 
         const newStatus = !follow_info.follow_status;
         const confirmMsg = newStatus ? 'Are you sure you want to follow this streamer?' : 'Are you sure you want to unfollow this streamer?';
-        
+
         if (!confirm(confirmMsg)) return;
-        
+
         try {
             const response = await fetch('/api/follow_live/toggle_follow_room/', {
                 method: 'POST',
@@ -447,7 +447,7 @@ static initFollowButton(live_info, follow_info) {
     static getCSRFToken() {
         return document.querySelector('[name=csrfmiddlewaretoken]')?.value || '';
     }
-    
+
 }
 
 export default StreamerInfoManager

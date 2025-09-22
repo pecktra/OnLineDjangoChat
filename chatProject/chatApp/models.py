@@ -21,6 +21,43 @@ class Anchor(models.Model):
         db_table = 'chatApp_anchor'
 
 
+
+
+class CharacterCard(models.Model):
+    room_id = models.CharField(max_length=150)  # 房间id
+    uid = models.CharField(max_length=150)  # 用户id
+    username = models.CharField(max_length=150)  # 用户名
+    character_name = models.CharField(max_length=150)  # 角色卡名称
+    image_name = models.CharField(max_length=150)  # 图片名称
+    image_path = models.CharField(max_length=255)  # 图片存储路径
+    character_data = models.TextField()  # 角色数据（JSON格式）
+    create_date = models.CharField(max_length=150)  # 上传时间
+
+    # 新增字段
+    language = models.CharField(
+        max_length=2,
+        choices=[('en', 'English'), ('cn', '中文')],
+        default='en',
+        verbose_name="语言"
+    )
+    tags = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True,
+        verbose_name="标签（逗号分隔或JSON）"
+    )
+    is_private = models.BooleanField(
+        default=False,
+        verbose_name="是否私密"
+    )
+
+    class Meta:
+        db_table = 'character_card'
+
+
+
+
+
 class ChatUser(AbstractBaseUser):
     id = models.AutoField(primary_key=True)
     password = models.CharField(max_length=128)
@@ -295,3 +332,7 @@ class PaymentLog(models.Model):
         db_table = "payment_logs"
         verbose_name = "支付日志"
         verbose_name_plural = "支付日志"
+
+
+
+        

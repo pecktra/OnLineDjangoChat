@@ -121,96 +121,320 @@ class LiveManager {
             }
 
     //<div class="room-details">${this.convertTo24Hour(room.character_date)}</div>
+static renderLiveList_home(livesInfo) {
+    const homeContainer = document.getElementById('homeLiveListContainer');
+    if (!homeContainer) {
+        console.warn('首页直播容器未找到');
+        return;
+    }
 
-    static renderLiveList_home(livesInfo) {
-        const homeContainer = document.getElementById('homeLiveListContainer');
-        if (!homeContainer) {
-            console.warn('首页直播容器未找到');
-            return;
+    const mediaUrl = window.MEDIA_URL || '/media/';
+
+    homeContainer.innerHTML = livesInfo.length === 0
+        ? this.getEmptyTemplate()
+        : '';
+
+    livesInfo.forEach((live, index) => {
+        // 创建卡片 - 171px宽 x 342px高
+        const liveCard = document.createElement('a');
+        liveCard.className = 'home-live-card';
+        liveCard.href = `/live/${live.room_id}/`;
+        liveCard.target = '_blank';
+        liveCard.setAttribute('data-room-id', live.room_id);
+        liveCard.setAttribute('data-room-name', live.room_name);
+        liveCard.style.cssText = `
+            animation-delay: ${index * 0.1}s;
+            width: 171px !important;
+            height: 342px !important;
+            max-width: 171px !important;
+            max-height: 342px !important;
+            display: flex !important;
+            flex-direction: column !important;
+            box-sizing: border-box !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        `;
+
+        // === 第1部分：图片区域 - 宽度占满171px，高度占一半171px ===
+        const imageContainer = document.createElement('div');
+        imageContainer.className = 'home-live-image-container';
+        imageContainer.style.cssText = `
+            width: 171px !important;
+            height: 171px !important;
+            position: relative !important;
+            overflow: hidden !important;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%) !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            border: none !important;
+            display: block !important;
+            box-sizing: border-box !important;
+            line-height: 0 !important;
+            font-size: 0 !important;
+            border-radius: 12px 12px 0 0 !important;
+        `;
+        
+        const image = document.createElement('img');
+        image.className = 'home-live-image';
+        image.style.cssText = `
+            width: 100% !important;
+            height: 100% !important;
+            object-fit: cover !important;
+            object-position: center !important;
+            display: block !important;
+            position: absolute !important;
+            top: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+            bottom: 0 !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            border: none !important;
+            outline: none !important;
+            border-radius: 12px 12px 0 0 !important;
+            background: transparent !important;
+            box-sizing: border-box !important;
+            line-height: 0 !important;
+            vertical-align: top !important;
+            font-size: 0 !important;
+        `;
+        
+        // 图片URL处理
+        let imageUrl = '/media/headimage/default_image1.png';
+        if (live.image_path) {
+            const cleanPath = live.image_path.replace(/^\/+/, '');
+            imageUrl = `${mediaUrl}${cleanPath}`;
+        }
+        
+        image.src = imageUrl;
+        image.alt = live.character_name || '直播图片';
+        image.loading = 'lazy';
+        
+        // 加载成功后强制样式
+        image.onload = function() {
+            console.log(`图片加载成功: ${this.src}，尺寸: ${this.naturalWidth}x${this.naturalHeight}`);
+            console.log(`容器尺寸: 171x171`);
+            
+            // 添加 loaded 类
+            this.classList.add('loaded');
+            
+            // 强制设置尺寸
+            this.style.width = '171px';
+            this.style.height = '171px';
+            this.style.maxWidth = '171px';
+            this.style.maxHeight = '171px';
+            this.style.minWidth = '171px';
+            this.style.minHeight = '171px';
+            this.style.objectFit = 'cover';
+            this.style.objectPosition = 'center';
+            
+            // 调试：检查实际显示尺寸
+            setTimeout(() => {
+                const rect = this.getBoundingClientRect();
+                console.log(`实际显示尺寸: ${rect.width}x${rect.height}`);
+            }, 100);
+        };
+        
+        // 错误处理
+        image.onerror = function() {
+            console.warn(`图片加载失败: ${this.src}`);
+            this.src = '/media/headimage/default_image1.png';
+        };
+        
+        image.addEventListener('error', function() {
+            console.warn(`默认图片也加载失败`);
+            imageContainer.innerHTML = `
+                <div class="image-placeholder" style="
+                    width: 171px !important;
+                    height: 171px !important;
+                    position: absolute !important;
+                    top: 0 !important;
+                    left: 0 !important;
+                    right: 0 !important;
+                    bottom: 0 !important;
+                    border-radius: 12px 12px 0 0 !important;
+                    line-height: 0 !important;
+                ">
+                    <i class="fas fa-image" style="font-size: 2rem;"></i>
+                </div>
+            `;
+        });
+        
+        imageContainer.appendChild(image);
+
+        // === 第2部分：角色名称 ===
+        const cardNameContainer = document.createElement('div');
+        cardNameContainer.className = 'home-card-name';
+        cardNameContainer.style.cssText = `
+            height: 45px !important;
+            width: 171px !important;
+            padding: 8px !important;
+            margin: 0 !important;
+            box-sizing: border-box !important;
+        `;
+        cardNameContainer.innerHTML = `
+            <div class="character-name" style="
+                height: 29px !important;
+                font-size: 0.85rem !important;
+                line-height: 1.1 !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                box-sizing: border-box !important;
+                overflow: hidden !important;
+                text-overflow: ellipsis !important;
+                white-space: nowrap !important;
+            ">${live.character_name || '未知角色'}</div>
+        `;
+
+        // === 第3部分：标题 ===
+        const titleContainer = document.createElement('div');
+        titleContainer.className = 'home-card-title-container';
+        titleContainer.style.cssText = `
+            height: 45px !important;
+            width: 171px !important;
+            padding: 8px !important;
+            margin: 0 !important;
+            box-sizing: border-box !important;
+        `;
+        
+        const fullTitle = live.room_info?.title ;
+        const truncatedTitle = fullTitle.length > 30 ? fullTitle.substring(0, 30) + '...' : fullTitle; // 窄卡片缩短标题
+        
+        const titleDiv = document.createElement('div');
+        titleDiv.className = 'home-card-title';
+        titleDiv.style.cssText = `
+            height: 29px !important;
+            font-size: 0.75rem !important;
+            line-height: 1.2 !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            box-sizing: border-box !important;
+            display: -webkit-box !important;
+            -webkit-line-clamp: 2 !important;
+            -webkit-box-orient: vertical !important;
+            overflow: hidden !important;
+        `;
+        titleDiv.textContent = truncatedTitle;
+        
+        const tooltip = document.createElement('div');
+        tooltip.className = 'home-title-tooltip';
+        tooltip.textContent = fullTitle;
+        tooltip.style.display = 'none';
+        
+        titleContainer.appendChild(titleDiv);
+        titleContainer.appendChild(tooltip);
+
+        // === 第4部分：标签 ===
+        const tagsContainer = document.createElement('div');
+        tagsContainer.className = 'home-tags-container';
+        tagsContainer.style.cssText = `
+            height: 45px !important;
+            width: 171px !important;
+            padding: 4px 8px !important;
+            margin: 0 !important;
+            box-sizing: border-box !important;
+            gap: 3px !important;
+            overflow: hidden !important;
+        `;
+        
+        if (live.tags && live.tags.length > 0) {
+            const maxTags = live.tags.slice(0, 3); // 窄卡片只显示3个标签
+            maxTags.forEach(tag => {
+                const tagSpan = document.createElement('span');
+                tagSpan.className = 'home-tag';
+                tagSpan.style.cssText = `
+                    height: 20px !important;
+                    font-size: 0.6rem !important;
+                    padding: 2px 6px !important;
+                    margin: 0 !important;
+                    box-sizing: border-box !important;
+                    display: flex !important;
+                    align-items: center !important;
+                    line-height: 1 !important;
+                    white-space: nowrap !important;
+                    overflow: hidden !important;
+                `;
+                tagSpan.textContent = `#${tag}`;
+                tagsContainer.appendChild(tagSpan);
+            });
+        } 
+
+        // === 第5部分：用户名 - 底部横向占满 ===
+        const usernameContainer = document.createElement('div');
+        usernameContainer.className = 'home-username-container';
+        usernameContainer.innerHTML = `
+            <div class="home-username" style="
+                font-size: 0.7rem !important;
+                max-width: 100% !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                box-sizing: border-box !important;
+                line-height: 1 !important;
+                overflow: hidden !important;
+                text-overflow: ellipsis !important;
+                white-space: nowrap !important;
+                display: block !important;
+            ">${live.username}</div>
+        `;
+
+        // VIP徽章
+        const roomInfo = live.room_info || {};
+        if (roomInfo.room_type === 1 && roomInfo.coin_num > 0) {
+            const diamondBadge = document.createElement('span');
+            diamondBadge.className = 'badge vip-badge';
+            diamondBadge.innerHTML = `<i class="fas fa-gem me-1"></i>VIP ${roomInfo.coin_num}`;
+            diamondBadge.style.cssText = `
+                position: absolute !important;
+                top: 6px !important;
+                right: 6px !important;
+                z-index: 10 !important;
+                font-size: 0.65rem !important;
+                padding: 3px 6px !important;
+                line-height: 1 !important;
+                box-sizing: border-box !important;
+            `;
+            imageContainer.appendChild(diamondBadge);
         }
 
-        homeContainer.innerHTML = livesInfo.length === 0
-            ? this.getEmptyTemplate()
-            : '';
-
-        livesInfo.forEach(live => {
-            const liveCard = document.createElement('a');
-            liveCard.className = 'home-live-card';
-            liveCard.href = `/live/${live.room_id}/`;
-            liveCard.target = '_blank';
-            liveCard.setAttribute('data-room-id', live.room_id);
-            liveCard.setAttribute('data-room-name', live.room_name );
-
-            const userHeader = document.createElement('div');
-            userHeader.className = 'home-user-header';
-
-            const userInfoDiv = document.createElement('div');
-            userInfoDiv.className = 'home-user-info';
-            // userInfoDiv.innerHTML = `
-            //     <div class="home-user-avatar">${live.username ? live.username.charAt(0).toUpperCase() : 'U'}</div>
-            //     <div>
-            //         <div class="username">${live.username || '未知用户'}</div>
-            //         <div class="home-live-info">观看人数: ${live.live_num || 0}</div>
-            //     </div>
-            // `;
-            userInfoDiv.innerHTML = `
-                <div class="home-user-avatar">${live.username ? live.username.charAt(0).toUpperCase() : 'U'}</div>
-                <div>
-                    <div class="username">${live.username}</div>
-                    <div class="home-live-info">${live.character_name}</div>
-                    
-                </div>
-            `;
-            userHeader.appendChild(userInfoDiv);
-
-            const roomList = document.createElement('div');
-            roomList.className = 'home-room-list';
-
-            let roomInfo = live.room_info || null;
-            let diamondBadge = roomInfo && roomInfo.room_type === 1 && roomInfo.coin_num > 0
-                ? `<span class="badge bg-primary ms-2 flex-shrink-0">
-                       <i class="fas fa-gem me-1" style="font-size: 0.8em;"></i>
-                       vip ${roomInfo.coin_num}
-                   </span>`
-                : '';
-
-            const roomItem = document.createElement('div');
-            roomItem.className = 'home-room-item';
-            // roomItem.innerHTML = `
-            //     <div class="home-room-icon">
-            //         <i class="fas fa-video"></i>
-            //     </div>
-            //     <div class="home-room-info">
-            //         <div class="room-title">${live.room_info.title || '无标题'}</div>
-            //         ${diamondBadge}
-            //     </div>
-            // `;
-            const titleText = (live.room_info.title).slice(0, 50) ;
-            const descriptionText = (live.room_info.describe).slice(0, 50) ;
-            roomItem.innerHTML = `
-                <div class="home-room-icon">
-                    <i class="fas fa-video"></i>
-                </div>
-                <div class="home-room-info">
-                    <div class="room-title">${titleText}</div>
-                    <div class="room-description">${descriptionText}</div>
-                    ${diamondBadge}
-                </div>
-            `;
-            roomList.appendChild(roomItem);
-            liveCard.appendChild(userHeader);
-            liveCard.appendChild(roomList);
-            homeContainer.appendChild(liveCard);
+        // 标题悬停事件
+        titleDiv.addEventListener('mouseenter', () => {
+            if (fullTitle.length > 30) {
+                tooltip.style.display = 'block';
+            }
         });
-    }
+        titleDiv.addEventListener('mouseleave', () => {
+            tooltip.style.display = 'none';
+        });
 
-    static getEmptyTemplate() {
-        return `
-        <div class="text-center py-3 text-white">
-            <p>暂无直播</p>
+        // 组装卡片
+        liveCard.appendChild(imageContainer);        // 1. 图片 - 171×171 (宽度占满，高度占一半)
+        liveCard.appendChild(cardNameContainer);     // 2. 角色名 - 45px
+        liveCard.appendChild(titleContainer);        // 3. 标题 - 45px
+        liveCard.appendChild(tagsContainer);         // 4. 标签 - 45px
+        liveCard.appendChild(usernameContainer);     // 5. 用户名 - 底部横向
+        
+        homeContainer.appendChild(liveCard);
+    });
+}
+
+static getEmptyTemplate() {
+    return `
+    <div class="text-center py-5 text-white empty-state">
+        <div class="mb-4">
+            <i class="fas fa-video-slash fa-4x text-muted mb-3"></i>
+            <h4 class="text-light">暂无直播</h4>
         </div>
-        `;
-    }
+        <p class="text-muted">稍后回来查看精彩直播</p>
+        <div class="mt-3">
+            <i class="fas fa-clock text-primary"></i>
+            <small class="text-muted ms-1">每小时更新</small>
+        </div>
+    </div>
+    `;
+}
 
     /**
      * 渲染直播列表到DOM

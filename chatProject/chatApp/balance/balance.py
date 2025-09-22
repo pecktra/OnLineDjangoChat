@@ -130,28 +130,28 @@ def get_user_total_donated(request):
 @api_view(['GET'])
 def get_anchor_total_received(request):
     """
-    获取用户的总打赏金额
-    GET /api/donations/user/total/?user_id=<user_id>
+    获取主播的总收到打赏金额
+    GET /api/donations/anchor/total/?anchor_id=<anchor_id>
     """
-    user_id = request.GET.get('user_id')
-
-    if not user_id:
-        return Response({"code": 1, "message": "Missing user_id parameter."}, status=400)
+    anchor_id = request.GET.get('anchor_id')
+    
+    if not anchor_id:
+        return Response({"code": 1, "message": "Missing anchor_id parameter."}, status=400)
 
     try:
-        # 查询该用户的总打赏金额（只统计 donation 类型）
-        total_donated = PaymentExpenditureRecord.objects.filter(
-            user_id=user_id,
+        # 查询该主播的总收到打赏金额（只统计 donation 类型）
+        total_received = PaymentExpenditureRecord.objects.filter(
+            anchor_id=anchor_id,
             payment_type='donation'
         ).aggregate(Sum('amount'))['amount__sum']
 
-        if total_donated is None:
-            return Response({"code": 1, "message": "No donations found for this user."}, status=404)
+        if total_received is None:
+            return Response({"code": 1, "message": "No donations found for this anchor."}, status=404)
 
         return Response({
             "code": 0,
             "data": {
-                "total_donated": total_donated
+                "total_received": total_received
             }
         })
 

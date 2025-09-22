@@ -7,7 +7,7 @@ from django.conf import settings
 import json
 import random
 from django.shortcuts import redirect, render
-from chatApp.models import ChatUserChatHistory,UserBalance,  RoomInfo, AnchorBalance,UserFollowedRoom, PaymentLiveroomEntryRecord
+from chatApp.models import ChatUserChatHistory,UserBalance,  RoomInfo, AnchorBalance,UserFollowedRoom, PaymentLiveroomEntryRecord,CharacterCard
 from django.utils import timezone
 from django.db.models import Subquery, OuterRef
 import hashlib
@@ -19,7 +19,10 @@ from django.contrib.auth import get_user
 from django.http import JsonResponse
 import chatProject.settings as setting
 from datetime import datetime
-
+from chatApp.consumers import ChatConsumer
+from datetime import datetime, timedelta, timezone
+from django.utils.dateparse import parse_datetime
+import random
 # 获取 Redis 连接
 redis_client = get_redis_connection('default')
 
@@ -27,6 +30,12 @@ redis_client = get_redis_connection('default')
 client = MongoClient(settings.MONGO_URI)
 db = client[settings.MONGO_DB_NAME]
 
+
+# 默认图片列表
+default_images = [
+    "headimage/default_image1.png",
+    "headimage/default_image2.png"
+]
 
 def parse_send_date(send_date_str):
     """
@@ -43,24 +52,48 @@ def parse_send_date(send_date_str):
         except ValueError:
             return None
 
+
 @api_view(['GET'])
 def get_all_lives(request):
     """
-    获取正在直播的直播间列表
-    GET /api/live/get_all_lives
-    按最近 AI 回复时间 (data.send_date) 降序排序，没有 AI 回复的排后面
-    从 Redis 获取 uid，查询 RoomInfo 获取 room_id，直接查询 MongoDB
+    获取正在直播的直播间列表，支持 tags 搜索
+    GET /api/live/get_all_lives?tags=<tag>
     """
+    # 获取 tags 参数
+    search_tag = request.GET.get("tags", "").strip()
+
     # 1. 获取 Redis 中所有 uid
     uids = [key.decode('utf-8') if isinstance(key, bytes) else key for key in redis_client.keys('*')]
+    if not uids:
+        return Response({"code": 0, "data": {"lives_info": []}})  # Redis 没有在线房间，直接返回空
 
-    # 2. 查询 RoomInfo 获取 room_id
+    # 2. 查询 RoomInfo 获取 room_id，只查 Redis 在线的
     room_infos = RoomInfo.objects.filter(room_id__in=uids)
+
+    # 3. 如果有 tags 搜索，则过滤 room_infos
+    if search_tag:
+        filtered_room_ids = []
+        for room_info in room_infos:
+            character_card = CharacterCard.objects.filter(room_id=room_info.room_id).order_by('-create_date').first()
+            if not character_card:
+                continue
+
+            # 按 language 搜索
+            if search_tag in ['en', 'cn']:
+                if character_card.language == search_tag:
+                    filtered_room_ids.append(room_info.room_id)
+            else:
+                # 按 tags 搜索，tags 是逗号分隔字符串
+                if character_card.tags and search_tag in character_card.tags.split(','):
+                    filtered_room_ids.append(room_info.room_id)
+
+        # 只保留 Redis 在线的 room_id
+        room_infos = room_infos.filter(room_id__in=filtered_room_ids)
 
     live_status_list = []
     for room_info in room_infos:
-        collection_name = room_info.room_id  # 每个房间对应的集合名
-        # 查询对应集合中最新 AI 回复
+        collection_name = room_info.room_id
+
         last_ai_doc = db[collection_name].find_one(
             {"data_type": "ai"},
             sort=[("data.send_date", -1)]
@@ -70,24 +103,45 @@ def get_all_lives(request):
         if last_ai_doc and "data" in last_ai_doc:
             send_date_str = last_ai_doc["data"].get("send_date")
 
+        character_card = CharacterCard.objects.filter(
+            room_id=room_info.room_id
+        ).order_by('-create_date').first()
+
+
+
+        # ===== 修改部分：如果数据库没有图片就随机使用默认图片 =====
+        if character_card:
+            image_name = character_card.image_name
+            image_path = character_card.image_path or random.choice(default_images)
+        else:
+            image_name = ""
+            image_path = random.choice(default_images)
+        # ============================================================
+
+        online_count = ChatConsumer.get_online_count(room_info.room_id)
+
         live_status_list.append({
             "room_id": room_info.room_id,
             "room_name": room_info.room_name,
             "uid": room_info.uid,
             "username": room_info.user_name,
-            "live_num": 0,
+            "live_num": online_count,
             "character_name": room_info.character_name,
             "character_date": room_info.character_date,
+            "image_name": image_name,
+            "image_path": image_path,
+            "tags": character_card.tags.split(",") if character_card and character_card.tags else [],
+            "language": character_card.language if character_card else "en",
             "room_info": {
                 "title": room_info.title or "",
                 "describe": room_info.describe or "",
                 "coin_num": room_info.coin_num if room_info.coin_num is not None else 0,
                 "room_type": room_info.room_type or 0
             },
-            "last_ai_reply": send_date_str
+            "last_ai_reply": send_date_str,
         })
 
-    # 4. 排序：按 last_ai_reply 降序，无 AI 回复的排后面
+    # 排序：按 last_ai_reply 降序，无 AI 回复排后面
     live_status_list.sort(
         key=lambda x: (
             x["last_ai_reply"] is None,
@@ -99,6 +153,134 @@ def get_all_lives(request):
         "code": 0,
         "data": {"lives_info": live_status_list}
     })
+
+def to_naive_datetime(send_date_str):
+    """
+    将 send_date 字符串转换为 naive datetime，确保无论带不带时区都可以比较。
+    """
+    if not send_date_str:
+        return None
+    try:
+        dt = parse_datetime(send_date_str)
+        if dt is None:
+            # 尝试手动解析 ISO 格式
+            dt = datetime.fromisoformat(send_date_str.replace("Z", "+00:00"))
+    except Exception:
+        return None
+
+    # 转为 naive datetime（去掉 tzinfo）
+    if hasattr(dt, "tzinfo") and dt.tzinfo is not None:
+        return dt.replace(tzinfo=None)
+    return dt
+
+
+@api_view(['GET'])
+def get_ranked_lives(request):
+    """
+    获取按照活跃度分数排序的正在直播的直播间列表
+    GET /api/live/get_ranked_lives
+    """
+    try:
+        # 1. 获取 Redis 中所有在线房间 UID
+        uids = [key.decode('utf-8') if isinstance(key, bytes) else key for key in redis_client.keys('*')]
+        if not uids:
+            return Response({"code": 0, "status": "success", "data": {"lives_info": []}})
+
+        room_infos = RoomInfo.objects.filter(room_id__in=uids)
+        live_status_list = []
+
+        now = datetime.utcnow()  # 使用 naive UTC datetime
+
+        for room_info in room_infos:
+            collection_name = room_info.room_id
+
+            # 2. 获取最近一条 AI 回复
+            last_ai_doc = db[collection_name].find_one(
+                {"data_type": "ai"},
+                sort=[("data.send_date", -1)]
+            )
+
+            send_date_str = None
+            ai_reply_count = 0
+            if last_ai_doc and "data" in last_ai_doc:
+                send_date_str = last_ai_doc["data"].get("send_date")
+                ai_reply_count = db[collection_name].count_documents({"data_type": "ai"})
+
+            # 3. 获取角色卡
+            character_card = CharacterCard.objects.filter(
+                room_id=room_info.room_id
+            ).order_by('-create_date').first()
+
+            # ===== 修改部分：如果数据库没有图片就随机使用默认图片 =====
+            if character_card:
+                image_name = character_card.image_name
+                image_path = character_card.image_path or random.choice(default_images)
+            else:
+                image_name = ""
+                image_path = random.choice(default_images)
+            # ============================================================
+
+            # 4. 获取在线人数
+            online_count = ChatConsumer.get_online_count(room_info.room_id)
+
+            # 5. 计算最近回复加成
+            recent_reply_bonus = 0
+            if send_date_str:
+                send_date = to_naive_datetime(send_date_str)
+                if send_date:
+                    diff = now - send_date
+                    if diff < timedelta(minutes=5):
+                        recent_reply_bonus = 10
+                    elif diff < timedelta(minutes=30):
+                        recent_reply_bonus = 5
+                    elif diff < timedelta(hours=2):
+                        recent_reply_bonus = 3
+
+            # 6. 计算活跃度分数
+            score = (online_count * 2) + (ai_reply_count * 1.5) + recent_reply_bonus
+
+            # 7. 组装返回数据
+            live_status_list.append({
+                "room_id": room_info.room_id,
+                "room_name": room_info.room_name,
+                "uid": room_info.uid,
+                "username": room_info.user_name,
+                "live_num": online_count,
+                "character_name": room_info.character_name,
+                "character_date": room_info.character_date,
+                "image_name": image_name,
+                "image_path": image_path,
+                "tags": character_card.tags.split(",") if character_card and character_card.tags else [],
+                "language": character_card.language if character_card else "en",
+                "room_info": {
+                    "title": room_info.title or "",
+                    "describe": room_info.describe or "",
+                    "coin_num": room_info.coin_num if room_info.coin_num is not None else 0,
+                    "room_type": room_info.room_type or 0
+                },
+                "last_ai_reply": send_date_str,
+                "ai_reply_count": ai_reply_count,
+                "score": score
+            })
+
+        # 8. 按 score 降序排序
+        live_status_list.sort(key=lambda x: x["score"], reverse=True)
+
+        return Response({
+            "code": 0,
+            "status": "success",
+            "data": {"lives_info": live_status_list}
+        })
+
+    except Exception as e:
+        import traceback
+        print(f"错误详情: {traceback.format_exc()}")
+        return Response({
+            "code": 1,
+            "status": "error",
+            "message": str(e)
+        }, status=500)
+
 
 @api_view(['GET'])
 def get_live_info(request):
@@ -136,47 +318,51 @@ def get_live_info(request):
         if not room_info.coin_num:
             vip_info['amount'] = 0
 
-        # 如果是 VIP 房间（即 room_type 为 1），并且用户已经订阅了此房间
-        if vip_info["room_type"] != 0:  # 如果不是免费房间
+        # 如果是 VIP 房间（即 room_type 不为 0），并且用户已经订阅了此房间
+        if vip_info["room_type"] != 0:
             vip_subscription = VipSubscriptionRecord.objects.filter(user_id=user.id,
                                                                     room_name=room_info.room_name).first()
-
             if vip_subscription:
-                # 订阅有效，设置 vip_status 为 True
                 vip_info["vip_status"] = True
 
         # 获取订阅信息
         subscription_info = {
-            "subscription_status": False,  # 默认为未订阅
-            "amount": 0  # 默认为 0
+            "subscription_status": False,
+            "amount": 0
         }
-
-        # 查询用户是否订阅了该主播的任何直播间
         redis_client_subscribe = get_redis_connection('subscribe')
-        subscription_key = f"subscription:{user.id}:{room_info.uid}"  # 使用 user.id 和 uid 作为键
+        subscription_key = f"subscription:{user.id}:{room_info.uid}"
         subscription_data = redis_client_subscribe.get(subscription_key)
 
         if subscription_data:
-            # 如果从 Redis 获取到的数据是 bytes 类型，先进行解码
             try:
-                # 假设订阅数据是 JSON 格式
                 subscription_data = json.loads(subscription_data.decode('utf-8'))
                 subscription_info["subscription_status"] = True
                 subscription_info["amount"] = int(subscription_data.get("diamonds_paid", 0))
             except json.JSONDecodeError:
-                # 如果 JSON 解码失败，可以输出一些调试信息
                 print("Error decoding subscription data:", subscription_data)
                 subscription_info["subscription_status"] = False
 
         # 获取 follow_info
         follow_info = {
-            "follow_status": False  # 默认为未关注
+            "follow_status": False
         }
-
-        # 查询是否已关注
         followed_room = UserFollowedRoom.objects.filter(user_id=user.id, room_id=room_info.room_id).first()
         if followed_room and followed_room.status:
-            follow_info["follow_status"] = True  # 用户已关注
+            follow_info["follow_status"] = True
+
+        # 🔽 查询角色卡信息并处理默认图片
+        character_card = CharacterCard.objects.filter(room_id=room_info.room_id).order_by('-create_date').first()
+        if character_card:
+            image_name = character_card.image_name
+            image_path = character_card.image_path or random.choice(default_images)
+            tags = character_card.tags.split(",") if character_card.tags else []
+            language = character_card.language or "en"
+        else:
+            image_name = ""
+            image_path = random.choice(default_images)
+            tags = []
+            language = "en"
 
         # 构建返回的 live_info
         live_info = {
@@ -185,9 +371,14 @@ def get_live_info(request):
             "uid": room_info.uid,
             "username": username,
             "character_name": room_info.character_name,
+            "image_name": image_name,
+            "image_path": image_path,
+            "tags": tags,
+            "language": language,
             "live_status": live_status,
             "title": room_info.title,
-            "describe": room_info.describe
+            "describe": room_info.describe,
+            "live_num": ChatConsumer.get_online_count(room_info.room_id)
         }
 
         return Response({
@@ -196,7 +387,7 @@ def get_live_info(request):
                 "live_info": live_info,
                 "vip_info": vip_info,
                 "follow_info": follow_info,
-                "subscription_info": subscription_info  # 添加订阅信息
+                "subscription_info": subscription_info
             }
         })
 
@@ -481,3 +672,42 @@ def pay_vip_coin(request):
 
     except Exception as e:
         return Response({"code": 1, "message": f"Internal server error: {str(e)}"}, status=500)
+
+
+@api_view(['GET'])
+def get_all_tags(request):
+    """
+    获取所有角色卡标签，语言本身也作为标签，去掉 NSFW 标签
+    GET /api/card/get_all_tags/
+    """
+    try:
+        cards = CharacterCard.objects.all().values('language', 'tags')
+        all_tags = set()
+        nsfw_keywords = {"Not Safe for Work", "NotSafeforWork", "NSFW", "nsfw"}
+
+        for card in cards:
+            language = card['language'] or 'en'
+            all_tags.add(language)  # 将语言本身作为标签
+
+            tags_str = card['tags'] or ''
+            tags_list = [tag.strip() for tag in tags_str.split(',') if tag.strip()]
+
+            # 过滤 NSFW 标签
+            tags_list = [tag for tag in tags_list if tag not in nsfw_keywords]
+
+            all_tags.update(tags_list)
+
+        return JsonResponse({
+            "code": 0,
+            "status": "success",
+            "tags": sorted(list(all_tags))
+        })
+
+    except Exception as e:
+        import traceback
+        print(f"错误详情: {traceback.format_exc()}")
+        return JsonResponse({
+            "code": 1,
+            "status": "error",
+            "message": str(e)
+        }, status=500)

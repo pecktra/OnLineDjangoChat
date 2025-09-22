@@ -157,7 +157,15 @@ CACHES = {
         'OPTIONS': {
             'CLIENT_CLASS': 'django_redis.client.DefaultClient',
         },
-    }
+    },
+    'chat-online': {
+              'BACKEND': 'django_redis.cache.RedisCache',
+              'LOCATION': f'redis://{REDIS_HOST}:{REDIS_PORT}/4',  # 用4号DB专门存在线人数
+              'OPTIONS': {
+                  'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+              },
+          }
+
 }
 
 
@@ -228,20 +236,6 @@ CHANNEL_LAYERS = {
             "expiry": 10,      # 消息过期时间（秒）
         },
     },
-}
-#JWT 相关的认证
-REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
-    ],
-}
-SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=360),  # 设置访问令牌的有效期（15分钟）
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),     # 设置刷新令牌的有效期（7天）
-    'ROTATE_REFRESH_TOKENS': False,                   # 设置为 False 表示不使用自动刷新令牌
-    'BLACKLIST_AFTER_ROTATION': False,                # 设置为 False 表示刷新令牌过期后不会加入黑名单
-    'ALGORITHM': 'HS256',                             # 设置 JWT 使用的加密算法
-    'SIGNING_KEY': 'your-secret-key',                 # 设置 JWT 签名密钥
 }
 
 # Google OAuth2 配置

@@ -17,8 +17,8 @@
         overflow: visible !important; /* 防止裁剪内容 */
         display: flex !important; /* 使用 flex 布局 */
         flex-direction: column; /* 垂直排列 */
-        height: 100vh; /* 占满屏幕 */
-        min-height: 100vh; /* 应对浏览器地址栏 */
+        height: 100dvh; /* 占满屏幕 */
+        min-height: 100dvh; /* 应对浏览器地址栏 */
         width: 100%;
         box-sizing: border-box;
 
@@ -29,7 +29,7 @@
     .total-chat {
         display: flex !important; /* 确保显示 */
         flex-direction: column; /* 垂直排列 */
-        height: 100vh; /* 占满 main 的高度 */
+        height: 100dvh; /* 占满 main 的高度 */
     }
 
     .chat-header {
@@ -59,11 +59,11 @@
     }
 
     .live-container {
-        flex: 0 0 50%; /* 占70%屏幕高度 */
+        /* flex: 0 0 50%; 占70%屏幕高度 */
         width: 100% !important; /* 占满宽度 */
         max-width: 100%;
-        height: 50vh !important; /* 明确高度 */
-        min-height: 50vh !important;
+        /* height: 50vh !important; /* 明确高度 */
+        /* min-height: 50vh !important; */
         position: relative; /* 相对定位 */
         box-sizing: border-box;
         overflow-y: auto !important; /* 允许滚动 */
@@ -88,8 +88,8 @@
         flex: 0 0 50%; /* 占30%屏幕高度 */
         width: 100% !important; /* 占满宽度 */
         max-width: 100%;
-        height: 50vh !important; /* 明确高度 */
-        min-height: 50vh !important;
+        /* height: 50vh !important; /* 明确高度 */
+        /* min-height: 50vh !important; */
         position: relative; /* 相对定位 */
         box-sizing: border-box;
         overflow: hidden !important; /* 防止内容溢出 */
@@ -104,7 +104,6 @@
         display: flex !important; /* 确保显示 */
         flex-direction: column;
         width: 100%;
-        padding-bottom: 60px; /* 为 chat-input 留出空间 */
         background-color: #1a1a1a; /* 与 user_chat.css 一致 */
     }
 
@@ -179,7 +178,6 @@
         background-color: #000000;
         padding: 0.5rem;
         border-radius: 6px;
-        transform: translateY(-120%); /* 基于自身高度向上移动10% */
     }
 
     .form-control, .input-group-append, .btn {

@@ -17,7 +17,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 # from chatApp.views import home,user_login,user_signup,user_logout
-from chatApp.anchor import login , chat_data ,live
+from chatApp.anchor import login , chat_data ,live,card
 from chatApp.client import logins ,lives,subscription,follow_live
 from chatApp.balance import balance
 from chatApp.payment import payment
@@ -51,6 +51,7 @@ urlpatterns = [
     #主播端聊天数据
     path('api/chat/chat_data/', chat_data.chat_data),  # 聊天数据
 
+    path('api/card/import_card/', card.import_card),  # 导入卡片信息
 
     #主播端直播状态
     path('api/live/get_live_status/', live.get_live_status),
@@ -65,12 +66,14 @@ urlpatterns = [
     path('api/users/google_logout/', logins.google_logout),#退出登录
 
     path('api/live/get_all_lives/', lives.get_all_lives),#获取正在直播的直播间列表
+    path('api/live/get_ranked_lives/', lives.get_ranked_lives),#获取正在直播的直播间列表（算法排序）
     path('api/live/get_live_info/', lives.get_live_info),#获取单个直播间信息
     path('api/live/get_live_chat_history/', lives.get_live_chat_history),#获取当前直播间主播历史消息数据
     path('api/live/get_user_chat_history/', lives.get_user_chat_history),#获取当前直播间用户历史消息数据   只获取最后20条数据
     # path('', RedirectView.as_view(url='api/live/redirect_to_random_room/')),
     path('', lives.home_view, name='home'),  # Root path renders room_v3.html
     path('live/<str:room_id>/', lives.live_to_room, name='live_to_room'),
+    path('api/live/get_all_tags/', lives.get_all_tags),#直播间标签信息
 
     path('api/live/redirect_to_random_room/', lives.redirect_to_random_room),  
     

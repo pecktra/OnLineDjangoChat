@@ -48,11 +48,7 @@ def chat_data(request):
 
     # 确保传递的参数都存在
     if not username or not uid or not character_name  or not character_date or not data_str:
-        print(username)
-        print(uid)
-        print(character_name)
-        print(character_date)
-        print(data_str)
+
         return Response({"code": 1, "message": "缺少必填参数"}, status=400)
 
     try:
