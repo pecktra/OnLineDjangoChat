@@ -30,6 +30,7 @@
         display: flex !important; /* 确保显示 */
         flex-direction: column; /* 垂直排列 */
         height: 100dvh; /* 占满 main 的高度 */
+        min-height: 100dvh;
     }
 
     .chat-header {
