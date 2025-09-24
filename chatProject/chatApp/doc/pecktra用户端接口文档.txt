@@ -1,53 +1,11 @@
 用户端：
-1、用户是否登录
-URL：/api/users/is_logged_in
-Method：get
-Body:
-	{
 
-	}
-Response:
-	Success：
-		{
-			"code":0,
-			"data":{
-					"user_info":
-							{
-								uid:string,
-								status: bool,登录为true
-								uname:string,未登录返回 游客,
-								coin_num:int 钻石数量，没有是0
-							}
-					
-				   }
-		}
-	error:
-		{
-			"code":1
-		}
-
-2、退出登录
-URL：/api/users/login_out
-Method：get
-Body:
-	{
-
-	}
-Response:
-	Success：
-		{
-			"code":0,
-		}
-	error:
-		{
-			"code":1
-		}
-		
-3、获取正在直播的直播间列表 （有改动）
+3、获取正在直播的直播间列表 （有改动）  （这个是主页中间的接口  加入了 搜索 和 分页  前端需要加搜索 和 分页 ）
 URL：/api/live/get_all_lives
 Method：get
 Body:
 	{
+	    page 页数
         search_tag （传入标签会搜索正在直播的房间 不传则为全部）
 	}
 Response:
@@ -65,7 +23,7 @@ Response:
 			"code":1
 		}
 
-获取正在直播的直播间列表 （首页左侧的接口 加入了一个简易的算法  实现活跃直播间排序）
+获取正在直播的直播间列表 （首页左侧的接口 加入了一个简易的算法  实现活跃直播间排序）  这个是主页左边列表的接口
 URL：/api/live/get_ranked_lives/
 Method：get
 Body:
@@ -143,35 +101,36 @@ Response:
 		{
 			"code":0,
 			"data":{
-					"live_info":
-							{
-								room_id:string 房间id, 
-								room_name:string 房间名称,
-								uid:string 主播id,
-								username:string 主播名,
-								live_num int 直播间观看人数,
-								character_name:string 角色名称，
-								live_status:bool 开播状态，true是直播中,
-								title:string,直播标题
-								describe:string,直播描述
-							},
-					"vip_info":
-							{
-								room_type: int ,房间类型
-								vip_status:bool ,是否有权限进入房间，true是有权限，是否付费过
-								amount:int ,钻石数量，免费房间是0
-							},
-					"follow_info":
-							{
-								follow_status:bool ,是否关注，true是关注
-							},
-					"subscription_info":
-							{
-								
-								subscription_status:bool ,是否有权限进入房间，true是有权限，订阅
-								amount:int ,订阅钻石数量
-							}
-				   }
+					{
+                     "live_info": {
+                          "room_id": "4cff21a28f2c0961",
+                          "room_name": "Baib646cTSWNl-g5i_4wcQ_Kotohime_2025-9-16 @21h 19m 03s 522ms",
+                          "uid": "Baib646cTSWNl-g5i_4wcQ",
+                          "username": "pride88",
+                          "character_name": "Kotohime",
+                          "image_name": "Kotohime16",
+                          "image_path": "headimage/default_image2.png",
+                          "tags": [],
+                          "language": "en",
+                          "live_status": true,
+                          "title": "标题1111111111111",
+                          "describe": "描述111111111111111111",
+                          "live_num": 0,
+                          "ai_replied_recently": false （这个是下午说的那个有新回复定位到下面  一个小时没有就定位到顶部）
+                         },
+                     "vip_info": {
+                       "room_type": 0,
+                       "vip_status": false,
+                       "amount": 0
+                     },
+                     "follow_info": {
+                       "follow_status": false
+                     },
+                     "subscription_info": {
+                       "subscription_status": true,
+                       "amount": 0
+                     }
+                 }
 		}
 	error:
 		{
