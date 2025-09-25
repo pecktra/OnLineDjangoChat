@@ -191,6 +191,7 @@
 /* 按钮容器（让两个按钮垂直排列） */
 .streamer-actions {
   display: flex;
+  margin-top: 48px;
   flex-direction: column; /* 垂直排列 */
   gap: 10px; /* 按钮间距 */
   width: fit-content; /* 宽度自适应按钮 */

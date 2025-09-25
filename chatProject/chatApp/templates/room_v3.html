@@ -33,6 +33,24 @@
             height: 100%;
             overflow: hidden;
         }
+        .mobile-switches {
+            display:none;
+        }
+        @media (max-width: 768px) {
+            .mobile-switches {
+                display: flex;
+                position: fixed;
+                top: 20px;
+                right: 16px;
+                z-index: 10; /* 高优先级 */
+            }
+            .switch-to-nav {
+                transform:scale(1.5)
+            }
+            .close-nav {
+                transform:scale(1.5)
+            }
+        }
     </style>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 </head>
@@ -61,8 +79,11 @@
     </symbol>
 </svg>
 <main>
+    {% block mobile_switcher %}
+        {% include 'mobile-switcher.html' %}
+    {% endblock %}
     <!--左侧导航-->
-		<div class="d-flex flex-column flex-shrink-0 p-3 text-white bg-dark nav-sidebar" style="width: 280px;">
+		<div class="flex-column flex-shrink-0 text-white bg-dark nav-sidebar">
 
 
                 <div class="d-flex align-items-center justify-content-between">
@@ -409,6 +430,17 @@ document.addEventListener('DOMContentLoaded', () => {
     //         }
     //     }, 1000);
     // }
+    if (switchToNavBtn && navSidebar) {
+        switchToNavBtn.addEventListener('click', function () {
+            navSidebar.classList.add('open');
+            switchToNavBtn.hidden = true;
+            // 若想来回切换，改成：navSidebar.classList.toggle('nav-sidebar-z1');
+        });
+        closeNavBtn.addEventListener('click', function (){
+            navSidebar.classList.remove('open');
+            switchToNavBtn.hidden = false;
+        })
+    }
 });
 
 
@@ -445,17 +477,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         })
     }
-
-
-
-
-
-
-
-
-
-
-
 
 
     </script>

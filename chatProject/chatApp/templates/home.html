@@ -2,9 +2,11 @@
 {% load static %}
 
 {% block title %} - Home{% endblock %}
-
+{% block mobile_switcher %}{% endblock %}
 {% block content %}
+
 <div class="homepage-container" id="homepageContainer">
+    {% include 'mobile-switcher.html' %}
     <div class="homepage-header">
         <div>
             <!-- <h1>欢迎加入Pecktra</h1> -->
@@ -14,6 +16,11 @@
             <p>For FAQs about Sillytavern, you can enter the Sillytavern Assistant's live stream.</p>
             <a href="https://discord.gg/cDHgrU3yYN" class="btn btn-primary mt-3" target="_blank">Discord</a>
         </div>
+        <button type="button" class="homepage-close-btn" aria-label="关闭">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M18.3 5.71a1 1 0 0 0-1.41 0L12 10.59 7.11 5.7A1 1 0 0 0 5.7 7.11L10.59 12l-4.9 4.89a1 1 0 1 0 1.41 1.41L12 13.41l4.89 4.9a1 1 0 0 0 1.41-1.41L13.41 12l4.9-4.89a1 1 0 0 0-.01-1.4z"/>
+            </svg>
+        </button>
     </div>
     <div class="homepage-lives">
         <div class="home-live-card-container" id="homeLiveListContainer">
@@ -21,4 +28,15 @@
         </div>
     </div>
 </div>
+<script>
+    (function(){
+      const header = document.querySelector('.homepage-header');
+      const closeBtn = header ? header.querySelector('.homepage-close-btn') : null;
+      if (header && closeBtn) {
+        closeBtn.addEventListener('click', function(){
+          header.style.display = 'none'; // 或者：header.classList.add('is-hidden');
+        });
+      }
+    })();
+</script>
 {% endblock %}

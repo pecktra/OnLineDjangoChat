@@ -1,12 +1,18 @@
 /* 按钮样式（电脑端和手机端通用） */
 .mobile-only {
-    display: none !important; /* 默认隐藏 */
+    display: none; /* 默认隐藏 */
 }
 
 /* 电脑端 total-chat 样式 */
 .total-chat {
     display: flex;
     flex: 1;
+}
+
+.nav-sidebar {
+    width: 280px;
+    display: flex;
+    padding: 1rem;
 }
 
 
@@ -38,16 +44,17 @@
     }
 
     .nav-sidebar {
-        width: 100% !important; /* 覆盖宽度设置 */
-        max-width: 100%;
-        height: calc(100vh - env(safe-area-inset-bottom, 20px)) !important; /* 适配 iPhone 地址栏 */
-        min-height: calc(100vh - env(safe-area-inset-bottom, 20px)) !important;
-        position: absolute;
-        top: 0;
-        left: 0;
-        box-sizing: border-box;
-        overflow: visible !important; /* 防止内容裁剪 */
-        display: none !important; /* 默认隐藏 */
+        width: 100%;
+        height:100%;
+        z-index:1;
+        display: none;
+    }
+
+    .nav-sidebar.open {
+        position: relative;    /* 若原本无定位，确保 z-index 生效 */
+        z-index: 1 !important;
+        display: flex;
+        padding: 1rem;
     }
 
     /* 显示导航时 */
@@ -127,7 +134,7 @@
 
     /* 按钮样式 */
     .mobile-only {
-        display: inline-flex !important; /* 在移动端显示 */
+        display: inline-flex; /* 在移动端显示 */
     }
 
     .close-nav, .close-chat, .switch-to-nav, .switch-to-chat {
@@ -151,16 +158,6 @@
 
     .close-nav:hover, .close-chat:hover, .switch-to-nav:hover, .switch-to-chat:hover {
         background: #0056b3;
-    }
-
-    .mobile-switches {
-        display: flex !important; /* 确保切换按钮容器显示 */
-        padding: 10px;
-        gap: 10px;
-        position: fixed;
-        top: 10px;
-        right: 10px;
-        z-index: 1000; /* 高优先级 */
     }
 
     /* 确保聊天输入框在 iPhone Safari 可见 */
