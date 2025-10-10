@@ -53,6 +53,18 @@
         }
     </style>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-F5XX7XLVL5"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      if (window.location.hostname === 'www.pecktra.com') {
+        gtag('config', 'G-F5XX7XLVL5');
+      }
+    </script>
 </head>
 <body>
 <svg xmlns="https://www.w3.org/2000/svg" style="display: none;">
@@ -161,6 +173,7 @@
                 <a href="#" class="btn btn-primary" id="googleLoginLink" style="display: none;">Sign in with Google</a>
                 <a href="#" class="btn btn-secondary" id="logoutLink" style="display: none;">Sign out</a>
             </div>
+            <div class="my-4"><a href="/about" class="text-white">About Us</a></div>
             <div style="font-size: 12px;">© 2025 Long Foundation.<div>All rights reserved</div></div>
 		</div>
 

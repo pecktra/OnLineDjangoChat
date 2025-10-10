@@ -1,6 +1,6 @@
 用户端：
 
-3、获取正在直播的直播间列表 （有改动）  （这个是主页中间的接口  加入了 搜索 和 分页  前端需要加搜索 和 分页 ）
+获取正在直播的直播间列表 （有改动）  （这个是主页中间的接口  加入了 搜索 和 分页  前端需要加搜索 和 分页 ）
 URL：/api/live/get_all_lives
 Method：get
 Body:
@@ -22,6 +22,38 @@ Response:
 		{
 			"code":1
 		}
+
+
+获得聊天记录
+URL：/api/chat/get_room_chat/
+Method：get
+Body:
+	{
+       room_id
+	}
+Response:
+	Success：
+		{
+			"code":0,
+			"message": "success",
+    "data": [
+        {
+            "floor": 1,
+            "data_type": "ai",
+            "data": {
+                "name": "Kotohime",
+                "is_user": false,
+                "send_date": "September 16, 2025 9:19pm",
+                "mes": "*Kotohime skids to a halt, kicking up dust as she strikes a dramatic pose. She jabs a finger forward, her red eyes gleaming with authority—or at least, whatever authority she believes she has.*\n\nYou there! Halt! You are officially under arrest for… uh…\n\n*She pauses mid-sentence, blinking. Her finger drops as she frowns in dramatic contemplation. With a flourish, she digs into her sleeve and whips out a ridiculously long scroll that unrolls all the way to her feet. It flaps in the breeze like it’s trying to escape the shame of its own contents.*\n\nLet’s see… Walking too confidently, excessive hat flair, loitering with dramatic intent—wait, here we go! *She jabs at the list triumphantly.* Unauthorized presence in a high-crime zone! Boom. Nailed it. That’s definitely something.\n\n*The accused just raises an eyebrow, unfazed. Kotohime doesn’t care. She digs back into her sleeve and yanks out a pair of handcuffs, brandishing them like they’re weapons of divine justice.*\n\nSo what's it gonna be, punk? You gonna come quietly?"
+            },
+            "mes_html": "<p><em>Kotohime skids to a halt, kicking up dust as she strikes a dramatic pose. She jabs a finger forward, her red eyes gleaming with authority—or at least, whatever authority she believes she has.</em></p>\n<p>You there! Halt! You are officially under arrest for… uh…</p>\n<p><em>She pauses mid-sentence, blinking. Her finger drops as she frowns in dramatic contemplation. With a flourish, she digs into her sleeve and whips out a ridiculously long scroll that unrolls all the way to her feet. It flaps in the breeze like it’s trying to escape the shame of its own contents.</em></p>\n<p>Let’s see… Walking too confidently, excessive hat flair, loitering with dramatic intent—wait, here we go! <em>She jabs at the list triumphantly.</em> Unauthorized presence in a high-crime zone! Boom. Nailed it. That’s definitely something.</p>\n<p><em>The accused just raises an eyebrow, unfazed. Kotohime doesn’t care. She digs back into her sleeve and yanks out a pair of handcuffs, brandishing them like they’re weapons of divine justice.</em></p>\n<p>So what's it gonna be, punk? You gonna come quietly?</p>"
+        },
+		}
+	error:
+		{
+			"code":1
+		}
+
 
 获取正在直播的直播间列表 （首页左侧的接口 加入了一个简易的算法  实现活跃直播间排序）  这个是主页左边列表的接口
 URL：/api/live/get_ranked_lives/

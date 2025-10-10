@@ -2,16 +2,16 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from django.conf import settings
 from pymongo import MongoClient
-
 from django.http import JsonResponse
-from chatApp.models import CharacterCard,Anchor
+from chatApp.models import CharacterCard, Anchor
 import json
-import os
 import hashlib
-import re  # 用于检测中文
+import re
+import os
+
 # 初始化 MongoDB 连接
 client = MongoClient(settings.MONGO_URI)
-db = client.chat_db  # 连接到 chat_db 数据库
+db = client.chat_db
 
 
 @api_view(['POST'])
@@ -25,7 +25,7 @@ def import_card(request):
         username = request.POST.get('username', '')
         filename = request.POST.get('filename', '')
 
-        # 解析JSON数据
+        # 解析 JSON 数据
         try:
             character_json = json.loads(character_data_str)
         except json.JSONDecodeError:
@@ -34,66 +34,72 @@ def import_card(request):
         character_name = character_json['data']['name']
         create_date = character_json['create_date']
 
-        # 1. 手动创建用户目录
-        user_dir = os.path.join(settings.MEDIA_ROOT, username, 'characters')
-        os.makedirs(user_dir, exist_ok=True)
-
-        # 构建完整文件路径
-        file_path = os.path.join(user_dir, filename + ".png")
-        relative_path = f'{username}/characters/{filename}.png'
-
-        # 判断是否创建过
-        if CharacterCard.objects.filter(image_path=relative_path).exists():
-            return JsonResponse({'status': 'success', 'message': '卡不可重复上传'})
-
-        # 手动保存图片文件
-        with open(file_path, 'wb') as f:
-            for chunk in image_file.chunks():
-                f.write(chunk)
-
-        # 查找uid
+        # 查找 uid
         user = Anchor.objects.filter(handle=username).first()
         if not user:
             return JsonResponse({'status': 'error', 'message': "not found username"}, status=500)
 
         room_id = hashlib.sha1(f"{user.uid}_{character_name}_{create_date}".encode('utf-8')).hexdigest()[:16]
 
-        # 自动判断语言：如果有中文字符则设为 cn，否则 en
+        # 自动判断语言
         language = "cn" if re.search(r'[\u4e00-\u9fff]', character_name) else "en"
 
         # 处理 tags
         tags_list = character_json.get('tags', [])
-        if isinstance(tags_list, list) and tags_list:
-            tags = ",".join(tags_list)
-        else:
-            tags = None
+        tags = ",".join(tags_list) if isinstance(tags_list, list) and tags_list else None
 
-        # 自动判断是否私密卡：只要 tags 里有 NSFW 相关关键字
+        # 判断是否私密卡
         nsfw_keywords = {"Not Safe for Work", "NotSafeforWork", "NSFW", "nsfw"}
         is_private = any(tag.strip() in nsfw_keywords for tag in tags_list)
 
-        # 创建数据库记录
+        # 检查是否重复上传
+        if CharacterCard.objects.filter(image_name=filename, username=username).exists():
+            existing_card = CharacterCard.objects.get(image_name=filename, username=username)
+            return JsonResponse({
+                'status': 'success',
+                'message': '卡不可重复上传',
+                'data': {
+                    'id': existing_card.id,
+                    'image_path': existing_card.image_path.url,
+                    'full_path': request.build_absolute_uri(existing_card.image_path.url)
+                }
+            })
+
+        # 创建数据库记录（先不保存图片）
         character_card = CharacterCard.objects.create(
             room_id=room_id,
             uid=user.uid,
             username=username,
             character_name=character_name,
             image_name=filename,
-            image_path=relative_path,
-            character_data=character_json,
+            character_data=json.dumps(character_json, ensure_ascii=False),  # 保存中文 JSON
             create_date=create_date,
             language=language,
             tags=tags,
             is_private=is_private
         )
 
+        # 保存图片文件到 ImageField，支持中文文件名
+        # 自动生成路径：MEDIA_ROOT/<username>/characters/<filename>.png
+        sub_path = os.path.join(username, 'characters', f"{filename}.png")
+        full_path = os.path.join(settings.MEDIA_ROOT, sub_path)
+        os.makedirs(os.path.dirname(full_path), exist_ok=True)
+
+        with open(full_path, 'wb') as f:
+            for chunk in image_file.chunks():
+                f.write(chunk)
+
+        # 使用 Django ImageField 指定保存路径
+        character_card.image_path.name = sub_path
+        character_card.save()
+
         return JsonResponse({
             'status': 'success',
             'message': '上传成功',
             'data': {
                 'id': character_card.id,
-                'image_path': character_card.image_path,
-                'full_path': os.path.join(settings.MEDIA_URL, relative_path)
+                'image_path': character_card.image_path.url,
+                'full_path': request.build_absolute_uri(character_card.image_path.url)
             }
         })
 
@@ -101,13 +107,3 @@ def import_card(request):
         import traceback
         print(f"错误详情: {traceback.format_exc()}")
         return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
-
-
-
-
-
-
-
-
-
-

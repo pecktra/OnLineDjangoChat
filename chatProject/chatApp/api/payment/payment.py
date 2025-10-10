@@ -7,14 +7,16 @@ import qrcode
 from io import BytesIO
 import base64
 from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
 from rest_framework.decorators import api_view
 from django.utils import timezone
 from django.db import transaction
-from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
 from chatApp.models import UserBalance, PaymentRechargeRecord,PaymentLog
 from django.http import JsonResponse
 import requests
+from rest_framework.decorators import api_view, authentication_classes
+from rest_framework.authentication import SessionAuthentication
 
 # NOWPayments 配置
 NOWPAYMENTS_API_KEY = settings.NOWPAYMENTS_API_KEY
@@ -45,6 +47,7 @@ def convert_image_to_base64(image):
     image.save(buffered, format="PNG")
     img_str = base64.b64encode(buffered.getvalue()).decode("utf-8")
     return img_str
+
 
 
 @api_view(['POST'])
@@ -151,7 +154,7 @@ def process_recharge(request):
         return JsonResponse({"code": 1, "error": f"Failed to create payment: {str(e)}"}, status=500)
 
 
-@csrf_exempt
+
 def payment_callback(request):
     """
     NOWPayments回调处理，更新余额和充值记录，并写日志

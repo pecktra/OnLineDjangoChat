@@ -10,6 +10,8 @@ def room_test(request):
     return render(request, 'room_v3.html')
 
 
+def about(request):
+    return render(request, 'about.html')
 
 
 @csrf_exempt

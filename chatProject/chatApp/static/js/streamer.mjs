@@ -9,7 +9,6 @@ class StreamerInfoManager {
         if(!vip_status){
             window.location.href = '/';
         }
-        this.updateUI(data.live_info);
         this.initSubscriptionButton(data.subscription_info); //初始化订阅按钮
         this.initFollowButton(data.live_info,data.follow_info); // 新增：初始化关注按钮
         return data.live_info?.room_name
@@ -30,6 +29,7 @@ class StreamerInfoManager {
 
         if (!response.ok) throw new Error('Network error');
         const data = await response.json();
+        this.updateUI(data.data.live_info);
         window.GLOBAL_ANCHOR_ID = data?.data?.live_info?.uid
 
 
@@ -136,7 +136,17 @@ class StreamerInfoManager {
         if (data) {
             // 头像
             const avatar = document.querySelector('.streamer-details img');
-            avatar.src = generateSimpleAvatar(data.username);
+            if (avatar) {
+                // 如果有自定义图片路径，使用它；否则使用默认头像
+                if (data.image_path) {
+                    avatar.onerror = function() {
+                        avatar.src = generateSimpleAvatar(data.username);
+                    };
+                    avatar.src = data.image_path;
+                } else {
+                    avatar.src = generateSimpleAvatar(data.username);
+                }
+            }
 
             const avatar1 = document.querySelector('.live-user-header img');
             avatar1.src = generateSimpleAvatar(data.username);

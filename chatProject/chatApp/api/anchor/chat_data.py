@@ -120,6 +120,10 @@ def chat_data(request):
             # 检查是否已经存在相同的房间（根据 room_id查找）
             if RoomInfo.objects.filter(room_id = room_id).exists():
                 return Response({"code": 1, "message": "Room with the given uid and character_name already exists."}, status=400)
+            file_name = request.data.get("file_name")
+            file_branch = "main"
+            if "Branch" in file_name:
+                file_branch = "branch"
 
             # 创建房间记录
             room_info = RoomInfo(
@@ -129,6 +133,8 @@ def chat_data(request):
                 room_name=room_name,
                 character_name=character_name,
                 character_date=character_date,
+                file_name = file_name,
+                file_branch = file_branch,
                 is_info=0
             )
             room_info.save()
@@ -136,9 +142,9 @@ def chat_data(request):
 
 
         # 转发 WebSocket 消息
-
-        if send_data['live_message']:
-            sync_send_to_websocket(room_id, send_data)
+        #
+        # if send_data['live_message']:
+        #     sync_send_to_websocket(room_id, send_data)
 
         return Response({
             "code": 0,

@@ -1,6 +1,5 @@
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
-from chatApp.permissions import IsAuthenticatedOrGuest
 from django_redis import get_redis_connection
 from pymongo import MongoClient
 from django.conf import settings
@@ -25,6 +24,7 @@ from django.utils.dateparse import parse_datetime
 import random
 from math import ceil
 from django.utils import timezone
+from urllib.parse import quote
 # 获取 Redis 连接
 redis_client = get_redis_connection('default')
 
@@ -109,12 +109,16 @@ def get_all_lives(request):
         ).order_by('-create_date').first()
 
         # ===== 修改部分：如果数据库没有图片就随机使用默认图片 =====
+        # ===== 修改部分：image_path 返回完整 URL 并处理中文 =====
         if character_card:
             image_name = character_card.image_name
-            image_path = character_card.image_path
+            # urlquote 对中文进行编码，保证 JSON 序列化不会报错
+            image_path = request.build_absolute_uri(character_card.image_path.url)
         else:
             image_name = ""
-            image_path = random.choice(default_images)
+            default_image_relative = random.choice(default_images)
+            image_path = request.build_absolute_uri(
+                f"{settings.MEDIA_URL}{quote(str(default_image_relative), safe='/')}")
         # ============================================================
 
         online_count = ChatConsumer.get_online_count(room_info.room_id)
@@ -224,12 +228,16 @@ def get_ranked_lives(request):
             ).order_by('-create_date').first()
 
             # ===== 修改部分：如果数据库没有图片就随机使用默认图片 =====
+            # ===== 修改部分：image_path 返回完整 URL 并处理中文 =====
             if character_card:
                 image_name = character_card.image_name
-                image_path = character_card.image_path
+                # urlquote 对中文进行编码，保证 JSON 序列化不会报错
+                image_path = request.build_absolute_uri(character_card.image_path.url)
             else:
                 image_name = ""
-                image_path = random.choice(default_images)
+                default_image_relative = random.choice(default_images)
+                image_path = request.build_absolute_uri(
+                    f"{settings.MEDIA_URL}{quote(str(default_image_relative), safe='/')}")
             # ============================================================
 
             # 4. 获取在线人数
@@ -301,7 +309,6 @@ def get_live_info(request):
     GET /api/live/get_live_info?room_id=<room_id>
     """
     room_id = request.GET.get("room_id")
-
     user = get_user(request)
     if not room_id:
         return Response({"code": 1, "message": "Missing room_name parameter"}, status=400)
@@ -329,10 +336,7 @@ def get_live_info(request):
             if vip_subscription:
                 vip_info["vip_status"] = True
 
-        subscription_info = {
-            "subscription_status": False,
-            "amount": 0
-        }
+        subscription_info = {"subscription_status": False, "amount": 0}
         redis_client_subscribe = get_redis_connection('subscribe')
         subscription_key = f"subscription:{user.id}:{room_info.uid}"
         subscription_data = redis_client_subscribe.get(subscription_key)
@@ -344,9 +348,7 @@ def get_live_info(request):
             except json.JSONDecodeError:
                 print("Error decoding subscription data:", subscription_data)
 
-        follow_info = {
-            "follow_status": False
-        }
+        follow_info = {"follow_status": False}
         followed_room = UserFollowedRoom.objects.filter(user_id=user.id, room_id=room_info.room_id).first()
         if followed_room and followed_room.status:
             follow_info["follow_status"] = True
@@ -354,37 +356,33 @@ def get_live_info(request):
         character_card = CharacterCard.objects.filter(room_id=room_info.room_id).order_by('-create_date').first()
         if character_card:
             image_name = character_card.image_name
-            image_path = character_card.image_path 
+            # ✅ 中文文件名处理并返回完整 URL
+            image_path = request.build_absolute_uri(character_card.image_path.url)
             tags = character_card.tags.split(",") if character_card.tags else []
             language = character_card.language or "en"
         else:
             image_name = ""
-            image_path = random.choice(default_images)
+            default_image_relative = random.choice(default_images)
+            image_path = request.build_absolute_uri(
+                f"{settings.MEDIA_URL}{quote(str(default_image_relative), safe='/')}")
             tags = []
             language = "en"
 
-        # ✅ 计算最近一小时 AI 是否回复（MongoDB）
+        # 计算最近一小时 AI 是否回复
         collection_name = room_info.room_id
         one_hour_ago = timezone.now() - timezone.timedelta(hours=1)
-
-        # 找最近一条 AI 回复
-        last_ai_doc = db[collection_name].find_one(
-            {"data_type": "ai"},
-            sort=[("data.send_date", -1)]
-        )
+        last_ai_doc = db[collection_name].find_one({"data_type": "ai"}, sort=[("data.send_date", -1)])
 
         ai_replied_recently = False
         if last_ai_doc and "data" in last_ai_doc:
             send_date_str = last_ai_doc["data"].get("send_date")
             if send_date_str:
                 try:
-                    # 解析 send_date
                     from datetime import datetime
                     try:
                         send_date = datetime.strptime(send_date_str, "%B %d, %Y %I:%M%p")
                     except ValueError:
                         send_date = datetime.strptime(send_date_str, "%Y-%m-%d %H:%M:%S")
-
                     send_date = timezone.make_aware(send_date, timezone.get_current_timezone())
                     if send_date >= one_hour_ago:
                         ai_replied_recently = True
@@ -398,14 +396,14 @@ def get_live_info(request):
             "username": username,
             "character_name": room_info.character_name,
             "image_name": image_name,
-            "image_path": image_path,
+            "image_path": image_path,  # ✅ 修改这里
             "tags": tags,
             "language": language,
             "live_status": live_status,
             "title": room_info.title,
             "describe": room_info.describe,
             "live_num": ChatConsumer.get_online_count(room_info.room_id),
-            "ai_replied_recently": ai_replied_recently  # ✅ 新增字段
+            "ai_replied_recently": ai_replied_recently
         }
 
         return Response({
@@ -420,6 +418,7 @@ def get_live_info(request):
 
     except Exception as e:
         return Response({"code": 1, "message": f"Internal server error: {str(e)}"}, status=500)
+
 @api_view(['GET'])
 def get_live_chat_history(request):
     """

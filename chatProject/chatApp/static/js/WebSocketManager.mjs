@@ -3,27 +3,33 @@
 export default class WebSocketManager {
     constructor(roomId,roomName,userName) {
         this.roomId = roomId;
-        this.roomName = roomName
+        this.roomName = roomName;
         this.userName = userName;
         this.socket = null;
         this.reconnectAttempts = 0;
         this.maxReconnectAttempts = 5;
         this.reconnectDelay = 2000;
 
+        // 轮询配置
+        this.pollingIntervalMs = 5000; // 10 秒
+        this.pollingTimerId = null;
+
+        // 已见消息去重集合
+        this.seenMessageIds = new Set();
+        this.lastFloor = 0;
+
         // DOM 元素
-        //获取
         this.chatArea = document.querySelector('.chat-area');
         this.chatContent = document.querySelector('.chat-content');
-
         this.chatInput = document.querySelector('#chatMessageInput');
         this.sendButton = document.querySelector('#chatMessageSend');
 
         window.addEventListener('beforeunload', () => this.disconnect());
         window.addEventListener('unload', () => this.disconnect()); // 备用
-
     }
 
     init() {
+        this.startPolling();
         this.connect();
         this.bindEvents();
     }
@@ -64,8 +70,62 @@ export default class WebSocketManager {
         }
     }
 
+    // 启动轮询
+    startPolling() {
+        // 立即拉取一次
+        this.fetchAndAppendNewMessages().catch(console.error);
 
+        // 定时轮询
+        this.pollingTimerId = window.setInterval(() => {
+            this.fetchAndAppendNewMessages()//.catch(console.error);
+        }, this.pollingIntervalMs);
+    }
 
+    // 从后端拉取消息并仅追加新增项
+    async fetchAndAppendNewMessages() {
+        try {
+            const url = `/api/chat/get_room_chat/?room_id=${encodeURIComponent(this.roomId)}&last_floor=${this.lastFloor}`;
+            const resp = await fetch(url, { credentials: 'same-origin' });
+            if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+            const payload = await resp.json();
+            document.querySelector('.chat-area .loading').hidden=true
+            // 兼容多种返回形态：{messages: [...]} 或直接 [...]
+            const items = payload.data
+            if (!Array.isArray(items)) return;
+
+            for (const item of items) {
+                if (item.floor <= this.lastFloor) continue;
+                this.lastFloor = item.floor
+                // 提取唯一 ID；尽量使用后端提供的 id，其次 data.id；都没有则构造一个稳定 key
+                // const rawId = item.id ?? item?.data?.id ?? `${item.type || 'msg'}-${item?.data?.username || ''}-${item?.data?.send_date || item?.data?.time || ''}-${item?.data?.message || item?.data?.live_message || ''}`;
+                // if (this.seenMessageIds.has(rawId)) continue;
+
+                // // 记录并渲染
+                // this.seenMessageIds.add(rawId);
+
+                const type = item.data_type
+                if (type === 'ai') {
+                    this.chatArea.insertAdjacentHTML('beforeend', this.appendLiveMessage(item));
+                    this.chatArea.scrollTop = this.chatArea.scrollHeight;
+                } else if (type === 'user') {
+                    this.chatArea.insertAdjacentHTML('beforeend', this.appendLiveMessage(item));
+                    this.chatArea.scrollTop = this.chatArea.scrollHeight;
+                } else {
+                    // 若后端未提供 type，则尝试通过字段推断
+                    const hasLiveFields = (item.data || item)?.live_message || (item.data || item)?.live_message_html;
+                    if (hasLiveFields) {
+                        this.chatArea.insertAdjacentHTML('beforeend', this.appendLiveMessage(item));
+                        this.chatArea.scrollTop = this.chatArea.scrollHeight;
+                    } else {
+                        this.chatContent.insertAdjacentHTML('beforeend', this.appendUserMessage(item));
+                        this.chatContent.scrollTop = this.chatContent.scrollHeight;
+                    }
+                }
+            }
+        } catch (err) {
+            console.error('轮询获取聊天失败:', err);
+        }
+    }
 
     connect() {
         this.socket = new WebSocket(`wss://${window.location.host}/ws/chat/${this.roomId}/`);
@@ -118,14 +178,13 @@ export default class WebSocketManager {
     }
 
     appendLiveMessage(msg) {
-        const messageContent = msg.is_user  ? msg.live_message : msg.live_message_html;
-
+        const messageContent = msg.data.is_user  ? msg.data.mes : msg.mes_html;
         return `
-                <div class="chat-message ${msg.is_user ? 'user-message' : 'ai-message'} ">
+                <div class="chat-message ${msg.data.is_user ? 'user-message' : 'ai-message'} ">
                     <div class="message-content">
                         <div class="message-header">
-                            <span class="sender-name">${msg.sender_name}</span>
-                            <span class="message-time">${this.convertTo24Hour(msg.send_date)}</span>
+                            <div><span class="sender-name">${msg.data.name}</span><span>#${msg.floor}</span><div>
+                            <span class="message-time">${this.convertTo24Hour(msg.data.send_date)}</span>
                         </div>
                         <div class="mes_text">
                             ${messageContent}
@@ -149,16 +208,15 @@ export default class WebSocketManager {
 
 
     appendUserMessage(data) {
-
-        const isCurrentUser = data.username === window.GLOBAL_USER_NAME;
+        const isCurrentUser = data.data.username === window.GLOBAL_USER_NAME;
         return `
             <div class="message ${isCurrentUser ? 'my-message' : 'other-message'}">
                 <div class="message-user-info">
                     <svg class="bi me-2 flex-shrink-0" width="16" height="16">  <!-- 禁止图标压缩 -->
                         <use xlink:href="#people-circle"/>
                     </svg>
-                     
-                    <span class="message-username">${data.username }</span>
+
+                    <div><span class="message-username">${data.data.username }</span></div>
                     <div class="message-time">${ new Date().toLocaleString('en-CA', {
                     year: 'numeric',
                     month: '2-digit',
@@ -168,8 +226,8 @@ export default class WebSocketManager {
                     hour12: false
                 }).replace(/,/, '')}</div>
                 </div>
-                <div class="message-bubble">${data.message}</div>
-                
+                <div class="message-bubble">${data.data.msg}</div>
+
             </div>
         `;
     }
@@ -193,18 +251,23 @@ export default class WebSocketManager {
             return;
         }
         const message = this.chatInput.value.trim();
-        
-        if (message && this.socket.readyState === WebSocket.OPEN) {
-            // this.socket.send(JSON.stringify({ message }));
-            this.socket.send(JSON.stringify({
-               message: message,  // 原始消息
-               username: this.userName
-            }));
-            
-        }
+
+        if (!message) return;
 
         // 2. 通过HTTP保存记录（不阻塞UI）
         this.saveChatHistory(message).catch(console.error);
+
+        // 3. 前端乐观追加一条当前用户消息（等待下一次轮询与服务端对齐）
+        try {
+            const optimistic = {
+                data: {
+                    username: this.userName,
+                    msg: message
+                }
+            };
+            this.chatContent.insertAdjacentHTML('beforeend', this.appendUserMessage(optimistic));
+            this.chatContent.scrollTop = this.chatContent.scrollHeight;
+        } catch (_) {}
         this.chatInput.value = '';
     }
 
@@ -233,6 +296,10 @@ export default class WebSocketManager {
         if (this.socket && this.socket.readyState === WebSocket.OPEN) {
             this.socket.close(1000, "User left the chat"); // 1000 是正常关闭状态码
             console.log("WebSocket 连接已主动关闭");
+        }
+        if (this.pollingTimerId) {
+            clearInterval(this.pollingTimerId);
+            this.pollingTimerId = null;
         }
     }
 }

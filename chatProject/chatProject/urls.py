@@ -17,10 +17,10 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 # from chatApp.views import home,user_login,user_signup,user_logout
-from chatApp.anchor import login , chat_data ,live,card
-from chatApp.client import logins ,lives,subscription,follow_live
-from chatApp.balance import balance
-from chatApp.payment import payment
+from chatApp.api.anchor import login, chat_data, live, card
+from chatApp.api.client import logins, lives, subscription, follow_live, chat
+from chatApp.api.balance import balance
+from chatApp.api.payment import payment
 # 导入静态文件模块，为了显示上传图片
 from django.conf.urls.static import static
 from django.views.generic.base import RedirectView
@@ -75,8 +75,8 @@ urlpatterns = [
     path('live/<str:room_id>/', lives.live_to_room, name='live_to_room'),
     path('api/live/get_all_tags/', lives.get_all_tags),#直播间标签信息
 
-    path('api/live/redirect_to_random_room/', lives.redirect_to_random_room),  
-    
+    path('api/live/redirect_to_random_room/', lives.redirect_to_random_room),
+
     # path('/', lives.redirect_to_random_room),
     path('api/live/pay_vip_coin/', lives.pay_vip_coin), #用户支付 VIP 钻石订阅vip直播间
 
@@ -101,7 +101,12 @@ urlpatterns = [
     #支付
     path('api/payment/process_recharge/', payment.process_recharge),  # 充值
     path('api/payment/payment_callback/', payment.payment_callback),  # 回调
-    path('api/payment/check_payment_status/<str:order_id>/', payment.check_payment_status)  # 查询订单状态
+    path('api/payment/check_payment_status/<str:order_id>/', payment.check_payment_status),  # 查询订单状态
+
+    #聊天列表
+    path('api/chat/get_room_chat/', chat.get_room_chat),  # 聊天列表
+
+    path('about/', views.about, name='about'),
 ]
 
 

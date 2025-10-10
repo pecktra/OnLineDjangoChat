@@ -216,6 +216,16 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # 指定用户模型
 AUTH_USER_MODEL="chatApp.ChatUser"
 
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'chatApp.api.auth.CsrfExemptSessionAuthentication',
+    ),
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.AllowAny',
+    ),
+}
+
+
 # 设置登陆、登出页面
 from django.urls import reverse_lazy
 LOGIN_REDIRECT_URL = reverse_lazy('login')
@@ -225,6 +235,7 @@ LOGIN_URL = reverse_lazy('login')
 import os
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR,'media')
+SITE_DOMAIN = os.getenv("SITE_DOMAIN", "http://127.0.0.1:8000")
 
 # 通道存储设置
 CHANNEL_LAYERS = {

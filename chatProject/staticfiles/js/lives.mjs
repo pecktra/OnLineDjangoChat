@@ -5,11 +5,17 @@
 class LiveManager {
     /**
      * 从API获取直播列表数据
+     * @param {string} searchTag 搜索标签参数
      * @returns {Promise<Array>} 直播列表数据
      */
-    static async fetchLiveList() {
+    static async fetchLiveList(searchTag = null) {
         try {
-            const response = await fetch('/api/live/get_all_lives/');
+            let url = '/api/live/get_all_lives/';
+            if (searchTag) {
+                url += `?tags=${encodeURIComponent(searchTag)}`;
+            }
+
+            const response = await fetch(url);
             if (!response.ok) throw new Error('Network response was not ok');
 
             const data = await response.json();
@@ -40,14 +46,14 @@ class LiveManager {
                 livesInfo.forEach(liveInfo => {
                     const userCard = document.createElement('div');
                     userCard.className = 'live-card';
-                    
+
                     // 用户头部信息（可点击展开）
                     const userHeader = document.createElement('div');
                     userHeader.className = 'user-header';
-                    
+
                     const userInfoDiv = document.createElement('div');
                     userInfoDiv.className = 'user-info';
-                    
+
                     userInfoDiv.innerHTML = `
                         <div class="user-avatar">${liveInfo.username ? liveInfo.username.charAt(0).toUpperCase() : 'U'}</div>
                         <div>
@@ -57,25 +63,25 @@ class LiveManager {
                             </div>
                         </div>
                     `;
-                    
+
                     const toggleIcon = document.createElement('div');
                     toggleIcon.className = 'toggle-icon';
                     toggleIcon.innerHTML = '<i class="fas fa-chevron-down"></i>';
-                    
+
                     userHeader.appendChild(userInfoDiv);
                     userHeader.appendChild(toggleIcon);
-                    
+
                     // 房间列表
                     const roomList = document.createElement('div');
                     roomList.className = 'room-list';
-                    
+
                     liveInfo.anchor_room_infos.forEach(room => {
                         let roomInfo = null;
                         let diamondBadge = '';
-                        
+
                         try {
                             roomInfo = room.room_info ? room.room_info : null;
-                            
+
                             // 如果是VIP房间且钻石数量>0
                             if (roomInfo && roomInfo.room_type === 1 && roomInfo.coin_num > 0) {
                                 diamondBadge = `
@@ -88,7 +94,7 @@ class LiveManager {
                         } catch (e) {
                             console.error('room_info error:', e);
                         }
-                        
+
                         const roomItem = document.createElement('a');
                         roomItem.href = `/live/${room.room_id}/`;
 
@@ -104,16 +110,16 @@ class LiveManager {
                             </div>
                             ${diamondBadge}
                         `;
-                        
+
                         roomList.appendChild(roomItem);
                     });
-                    
+
                     // 添加点击展开/收缩功能
                     userHeader.addEventListener('click', () => {
                         roomList.classList.toggle('expanded');
                         toggleIcon.classList.toggle('expanded');
                     });
-                    
+
                     userCard.appendChild(userHeader);
                     userCard.appendChild(roomList);
                     container.appendChild(userCard);
@@ -173,7 +179,7 @@ static renderLiveList_home(livesInfo) {
             font-size: 0 !important;
             border-radius: 12px 12px 0 0 !important;
         `;
-        
+
         const image = document.createElement('img');
         image.className = 'home-live-image';
         image.style.cssText = `
@@ -198,26 +204,26 @@ static renderLiveList_home(livesInfo) {
             vertical-align: top !important;
             font-size: 0 !important;
         `;
-        
+
         // 图片URL处理
         let imageUrl = '/media/headimage/default_image1.png';
         if (live.image_path) {
             const cleanPath = live.image_path.replace(/^\/+/, '');
-            imageUrl = `${mediaUrl}${cleanPath}`;
+            imageUrl = `${cleanPath}`;
         }
-        
+
         image.src = imageUrl;
         image.alt = live.character_name || '直播图片';
         image.loading = 'lazy';
-        
+
         // 加载成功后强制样式
         image.onload = function() {
             console.log(`图片加载成功: ${this.src}，尺寸: ${this.naturalWidth}x${this.naturalHeight}`);
             console.log(`容器尺寸: 171x171`);
-            
+
             // 添加 loaded 类
             this.classList.add('loaded');
-            
+
             // 强制设置尺寸
             this.style.width = '171px';
             this.style.height = '171px';
@@ -227,20 +233,20 @@ static renderLiveList_home(livesInfo) {
             this.style.minHeight = '171px';
             this.style.objectFit = 'cover';
             this.style.objectPosition = 'center';
-            
+
             // 调试：检查实际显示尺寸
             setTimeout(() => {
                 const rect = this.getBoundingClientRect();
                 console.log(`实际显示尺寸: ${rect.width}x${rect.height}`);
             }, 100);
         };
-        
+
         // 错误处理
         image.onerror = function() {
             console.warn(`图片加载失败: ${this.src}`);
             this.src = '/media/headimage/default_image1.png';
         };
-        
+
         image.addEventListener('error', function() {
             console.warn(`默认图片也加载失败`);
             imageContainer.innerHTML = `
@@ -259,7 +265,7 @@ static renderLiveList_home(livesInfo) {
                 </div>
             `;
         });
-        
+
         imageContainer.appendChild(image);
 
         // === 第2部分：角色名称 ===
@@ -299,10 +305,10 @@ static renderLiveList_home(livesInfo) {
             margin: 0 !important;
             box-sizing: border-box !important;
         `;
-        
+
         const fullTitle = live.room_info?.title ;
         const truncatedTitle = fullTitle.length > 30 ? fullTitle.substring(0, 30) + '...' : fullTitle; // 窄卡片缩短标题
-        
+
         const titleDiv = document.createElement('div');
         titleDiv.className = 'home-card-title';
         titleDiv.style.cssText = `
@@ -318,12 +324,12 @@ static renderLiveList_home(livesInfo) {
             overflow: hidden !important;
         `;
         titleDiv.textContent = truncatedTitle;
-        
+
         const tooltip = document.createElement('div');
         tooltip.className = 'home-title-tooltip';
         tooltip.textContent = fullTitle;
         tooltip.style.display = 'none';
-        
+
         titleContainer.appendChild(titleDiv);
         titleContainer.appendChild(tooltip);
 
@@ -339,7 +345,7 @@ static renderLiveList_home(livesInfo) {
             gap: 3px !important;
             overflow: hidden !important;
         `;
-        
+
         if (live.tags && live.tags.length > 0) {
             const maxTags = live.tags.slice(0, 3); // 窄卡片只显示3个标签
             maxTags.forEach(tag => {
@@ -356,11 +362,22 @@ static renderLiveList_home(livesInfo) {
                     line-height: 1 !important;
                     white-space: nowrap !important;
                     overflow: hidden !important;
+                    cursor: pointer !important;
                 `;
                 tagSpan.textContent = `#${tag}`;
+
+                // 添加点击事件
+                tagSpan.addEventListener('click', async (e) => {
+                    console.log(44444)
+                    e.preventDefault();
+                    e.stopPropagation();
+                    console.log(`点击标签: ${tag}`);
+                    await this.handleTagClick(tag);
+                });
+
                 tagsContainer.appendChild(tagSpan);
             });
-        } 
+        }
 
         // === 第5部分：用户名 - 底部横向占满 ===
         const usernameContainer = document.createElement('div');
@@ -415,7 +432,7 @@ static renderLiveList_home(livesInfo) {
         liveCard.appendChild(titleContainer);        // 3. 标题 - 45px
         liveCard.appendChild(tagsContainer);         // 4. 标签 - 45px
         liveCard.appendChild(usernameContainer);     // 5. 用户名 - 底部横向
-        
+
         homeContainer.appendChild(liveCard);
     });
 }
@@ -455,20 +472,20 @@ static getEmptyTemplate() {
     //         return;
     //     }
 
-        
+
     //     // 生成直播列表HTML
     //     container.innerHTML = lives.map(live => {
     //         // 解析room_info
     //         let roomInfo = null;
     //         let diamondBadge = '';
-            
+
     //         try {
     //             roomInfo = live.room_info ? live.room_info : null;
-                
+
     //             // 如果是VIP房间且钻石数量>0
     //             if (roomInfo && roomInfo.room_type === 1 && roomInfo.coin_num > 0) {
     //                 diamondBadge = `
-    //                     <span class="badge bg-primary ms-2 flex-shrink-0" 
+    //                     <span class="badge bg-primary ms-2 flex-shrink-0"
     //                         style="background-color: #3498db !important; min-width: 30px;">
     //                         <i class="fas fa-gem me-1" style="font-size: 0.8em;"></i>
     //                         vip ${roomInfo.coin_num}
@@ -480,10 +497,10 @@ static getEmptyTemplate() {
     //         }
 
     //         return `
-    //         <a href="/live/${live.room_id}/" 
-    //         class="nav-link text-white d-flex align-items-center live-room text-nowrap" 
-    //         data-bs-toggle="tooltip" 
-    //         data-bs-placement="right" 
+    //         <a href="/live/${live.room_id}/"
+    //         class="nav-link text-white d-flex align-items-center live-room text-nowrap"
+    //         data-bs-toggle="tooltip"
+    //         data-bs-placement="right"
     //         title="Join ${live.username} Livestream"
     //         data-room-id="${live.room_id}"
     //         data-room-name="${live.room_name}"
@@ -554,14 +571,14 @@ static renderLiveList(livesInfo) {
 
         // 包裹在链接中
         userInfoDiv.innerHTML = `
-            <a href="/live/${liveInfo.room_id}/" 
-               class="nav-link text-white d-flex align-items-center live-room text-nowrap" 
-               data-bs-toggle="tooltip" 
-               data-bs-placement="right" 
+            <a href="/live/${liveInfo.room_id}/"
+               class="nav-link text-white d-flex align-items-center live-room text-nowrap"
+               data-bs-toggle="tooltip"
+               data-bs-placement="right"
                title="Join ${liveInfo.username} Livestream"
                data-room-id="${liveInfo.room_id}"
                data-room-name="${liveInfo.room_name}"
-               target="_blank"  
+               target="_blank"
                style="min-width: 0;">
                 <div class="user-avatar">${liveInfo.username ? liveInfo.username.charAt(0).toUpperCase() : 'U'}</div>
                 <div class="text-truncate flex-grow-1">
@@ -626,6 +643,25 @@ static renderLiveList(livesInfo) {
     }
 
     /**
+     * 处理标签点击事件
+     * @param {string} tag 被点击的标签
+     */
+    static async handleTagClick(tag) {
+        try {
+            console.log(`搜索标签: ${tag}`);
+            const lives = await this.fetchLiveList(tag);
+
+            // 如果存在首页容器，也更新首页列表
+            const homeContainer = document.getElementById('homeLiveListContainer');
+            if (homeContainer) {
+                this.renderLiveList_home(lives);
+            }
+        } catch (error) {
+            console.error('标签搜索失败:', error);
+        }
+    }
+
+    /**
      * 模块初始化入口
      */
     static async init() {
@@ -661,7 +697,7 @@ static renderLiveList(livesInfo) {
         // 检查用户是否登录
         if (!window.GLOBAL_USER_ID || window.GLOBAL_USER_ID === 'null') {
             alert('please log in first');
-            
+
             const googleLoginLink = document.getElementById('googleLoginLink');
             if (googleLoginLink) {
                 googleLoginLink.click()
@@ -697,7 +733,7 @@ static renderLiveList(livesInfo) {
         // 检查用户是否登录
         if (!window.GLOBAL_USER_ID || window.GLOBAL_USER_ID === 'null') {
             alert('please log in first');
-            
+
             const googleLoginLink = document.getElementById('googleLoginLink');
             if (googleLoginLink) {
                 googleLoginLink.click()

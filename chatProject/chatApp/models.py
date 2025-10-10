@@ -23,13 +23,24 @@ class Anchor(models.Model):
 
 
 
+def character_image_upload_path(instance, filename):
+    """
+    动态生成图片上传路径，例如：
+    <username>/characters/<filename>
+    """
+    return os.path.join(instance.username, 'characters', filename)
+
 class CharacterCard(models.Model):
     room_id = models.CharField(max_length=150)  # 房间id
     uid = models.CharField(max_length=150)  # 用户id
     username = models.CharField(max_length=150)  # 用户名
     character_name = models.CharField(max_length=150)  # 角色卡名称
     image_name = models.CharField(max_length=150)  # 图片名称
-    image_path = models.CharField(max_length=255)  # 图片存储路径
+    image_path = models.ImageField(
+        upload_to=character_image_upload_path,  # 只改这里为 ImageField
+        max_length=255,
+        verbose_name="图片存储路径"
+    )
     character_data = models.TextField()  # 角色数据（JSON格式）
     create_date = models.CharField(max_length=150)  # 上传时间
 
@@ -214,6 +225,8 @@ class RoomInfo(models.Model):
     describe = models.CharField(max_length=255,null=True, verbose_name="房间描述")
     coin_num = models.IntegerField(verbose_name="钻石数量")
     room_type = models.SmallIntegerField(choices=ROOM_TYPE_CHOICES, default=0, verbose_name="房间类型")
+    file_name = models.CharField(max_length=255,null=True, verbose_name="文件名")
+    file_branch = models.CharField(max_length=255,null=True, verbose_name="文件分支")
     is_info = models.IntegerField(verbose_name="是否添加info",null=True)
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="房间创建时间")
     updated_at = models.DateTimeField(auto_now=True, verbose_name="房间最后更新时间")
@@ -334,5 +347,32 @@ class PaymentLog(models.Model):
         verbose_name_plural = "支付日志"
 
 
+class ForkRelation(models.Model):
+    """
+    Fork 关系表：
+    记录用户 fork 用户或主播的关系
+    """
 
+    id = models.BigAutoField(primary_key=True)
+
+    from_user_id = models.IntegerField(verbose_name='发起用户ID')  # 发起 fork 的用户
+
+    # 被 fork 对象 ID，用户使用整数ID，主播使用 UID（22位字符串）
+    target_id = models.CharField(max_length=22, verbose_name='被 fork 对象ID')
+
+    # 可选字段
+    room_id = models.IntegerField(null=True, blank=True, verbose_name='来源房间ID')
+    character_name = models.CharField(max_length=255, null=True, blank=True, verbose_name='角色名称')
+    floor = models.IntegerField(null=True, blank=True, verbose_name='楼层')
+
+    created_at = models.DateTimeField(default=timezone.now, verbose_name='创建时间')
+    updated_at = models.DateTimeField(auto_now=True, verbose_name='更新时间')
+
+    class Meta:
+        db_table = 'fork_relation'
+        verbose_name = 'Fork关系'
+        verbose_name_plural = 'Fork关系'
+
+    def __str__(self):
+        return f"User {self.from_user_id} forked {self.target_id}"
         

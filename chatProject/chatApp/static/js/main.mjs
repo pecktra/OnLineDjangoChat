@@ -23,8 +23,8 @@ async  function initializeApp() {
     UserManager.bindLogoutEvent();
     // await UserManager.initGoogleLogin()
 
-    
-    
+
+
 
     //直播模块
     LiveManager.init();
@@ -63,7 +63,7 @@ async  function initializeApp() {
 
 
     //主播历史聊天
-    ChatLiveManager.init(room_id);
+    // ChatLiveManager.init(room_id);
 
     //主播信息端
     await StreamerInfoManager.init(room_id)
@@ -89,14 +89,12 @@ async  function initializeApp() {
 
     initWebSocket(room_id,room_name,userName);
 }
-//初始化websocket
+// 初始化聊天（已改为 HTTP 轮询实现，但保留函数名以兼容）
 function initWebSocket(room_id,room_name,userName) {
-
+    console.log(userName)
     const wsManager = new WebSocketManager(room_id,room_name,userName);
     wsManager.init();
-
-    // 暴露给全局以便调试（可选）
-    window.wsManager = wsManager;
+    window.wsManager = wsManager; // 可用于调试
 }
 // 专门处理静态元素的工具提示
 function initStaticTooltips() {

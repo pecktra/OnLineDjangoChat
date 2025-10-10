@@ -12,7 +12,6 @@ from chatApp.models  import ChatUser,UserBalance
 from django.contrib.auth import authenticate
 from rest_framework_simplejwt.tokens import AccessToken, RefreshToken
 from rest_framework_simplejwt.authentication import JWTAuthentication
-from chatApp.permissions import IsAuthenticatedOrGuest
 from rest_framework.decorators import api_view, permission_classes
 from django_redis import get_redis_connection
 from django.conf import settings
