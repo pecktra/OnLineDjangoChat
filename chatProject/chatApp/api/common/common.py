@@ -18,3 +18,19 @@ def build_full_image_url(request, relative_path: str) -> str:
 
     # 使用 build_absolute_uri 拼接域名
     return request.build_absolute_uri(relative_path)
+
+
+def generate_new_room_id(user_id: str, character_name: str) -> str:
+    """
+    生成新的 room_id，按 sha1 前16位
+    """
+    character_date = timezone.now().strftime("%Y-%m-%d %H:%M:%S")
+    room_id = hashlib.sha1(f"Branch_{user_id}_{character_name}_{character_date}".encode('utf-8')).hexdigest()[:16]
+    return room_id, character_date
+
+def generate_new_room_name(origin_room_name: str, character_name: str) -> str:
+    """
+    生成新房间名称，包含 Branch_ + 原房间名 + 角色名 + 时间戳
+    """
+    timestamp_str = timezone.now().strftime("%Y-%m-%d @%Hh %Mm %Ss %fms")
+    return f"Branch_{origin_room_name}_{character_name}_{timestamp_str}"

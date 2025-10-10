@@ -89,7 +89,7 @@
     font-family: 'Roboto', sans-serif; /* 与 #streamerName 一致 */
     font-weight: 500; /* 中等字重 */
     color: #ffffff; /* 白色文字 */
-    padding:6px 10px;
+    padding:4px 12px;
     background: linear-gradient(90deg, #868d97, #664f8c); /* 蓝色到紫色渐变 */
     border-radius: 20px; /* 更圆润的边角 */
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* 轻微阴影 */
@@ -99,8 +99,6 @@
     text-align: left;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
-    overflow: hidden;
-    text-overflow: ellipsis;
     white-space: normal;
 }
 
@@ -212,7 +210,9 @@
   margin-top: 48px;
   flex-direction: column; /* 垂直排列 */
   gap: 10px; /* 按钮间距 */
-  width: fit-content; /* 宽度自适应按钮 */
+  width: 40px; /* 宽度自适应按钮 */
+  position: relative;
+  flex-shrink: 0;
 }
 
 /* 分享按钮样式 */
@@ -376,6 +376,8 @@
     margin-left: auto;
     border-top-right-radius: 0;
     min-width: 200px;
+    background: #3eee66;
+    color: #1a1a1a;
 }
 
 

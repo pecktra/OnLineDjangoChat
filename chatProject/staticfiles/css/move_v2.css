@@ -81,14 +81,12 @@
 
     /* 调整 .live-container 内部的 .streamer-info 和 .chat-area */
     .live-container .streamer-info {
-        flex: 0 0 10% !important; /* 占 .live-container 高度的 10% */
+        flex: unset;
         min-height: 10% !important;
         padding: 0.5rem !important; /* 减小内边距以适应小高度 */
     }
 
     .live-container .chat-area {
-        flex: 0 0 90% !important; /* 占 .live-container 高度的 90% */
-        min-height: 90% !important;
         overflow-y: auto !important; /* 确保可滚动 */
     }
 
@@ -119,7 +117,7 @@
     .show-chat .total-chat {
         display: flex !important; /* 显示 total-chat（包含 live-container 和 chat-panel） */
         flex-direction: column; /* 确保垂直排列 */
-        height: 100vh; /* 占满屏幕 */
+        height: 100dvh; /* 占满屏幕 */
     }
 
     .show-chat .nav-sidebar {

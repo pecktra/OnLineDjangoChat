@@ -177,8 +177,55 @@ export default class WebSocketManager {
         }
     }
 
+    extractHtmlContent(content) {
+        // 提取 ```html 代码块中的内容
+        const htmlCodeBlockMatch = content.match(/```html\s*([\s\S]*?)```/i);
+        if (htmlCodeBlockMatch) {
+            return htmlCodeBlockMatch[1].trim();
+        }
+
+        // 提取 <pre><code> 标签中的内容
+        const preCodeMatch = content.match(/<pre[^>]*><code[^>]*>([\s\S]*?)<\/code><\/pre>/i);
+        if (preCodeMatch) {
+            // 解码 HTML 实体
+            const div = document.createElement('div');
+            div.innerHTML = preCodeMatch[1];
+            return div.textContent || div.innerText;
+        }
+
+        // 直接返回原内容
+        return content;
+    }
+
+    isCompleteHtml(content) {
+        // 检查是否包含完整的 HTML 结构标签
+        const hasHtmlTag = /<html[^>]*>/i.test(content);
+        const hasBodyTag = /<body[^>]*>/i.test(content);
+        const hasHeadTag = /<head[^>]*>/i.test(content);
+
+        // 如果包含 html/body/head 标签之一，认为是完整 HTML
+        return hasHtmlTag || hasBodyTag || hasHeadTag;
+    }
+
     appendLiveMessage(msg) {
-        const messageContent = msg.data.is_user  ? msg.data.mes : msg.mes_html;
+        let messageContent = msg.data.is_user  ? msg.data.mes : msg.mes_html;
+
+        // 提取可能包裹在代码块中的 HTML
+        const extractedHtml = this.extractHtmlContent(messageContent);
+        console.log(extractedHtml);
+        // 检查是否是完整的 HTML
+        let contentHtml;
+        if (this.isCompleteHtml(extractedHtml)) {
+            // 使用 iframe srcdoc 渲染完整 HTML
+            const escapedHtml = extractedHtml
+                .replace(/&/g, '&amp;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+            contentHtml = `<iframe srcdoc="${escapedHtml}" style="width: 100%; min-height: 400px; border: 1px solid #ddd; border-radius: 4px;"></iframe>`;
+        } else {
+            contentHtml = messageContent;
+        }
+
         return `
                 <div class="chat-message ${msg.data.is_user ? 'user-message' : 'ai-message'} ">
                     <div class="message-content">
@@ -187,7 +234,7 @@ export default class WebSocketManager {
                             <span class="message-time">${this.convertTo24Hour(msg.data.send_date)}</span>
                         </div>
                         <div class="mes_text">
-                            ${messageContent}
+                            ${contentHtml}
                         </div>
 
                     </div>
@@ -303,3 +350,4 @@ export default class WebSocketManager {
         }
     }
 }
+

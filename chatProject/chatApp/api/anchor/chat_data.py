@@ -87,7 +87,7 @@ def chat_data(request):
 
 
         ## 每次重置下播时间
-        redis_client.setex(room_id, 7 * 24 * 60 * 60, "start")
+        redis_client.set(room_id, "start")
         # MongoDB 插入数据
         collection = db[room_id]
         collection.insert_one({

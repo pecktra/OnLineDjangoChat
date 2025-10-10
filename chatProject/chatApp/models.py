@@ -227,6 +227,7 @@ class RoomInfo(models.Model):
     room_type = models.SmallIntegerField(choices=ROOM_TYPE_CHOICES, default=0, verbose_name="房间类型")
     file_name = models.CharField(max_length=255,null=True, verbose_name="文件名")
     file_branch = models.CharField(max_length=255,null=True, verbose_name="文件分支")
+    is_show = models.IntegerField(default=0, verbose_name="是否展示")
     is_info = models.IntegerField(verbose_name="是否添加info",null=True)
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="房间创建时间")
     updated_at = models.DateTimeField(auto_now=True, verbose_name="房间最后更新时间")

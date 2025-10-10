@@ -368,7 +368,6 @@ static renderLiveList_home(livesInfo) {
 
                 // 添加点击事件
                 tagSpan.addEventListener('click', async (e) => {
-                    console.log(44444)
                     e.preventDefault();
                     e.stopPropagation();
                     console.log(`点击标签: ${tag}`);
