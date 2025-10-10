@@ -153,20 +153,20 @@ def get_all_lives(request):
     )
 
     # ===== 分页逻辑 =====
-    total = len(live_status_list)
-    total_pages = ceil(total / per_page)
-    start = (page - 1) * per_page
-    end = start + per_page
-    paginated_list = live_status_list[start:end]
+    # total = len(live_status_list)
+    # total_pages = ceil(total / per_page)
+    # start = (page - 1) * per_page
+    # end = start + per_page
+    # paginated_list = live_status_list[start:end]
     # ==================
 
     return Response({
         "code": 0,
         "data": {
-            "lives_info": paginated_list,
-            "page": page,
-            "total_pages": total_pages,
-            "total": total
+            "lives_info": live_status_list
+            # "page": page,
+            # "total_pages": total_pages,
+            # "total": total
         }
     })
 
