@@ -20,7 +20,7 @@ from google.auth.transport.requests import Request
 from django.shortcuts import redirect
 from django.contrib.auth import get_user
 from rest_framework.response import Response
-
+from django.contrib.auth import logout
 
 def generate_random_username():
     """生成一个随机的游客用户名"""
