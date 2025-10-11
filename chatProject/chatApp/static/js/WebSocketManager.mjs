@@ -248,7 +248,7 @@ export default class WebSocketManager {
                             iframeDoc.documentElement.offsetHeight
                         );
                         // 设置 iframe 高度，增加一点缓冲空间
-                        iframe.style.height = contentHeight + 'px';
+                        iframe.style.height = (contentHeight + 2) + 'px';
                     }
                 } catch (error) {
                     console.error('无法访问 iframe 内容:', error);
