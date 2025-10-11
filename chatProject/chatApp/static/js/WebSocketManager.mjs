@@ -18,6 +18,9 @@ export default class WebSocketManager {
         this.seenMessageIds = new Set();
         this.lastFloor = 0;
 
+        // 滚动控制
+        this.isInitialLoad = true; // 标记是否首次加载
+
         // DOM 元素
         this.chatArea = document.querySelector('.chat-area');
         this.chatContent = document.querySelector('.chat-content');
@@ -34,6 +37,23 @@ export default class WebSocketManager {
         this.bindEvents();
     }
 
+    // 检测是否滚动到底部
+    isScrolledToBottom(element) {
+        const threshold = 50; // 允许50px的误差范围
+        return element.scrollHeight - element.scrollTop - element.clientHeight <= threshold;
+    }
+
+    // 条件滚动：只在用户在底部时滚动
+    conditionalScroll(element) {
+        // 如果是首次加载，不滚动
+        if (this.isInitialLoad) {
+            return;
+        }
+        // 如果用户滚动到底部，才自动滚动
+        if (this.isScrolledToBottom(element)) {
+            element.scrollTop = element.scrollHeight;
+        }
+    }
 
     // 新增方法：保存聊天记录到服务器
     async saveChatHistory(message) {
@@ -106,21 +126,26 @@ export default class WebSocketManager {
                 const type = item.data_type
                 if (type === 'ai') {
                     this.chatArea.insertAdjacentHTML('beforeend', this.appendLiveMessage(item));
-                    this.chatArea.scrollTop = this.chatArea.scrollHeight;
+                    this.conditionalScroll(this.chatArea);
                 } else if (type === 'user') {
                     this.chatArea.insertAdjacentHTML('beforeend', this.appendLiveMessage(item));
-                    this.chatArea.scrollTop = this.chatArea.scrollHeight;
+                    this.conditionalScroll(this.chatArea);
                 } else {
                     // 若后端未提供 type，则尝试通过字段推断
                     const hasLiveFields = (item.data || item)?.live_message || (item.data || item)?.live_message_html;
                     if (hasLiveFields) {
                         this.chatArea.insertAdjacentHTML('beforeend', this.appendLiveMessage(item));
-                        this.chatArea.scrollTop = this.chatArea.scrollHeight;
+                        this.conditionalScroll(this.chatArea);
                     } else {
                         this.chatContent.insertAdjacentHTML('beforeend', this.appendUserMessage(item));
-                        this.chatContent.scrollTop = this.chatContent.scrollHeight;
+                        this.conditionalScroll(this.chatContent);
                     }
                 }
+            }
+
+            // 首次加载完成后，标记为非首次加载
+            if (this.isInitialLoad && items.length > 0) {
+                this.isInitialLoad = false;
             }
         } catch (err) {
             console.error('轮询获取聊天失败:', err);
@@ -163,11 +188,11 @@ export default class WebSocketManager {
             case 'chat_live_message':
 
                 this.chatArea.insertAdjacentHTML('beforeend', this.appendLiveMessage(data.data));
-                this.chatArea.scrollTop = this.chatArea.scrollHeight;
+                this.conditionalScroll(this.chatArea);
                 break;
             case 'chat_user_message':
                 this.chatContent.insertAdjacentHTML('beforeend', this.appendUserMessage(data.data));
-                this.chatContent.scrollTop = this.chatContent.scrollHeight;
+                this.conditionalScroll(this.chatContent);
 
 
                 break;
@@ -312,6 +337,7 @@ export default class WebSocketManager {
                 }
             };
             this.chatContent.insertAdjacentHTML('beforeend', this.appendUserMessage(optimistic));
+            // 用户发送消息时，主动滚动到底部
             this.chatContent.scrollTop = this.chatContent.scrollHeight;
         } catch (_) {}
         this.chatInput.value = '';
