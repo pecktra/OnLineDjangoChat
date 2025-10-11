@@ -22,7 +22,11 @@ from django.contrib.auth import get_user
 from rest_framework.response import Response
 
 
-
+def generate_random_username():
+    """生成一个随机的游客用户名"""
+    length = random.randint(6, 12)  # 随机长度 6-12个字符
+    random_username ='游客' + ''.join(random.choices(string.ascii_letters + string.digits, k=length))
+    return random_username
 
 @api_view(['GET'])
 def google_oauth2_url(request):

@@ -169,7 +169,7 @@ CACHES = {
 }
 
 
-MONGO_URI = "mongodb://admin:Tura1050493761%40@127.0.0.1:27017/chat_db?authSource=admin"
+MONGO_URI = os.getenv("MONGO_URI")
 MONGO_DB_NAME = "chat_db"
 
 # Password validation
