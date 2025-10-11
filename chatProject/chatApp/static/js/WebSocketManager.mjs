@@ -232,6 +232,34 @@ export default class WebSocketManager {
         return hasHtmlTag || hasBodyTag || hasHeadTag;
     }
 
+    // 自适应 iframe 高度
+    autoResizeIframe(iframe) {
+        try {
+            // 等待 iframe 内容加载完成
+            iframe.addEventListener('load', () => {
+                try {
+                    const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+                    if (iframeDoc && iframeDoc.body) {
+                        // 获取内容的实际高度
+                        const contentHeight = Math.max(
+                            iframeDoc.body.scrollHeight,
+                            iframeDoc.body.offsetHeight,
+                            iframeDoc.documentElement.scrollHeight,
+                            iframeDoc.documentElement.offsetHeight
+                        );
+                        // 设置 iframe 高度，增加一点缓冲空间
+                        iframe.style.height = contentHeight + 'px';
+                    }
+                } catch (error) {
+                    console.error('无法访问 iframe 内容:', error);
+                    // 如果无法访问，保持默认高度
+                }
+            });
+        } catch (error) {
+            console.error('设置 iframe 自适应失败:', error);
+        }
+    }
+
     appendLiveMessage(msg) {
         let messageContent = msg.data.is_user  ? msg.data.mes : msg.mes_html;
 
@@ -239,18 +267,21 @@ export default class WebSocketManager {
         const extractedHtml = this.extractHtmlContent(messageContent);
         // 检查是否是完整的 HTML
         let contentHtml;
+        let hasIframe = false;
         if (this.isCompleteHtml(extractedHtml)) {
             // 使用 iframe srcdoc 渲染完整 HTML
             const escapedHtml = extractedHtml
                 .replace(/&/g, '&amp;')
                 .replace(/"/g, '&quot;')
                 .replace(/'/g, '&#39;');
-            contentHtml = `<iframe srcdoc="${escapedHtml}" style="width: 100%; min-height: 400px; border: 1px solid #ddd; border-radius: 4px;"></iframe>`;
+            // 添加 auto-resize-iframe class 用于标识需要自适应的 iframe
+            contentHtml = `<iframe loading="lazy" class="auto-resize-iframe" srcdoc="${escapedHtml}" style="width: 100%; min-height: 200px; border: 1px solid #ddd; border-radius: 4px;"></iframe>`;
+            hasIframe = true;
         } else {
             contentHtml = messageContent;
         }
 
-        return `
+        const messageHtml = `
                 <div class="chat-message ${msg.data.is_user ? 'user-message' : 'ai-message'} ">
                     <div class="message-content">
                         <div class="message-header">
@@ -264,6 +295,20 @@ export default class WebSocketManager {
                     </div>
                 </div>
             `;
+
+        // 如果包含 iframe，需要在插入后设置自适应
+        if (hasIframe) {
+            // 使用 setTimeout 确保 DOM 已更新
+            setTimeout(() => {
+                const iframes = document.querySelectorAll('.auto-resize-iframe:not([data-resized])');
+                iframes.forEach(iframe => {
+                    iframe.setAttribute('data-resized', 'true');
+                    this.autoResizeIframe(iframe);
+                });
+            }, 20);
+        }
+
+        return messageHtml;
     }
 
     convertTo24Hour(timeStr) {
