@@ -32,6 +32,7 @@ async def send_to_websocket(room_id, send_data):
 # 包装为同步函数
 sync_send_to_websocket = async_to_sync(send_to_websocket)
 
+
 @api_view(['POST'])
 def chat_data(request):
     """
@@ -44,15 +45,14 @@ def chat_data(request):
     character_date = request.data.get("character_date")
     data_str = request.data.get("data")  # 获取 data 字段
     mes_html = request.data.get("mes_html")
-    isNewCreated = request.data.get("isNewCreated",None)
+    isNewCreated = request.data.get("isNewCreated", None)
 
-    # 确保传递的参数都存在
-    if not username or not uid or not character_name  or not character_date or not data_str:
-
+    # 确保必填参数存在
+    if not all([username, uid, character_name, character_date, data_str]):
         return Response({"code": 1, "message": "缺少必填参数"}, status=400)
 
     try:
-        # 如果 data_str 是字符串，尝试将其转换为字典
+        # 处理 data_str
         if isinstance(data_str, str):
             try:
                 data = json.loads(data_str)  # 解析 JSON 字符串
@@ -63,12 +63,17 @@ def chat_data(request):
         else:
             return Response({"code": 1, "message": "数据格式错误，应该是字典或JSON字符串"}, status=400)
 
+        # 确保 data 是字典
+        if not isinstance(data, dict):
+            return Response({"code": 1, "message": "数据格式错误，data 必须是字典"}, status=400)
 
+        # 检查 mes 字段
         if data.get('mes', '') == '...':
-                    return Response({
-                        "code": 0,
-                        "message": "mes是...不接收"
-                    })
+            return Response({
+                "code": 0,
+                "message": "mes是...不接收"
+            })
+
         # 判断数据类型
         if "chat_metadata" in data:
             data_type = "create"
@@ -80,14 +85,12 @@ def chat_data(request):
             data_type = "unknown"
 
         # 生成 room_id 和 room_name
-        # room_id = hashlib.md5(f"{uid}_{character_name}_{character_date}".encode('utf-8')).hexdigest()
-        # 短hash 使用SHA1然后取前12个字符（比MD5短）
         room_id = hashlib.sha1(f"{uid}_{character_name}_{character_date}".encode('utf-8')).hexdigest()[:16]
         room_name = f"{uid}_{character_name}_{character_date}"
 
-
-        ## 每次重置下播时间
+        # 设置 Redis
         redis_client.set(room_id, "start")
+
         # MongoDB 插入数据
         collection = db[room_id]
         collection.insert_one({
@@ -99,7 +102,7 @@ def chat_data(request):
             "room_name": room_name,
             "data_type": data_type,
             "data": data,
-            "mes_html":mes_html
+            "mes_html": mes_html
         })
 
         # 准备转发数据
@@ -111,18 +114,17 @@ def chat_data(request):
             'send_date': data.get('send_date', ''),
             'live_message': data.get('mes', ''),
             'live_message_html': mes_html
-            
         }
 
-
-        #如果是创建房间，则放入mysql
+        # 如果是创建房间，插入 MySQL
         if isNewCreated:
-            # 检查是否已经存在相同的房间（根据 room_id查找）
-            if RoomInfo.objects.filter(room_id = room_id).exists():
-                return Response({"code": 1, "message": "Room with the given uid and character_name already exists."}, status=400)
+            if RoomInfo.objects.filter(room_id=room_id).exists():
+                return Response({"code": 1, "message": "Room with the given uid and character_name already exists."},
+                                status=400)
+
             file_name = request.data.get("file_name")
             file_branch = "main"
-            if "Branch" in file_name:
+            if file_name and "Branch" in file_name:
                 file_branch = "branch"
 
             # 创建房间记录
@@ -133,16 +135,13 @@ def chat_data(request):
                 room_name=room_name,
                 character_name=character_name,
                 character_date=character_date,
-                file_name = file_name,
-                file_branch = file_branch,
+                file_name=file_name,
+                file_branch=file_branch,
                 is_info=0
             )
             room_info.save()
 
-
-
-        # 转发 WebSocket 消息
-        #
+        # 转发 WebSocket 消息（取消注释以启用）
         # if send_data['live_message']:
         #     sync_send_to_websocket(room_id, send_data)
 
@@ -152,4 +151,7 @@ def chat_data(request):
         })
 
     except Exception as e:
+        # 记录详细错误日志
+        import traceback
+        traceback.print_exc()
         return Response({"code": 1, "message": f"服务器内部错误: {str(e)}"}, status=500)
