@@ -203,23 +203,75 @@ export default class WebSocketManager {
     }
 
     extractHtmlContent(content) {
-        // 提取 ```html 代码块中的内容
-        const htmlCodeBlockMatch = content.match(/```html\s*([\s\S]*?)```/i);
-        if (htmlCodeBlockMatch) {
-            return htmlCodeBlockMatch[1].trim();
-        }
+        // 存储所有需要替换的 <pre><code> 块及其对应的 iframe
+        const replacements = [];
+        let processedContent = content;
 
-        // 提取 <pre><code> 标签中的内容
-        const preCodeMatch = content.match(/<pre[^>]*><code[^>]*>([\s\S]*?)<\/code><\/pre>/i);
-        if (preCodeMatch) {
+        // 1. 处理所有 <pre><code> 标签块
+        const preCodeRegex = /<pre[^>]*><code[^>]*>([\s\S]*?)<\/code><\/pre>/gi;
+        let match;
+        let index = 0;
+
+        while ((match = preCodeRegex.exec(content)) !== null) {
+            const fullMatch = match[0]; // 完整的 <pre><code>...</code></pre>
+            const codeContent = match[1]; // code 标签内的内容
+
             // 解码 HTML 实体
             const div = document.createElement('div');
-            div.innerHTML = preCodeMatch[1];
-            return div.textContent || div.innerText;
+            div.innerHTML = codeContent;
+            const decodedHtml = div.textContent || div.innerText;
+
+            // 检查解码后的内容是否是完整的 HTML
+            if (this.isCompleteHtml(decodedHtml)) {
+                // 创建一个占位符
+                const placeholder = `__IFRAME_PLACEHOLDER_${index}__`;
+                replacements.push({
+                    placeholder: placeholder,
+                    html: decodedHtml
+                });
+
+                // 在内容中替换为占位符
+                processedContent = processedContent.replace(fullMatch, placeholder);
+                index++;
+            }
         }
 
-        // 直接返回原内容
-        return content;
+        // 2. 处理 ```html 代码块（如果有的话）
+        const htmlCodeBlockRegex = /```html\s*([\s\S]*?)```/gi;
+        while ((match = htmlCodeBlockRegex.exec(content)) !== null) {
+            const fullMatch = match[0];
+            const htmlContent = match[1].trim();
+
+            if (this.isCompleteHtml(htmlContent)) {
+                const placeholder = `__IFRAME_PLACEHOLDER_${index}__`;
+                replacements.push({
+                    placeholder: placeholder,
+                    html: htmlContent
+                });
+
+                processedContent = processedContent.replace(fullMatch, placeholder);
+                index++;
+            }
+        }
+
+        // 3. 如果没有找到任何需要转换为 iframe 的内容，直接返回原内容
+        if (replacements.length === 0) {
+            return content;
+        }
+
+        // 4. 将占位符替换为实际的 iframe
+        replacements.forEach((replacement) => {
+            const escapedHtml = replacement.html
+                .replace(/&/g, '&amp;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+
+            const iframeHtml = `<iframe loading="lazy" class="auto-resize-iframe" srcdoc="${escapedHtml}" style="width: 100%; min-height: 200px; border: 1px solid #ddd; border-radius: 4px; margin: 10px 0;"></iframe>`;
+
+            processedContent = processedContent.replace(replacement.placeholder, iframeHtml);
+        });
+
+        return processedContent;
     }
 
     isCompleteHtml(content) {
@@ -263,23 +315,11 @@ export default class WebSocketManager {
     appendLiveMessage(msg) {
         let messageContent = msg.data.is_user  ? msg.data.mes : msg.mes_html;
 
-        // 提取可能包裹在代码块中的 HTML
-        const extractedHtml = this.extractHtmlContent(messageContent);
-        // 检查是否是完整的 HTML
-        let contentHtml;
-        let hasIframe = false;
-        if (this.isCompleteHtml(extractedHtml)) {
-            // 使用 iframe srcdoc 渲染完整 HTML
-            const escapedHtml = extractedHtml
-                .replace(/&/g, '&amp;')
-                .replace(/"/g, '&quot;')
-                .replace(/'/g, '&#39;');
-            // 添加 auto-resize-iframe class 用于标识需要自适应的 iframe
-            contentHtml = `<iframe loading="lazy" class="auto-resize-iframe" srcdoc="${escapedHtml}" style="width: 100%; min-height: 200px; border: 1px solid #ddd; border-radius: 4px;"></iframe>`;
-            hasIframe = true;
-        } else {
-            contentHtml = messageContent;
-        }
+        // 提取并处理所有 HTML 内容（可能包含多个 iframe）
+        const processedContent = this.extractHtmlContent(messageContent);
+
+        // 检查处理后的内容是否包含 iframe
+        const hasIframe = processedContent.includes('auto-resize-iframe');
 
         const messageHtml = `
                 <div class="chat-message ${msg.data.is_user ? 'user-message' : 'ai-message'} ">
@@ -289,7 +329,7 @@ export default class WebSocketManager {
                             <span class="message-time">${this.convertTo24Hour(msg.data.send_date)}</span>
                         </div>
                         <div class="mes_text">
-                            ${contentHtml}
+                            ${processedContent}
                         </div>
 
                     </div>
