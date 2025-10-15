@@ -1,10 +1,12 @@
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from chatApp.models import RoomInfo, CharacterCard ,ForkRelation
-from common.utils import build_full_image_url
+from chatApp.models import RoomInfo, CharacterCard ,ForkRelation,Anchor
+from chatApp.api.common.common import build_full_image_url,generate_new_room_id, generate_new_room_name
 from pymongo import MongoClient
 from django.conf import settings
 from django.contrib.auth import get_user
+import traceback
+from django.utils import timezone
 
 # 初始化 MongoDB 连接
 client = MongoClient(settings.MONGO_URI)
@@ -18,7 +20,6 @@ def fork_preview(request):
     查询被 fork 的房间信息及聊天记录（已 fork 楼层 <= last_floor）
 
     请求参数：
-    - target_id: 被 fork 对象ID（用户id 或 主播uid）【必填】
     - room_id: 要 fork 的房间ID【必填】
     - last_floor: 已 fork 的最后楼层【必填，整数 >=1】
 
@@ -33,16 +34,15 @@ def fork_preview(request):
         }
     }
     """
-    target_id = request.GET.get('target_id')
     room_id = request.GET.get('room_id')
     last_floor_str = request.GET.get('last_floor')
 
     # 参数检查
-    if not target_id or not room_id or last_floor_str is None:
+    if  not room_id or last_floor_str is None:
         return Response({
             "code": 1,
             "success": False,
-            "message": "target_id, room_id 和 last_floor 都必须提供"
+            "message": " room_id 和 last_floor 都必须提供"
         }, status=400)
 
     # 验证 last_floor
@@ -112,14 +112,12 @@ def fork_preview(request):
     except Exception as e:
         return Response({
             "code": 1,
-            "success": False,
             "message": f"获取聊天历史失败: {str(e)}"
         }, status=500)
 
     # 返回结果
     return Response({
         "code": 0,
-        "success": True,
         "message": "获取成功",
         "data": {
             "room_info": {
@@ -141,33 +139,34 @@ def fork_preview(request):
 def fork_confirm(request):
     """
     Fork 确认接口：
-    - 创建 fork 关系记录
-    - 生成新的房间（room_id 按 sha1 加密规则生成）
-    - 从 MongoDB 复制聊天记录（≤ floor）
-    - 新房间继承角色卡信息，不新建
-    - 前端可自定义 title、describe
-    - 返回新房间信息 + 已 fork 的聊天记录
+    - 当前登录用户为发起 fork 的人
+    - target_id: 被 fork 的房间所属用户ID（必填）
+    - room_id: 要 fork 的房间ID（必填）
+    - floor: fork 楼层（必填，>=1）
+    - title: 新房间标题（可选）
+    - describe: 新房间描述（可选）
     """
     try:
+        # 获取当前登录用户
+        user = get_user(request)
+        user_name = request.session.get('google_name')
+        if not user:
+            return Response({"success": False, "message": "用户未登录"}, status=401)
+
         # 请求参数
-        from_user_id = request.data.get('from_user_id')  # 发起 fork 的用户
-        room_id = request.data.get('room_id')            # 被 fork 房间ID
-        floor = request.data.get('floor')                # fork 楼层
-        title = request.data.get('title', '')            # 新房间标题
-        describe = request.data.get('describe', '')      # 新房间描述
+        target_id = request.data.get('target_id')  # 被 fork 的房间所属用户ID
+        room_id = request.data.get('room_id')      # 被 fork 房间ID
+        floor = request.data.get('floor')          # fork 楼层
+        title = request.data.get('title', '')
+        describe = request.data.get('describe', '')
 
         # 参数校验
-        if not all([from_user_id, room_id, floor]):
+        if not all([target_id, room_id, floor]):
             return Response({"success": False, "message": "缺少必要参数"}, status=400)
 
         floor = int(floor)
         if floor < 1:
             return Response({"success": False, "message": "floor 必须 >= 1"}, status=400)
-
-        # 获取当前用户
-        user = get_user(request)
-        if not user:
-            return Response({"success": False, "message": "用户未登录"}, status=401)
 
         # 查询原房间
         try:
@@ -180,18 +179,14 @@ def fork_confirm(request):
         character_name = character_card.character_name if character_card else "UnknownCharacter"
         is_private = int(character_card.is_private) if character_card else 0
 
-        # 生成新房间名
-        timestamp_str = timezone.now().strftime("%Y-%m-%d @%Hh %Mm %Ss %fms")
-        new_room_name = f"Branch_{origin_room.room_name}_{character_name}_{timestamp_str}"
-
-        # 生成新的 room_id
-        character_date = timezone.now().strftime("%Y-%m-%d %H:%M:%S")
-        new_room_id = hashlib.sha1(f"Branch_{user.id}_{character_name}_{character_date}".encode('utf-8')).hexdigest()[:16]
+        # 生成新房间 name 和 id
+        new_room_name = generate_new_room_name(origin_room.room_name, character_name)
+        new_room_id, character_date = generate_new_room_id(user.id, character_name)
 
         # 创建新房间
         new_room = RoomInfo.objects.create(
-            uid=user.id,                 # 新房间属于当前用户
-            user_name=user.username,
+            uid=uesr.id,                 # 当前登录用户为新房间拥有者
+            user_name=user_name,
             room_id=new_room_id,
             room_name=new_room_name,
             character_name=character_name,
@@ -199,32 +194,33 @@ def fork_confirm(request):
             title=title,
             describe=describe,
             room_type=origin_room.room_type,
-            file_name=file_name,
-            file_branch=file_branch,
+            file_name=origin_room.file_name,
+            file_branch='branch',
+            is_info=origin_room.is_info,
             is_show=is_private,          # 与角色卡 is_private 保持一致
             created_at=timezone.now()
         )
 
-        # === 写入 ForkRelation，target_id 为新房间 uid ===
+        # 写入 ForkRelation
         ForkRelation.objects.create(
-            from_user_id=from_user_id,
-            target_id=new_room.uid,      # 新房间所属用户ID
-            room_id=room_id,             # 原房间ID
+            from_user_id=uesr.id,       # 当前登录用户
+            target_id=target_id,        # 被 fork 的人
+            room_id=room_id,            # 原房间ID
             floor=floor,
+            character_name=character_name,
             created_at=timezone.now()
+
         )
 
         # 复制 MongoDB 聊天记录（≤ floor）
         origin_collection = db[str(room_id)]
         new_collection = db[str(new_room_id)]
         chat_records = list(origin_collection.find({}).sort("_id", 1))
-        forked_chat_info = []  # 返回给前端的聊天记录
+        forked_chat_info = []
         for index, item in enumerate(chat_records, start=1):
             if index > floor:
                 break
-            # 插入到新房间 MongoDB
             new_collection.insert_one(item)
-            # 构造返回数据
             data = item.get("data", {})
             forked_chat_info.append({
                 "floor": index,
@@ -271,7 +267,7 @@ def forked_list(request):
     """
     user = get_user(request)
     if not user:
-        return Response({"success": False, "message": "用户未登录"}, status=401)
+        return Response({"code":1 , "message": "用户未登录"}, status=401)
 
     forks = ForkRelation.objects.filter(from_user_id=user.id).order_by('-created_at')
 
@@ -294,7 +290,7 @@ def forked_list(request):
         })
 
     return Response({
-        "success": True,
+        "code": 0,
         "data": result_list
     }, status=200)
 

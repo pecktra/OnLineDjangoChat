@@ -6,7 +6,7 @@ from django.conf import settings
 from pymongo import MongoClient
 import json
 import hashlib
-from chatApp.models import RoomInfo
+from chatApp.models import RoomInfo, CharacterCard
 from django_redis import get_redis_connection  # 获取 Redis 连接
 
 # 建立 MongoDB 连接
@@ -127,6 +127,13 @@ def chat_data(request):
             if file_name and "Branch" in file_name:
                 file_branch = "branch"
 
+            # ✅ 获取 CharacterCard 判断是否私密
+            character_card = CharacterCard.objects.filter(room_id=room_id).first()
+            if character_card and character_card.is_private == 1:
+                is_show = 1  # 不公开
+            else:
+                is_show = 0  # 公开
+
             # 创建房间记录
             room_info = RoomInfo(
                 uid=uid,
@@ -137,7 +144,8 @@ def chat_data(request):
                 character_date=character_date,
                 file_name=file_name,
                 file_branch=file_branch,
-                is_info=0
+                is_info=0,
+                is_show=is_show  # ✅ 新增字段
             )
             room_info.save()
 
@@ -151,7 +159,6 @@ def chat_data(request):
         })
 
     except Exception as e:
-        # 记录详细错误日志
         import traceback
         traceback.print_exc()
         return Response({"code": 1, "message": f"服务器内部错误: {str(e)}"}, status=500)

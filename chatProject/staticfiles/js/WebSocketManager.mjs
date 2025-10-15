@@ -18,6 +18,9 @@ export default class WebSocketManager {
         this.seenMessageIds = new Set();
         this.lastFloor = 0;
 
+        // 滚动控制
+        this.isInitialLoad = true; // 标记是否首次加载
+
         // DOM 元素
         this.chatArea = document.querySelector('.chat-area');
         this.chatContent = document.querySelector('.chat-content');
@@ -34,6 +37,23 @@ export default class WebSocketManager {
         this.bindEvents();
     }
 
+    // 检测是否滚动到底部
+    isScrolledToBottom(element) {
+        const threshold = 50; // 允许50px的误差范围
+        return element.scrollHeight - element.scrollTop - element.clientHeight <= threshold;
+    }
+
+    // 条件滚动：只在用户在底部时滚动
+    conditionalScroll(element) {
+        // 如果是首次加载，不滚动
+        if (this.isInitialLoad) {
+            return;
+        }
+        // 如果用户滚动到底部，才自动滚动
+        if (this.isScrolledToBottom(element)) {
+            element.scrollTop = element.scrollHeight;
+        }
+    }
 
     // 新增方法：保存聊天记录到服务器
     async saveChatHistory(message) {
@@ -106,21 +126,26 @@ export default class WebSocketManager {
                 const type = item.data_type
                 if (type === 'ai') {
                     this.chatArea.insertAdjacentHTML('beforeend', this.appendLiveMessage(item));
-                    this.chatArea.scrollTop = this.chatArea.scrollHeight;
+                    this.conditionalScroll(this.chatArea);
                 } else if (type === 'user') {
                     this.chatArea.insertAdjacentHTML('beforeend', this.appendLiveMessage(item));
-                    this.chatArea.scrollTop = this.chatArea.scrollHeight;
+                    this.conditionalScroll(this.chatArea);
                 } else {
                     // 若后端未提供 type，则尝试通过字段推断
                     const hasLiveFields = (item.data || item)?.live_message || (item.data || item)?.live_message_html;
                     if (hasLiveFields) {
                         this.chatArea.insertAdjacentHTML('beforeend', this.appendLiveMessage(item));
-                        this.chatArea.scrollTop = this.chatArea.scrollHeight;
+                        this.conditionalScroll(this.chatArea);
                     } else {
                         this.chatContent.insertAdjacentHTML('beforeend', this.appendUserMessage(item));
-                        this.chatContent.scrollTop = this.chatContent.scrollHeight;
+                        this.conditionalScroll(this.chatContent);
                     }
                 }
+            }
+
+            // 首次加载完成后，标记为非首次加载
+            if (this.isInitialLoad && items.length > 0) {
+                this.isInitialLoad = false;
             }
         } catch (err) {
             console.error('轮询获取聊天失败:', err);
@@ -163,11 +188,11 @@ export default class WebSocketManager {
             case 'chat_live_message':
 
                 this.chatArea.insertAdjacentHTML('beforeend', this.appendLiveMessage(data.data));
-                this.chatArea.scrollTop = this.chatArea.scrollHeight;
+                this.conditionalScroll(this.chatArea);
                 break;
             case 'chat_user_message':
                 this.chatContent.insertAdjacentHTML('beforeend', this.appendUserMessage(data.data));
-                this.chatContent.scrollTop = this.chatContent.scrollHeight;
+                this.conditionalScroll(this.chatContent);
 
 
                 break;
@@ -178,23 +203,75 @@ export default class WebSocketManager {
     }
 
     extractHtmlContent(content) {
-        // 提取 ```html 代码块中的内容
-        const htmlCodeBlockMatch = content.match(/```html\s*([\s\S]*?)```/i);
-        if (htmlCodeBlockMatch) {
-            return htmlCodeBlockMatch[1].trim();
-        }
+        // 存储所有需要替换的 <pre><code> 块及其对应的 iframe
+        const replacements = [];
+        let processedContent = content;
 
-        // 提取 <pre><code> 标签中的内容
-        const preCodeMatch = content.match(/<pre[^>]*><code[^>]*>([\s\S]*?)<\/code><\/pre>/i);
-        if (preCodeMatch) {
+        // 1. 处理所有 <pre><code> 标签块
+        const preCodeRegex = /<pre[^>]*><code[^>]*>([\s\S]*?)<\/code><\/pre>/gi;
+        let match;
+        let index = 0;
+
+        while ((match = preCodeRegex.exec(content)) !== null) {
+            const fullMatch = match[0]; // 完整的 <pre><code>...</code></pre>
+            const codeContent = match[1]; // code 标签内的内容
+
             // 解码 HTML 实体
             const div = document.createElement('div');
-            div.innerHTML = preCodeMatch[1];
-            return div.textContent || div.innerText;
+            div.innerHTML = codeContent;
+            const decodedHtml = div.textContent || div.innerText;
+
+            // 检查解码后的内容是否是完整的 HTML
+            if (this.isCompleteHtml(decodedHtml)) {
+                // 创建一个占位符
+                const placeholder = `__IFRAME_PLACEHOLDER_${index}__`;
+                replacements.push({
+                    placeholder: placeholder,
+                    html: decodedHtml
+                });
+
+                // 在内容中替换为占位符
+                processedContent = processedContent.replace(fullMatch, placeholder);
+                index++;
+            }
         }
 
-        // 直接返回原内容
-        return content;
+        // 2. 处理 ```html 代码块（如果有的话）
+        const htmlCodeBlockRegex = /```html\s*([\s\S]*?)```/gi;
+        while ((match = htmlCodeBlockRegex.exec(content)) !== null) {
+            const fullMatch = match[0];
+            const htmlContent = match[1].trim();
+
+            if (this.isCompleteHtml(htmlContent)) {
+                const placeholder = `__IFRAME_PLACEHOLDER_${index}__`;
+                replacements.push({
+                    placeholder: placeholder,
+                    html: htmlContent
+                });
+
+                processedContent = processedContent.replace(fullMatch, placeholder);
+                index++;
+            }
+        }
+
+        // 3. 如果没有找到任何需要转换为 iframe 的内容，直接返回原内容
+        if (replacements.length === 0) {
+            return content;
+        }
+
+        // 4. 将占位符替换为实际的 iframe
+        replacements.forEach((replacement) => {
+            const escapedHtml = replacement.html
+                .replace(/&/g, '&amp;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+
+            const iframeHtml = `<iframe loading="lazy" class="auto-resize-iframe" srcdoc="${escapedHtml}" style="width: 100%; min-height: 200px; border: 1px solid #ddd; border-radius: 4px; margin: 10px 0;"></iframe>`;
+
+            processedContent = processedContent.replace(replacement.placeholder, iframeHtml);
+        });
+
+        return processedContent;
     }
 
     isCompleteHtml(content) {
@@ -207,26 +284,44 @@ export default class WebSocketManager {
         return hasHtmlTag || hasBodyTag || hasHeadTag;
     }
 
+    // 自适应 iframe 高度
+    autoResizeIframe(iframe) {
+        try {
+            // 等待 iframe 内容加载完成
+            iframe.addEventListener('load', () => {
+                try {
+                    const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+                    if (iframeDoc && iframeDoc.body) {
+                        // 获取内容的实际高度
+                        const contentHeight = Math.max(
+                            iframeDoc.body.scrollHeight,
+                            iframeDoc.body.offsetHeight,
+                            iframeDoc.documentElement.scrollHeight,
+                            iframeDoc.documentElement.offsetHeight
+                        );
+                        // 设置 iframe 高度，增加一点缓冲空间
+                        iframe.style.height = (contentHeight + 2) + 'px';
+                    }
+                } catch (error) {
+                    console.error('无法访问 iframe 内容:', error);
+                    // 如果无法访问，保持默认高度
+                }
+            });
+        } catch (error) {
+            console.error('设置 iframe 自适应失败:', error);
+        }
+    }
+
     appendLiveMessage(msg) {
         let messageContent = msg.data.is_user  ? msg.data.mes : msg.mes_html;
 
-        // 提取可能包裹在代码块中的 HTML
-        const extractedHtml = this.extractHtmlContent(messageContent);
-        console.log(extractedHtml);
-        // 检查是否是完整的 HTML
-        let contentHtml;
-        if (this.isCompleteHtml(extractedHtml)) {
-            // 使用 iframe srcdoc 渲染完整 HTML
-            const escapedHtml = extractedHtml
-                .replace(/&/g, '&amp;')
-                .replace(/"/g, '&quot;')
-                .replace(/'/g, '&#39;');
-            contentHtml = `<iframe srcdoc="${escapedHtml}" style="width: 100%; min-height: 400px; border: 1px solid #ddd; border-radius: 4px;"></iframe>`;
-        } else {
-            contentHtml = messageContent;
-        }
+        // 提取并处理所有 HTML 内容（可能包含多个 iframe）
+        const processedContent = this.extractHtmlContent(messageContent);
 
-        return `
+        // 检查处理后的内容是否包含 iframe
+        const hasIframe = processedContent.includes('auto-resize-iframe');
+
+        const messageHtml = `
                 <div class="chat-message ${msg.data.is_user ? 'user-message' : 'ai-message'} ">
                     <div class="message-content">
                         <div class="message-header">
@@ -234,12 +329,26 @@ export default class WebSocketManager {
                             <span class="message-time">${this.convertTo24Hour(msg.data.send_date)}</span>
                         </div>
                         <div class="mes_text">
-                            ${contentHtml}
+                            ${processedContent}
                         </div>
 
                     </div>
                 </div>
             `;
+
+        // 如果包含 iframe，需要在插入后设置自适应
+        if (hasIframe) {
+            // 使用 setTimeout 确保 DOM 已更新
+            setTimeout(() => {
+                const iframes = document.querySelectorAll('.auto-resize-iframe:not([data-resized])');
+                iframes.forEach(iframe => {
+                    iframe.setAttribute('data-resized', 'true');
+                    this.autoResizeIframe(iframe);
+                });
+            }, 20);
+        }
+
+        return messageHtml;
     }
 
     convertTo24Hour(timeStr) {
@@ -313,6 +422,7 @@ export default class WebSocketManager {
                 }
             };
             this.chatContent.insertAdjacentHTML('beforeend', this.appendUserMessage(optimistic));
+            // 用户发送消息时，主动滚动到底部
             this.chatContent.scrollTop = this.chatContent.scrollHeight;
         } catch (_) {}
         this.chatInput.value = '';

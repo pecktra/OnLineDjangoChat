@@ -25,6 +25,8 @@ import random
 from math import ceil
 from django.utils import timezone
 from urllib.parse import quote
+from chatApp.api.common.common import get_online_room_ids,build_full_image_url
+
 # 获取 Redis 连接
 redis_client = get_redis_connection('default')
 
@@ -67,12 +69,13 @@ def get_all_lives(request):
     per_page = 12  # 每页 12 条
 
     # 1. 获取 Redis 中所有 uid
-    uids = [key.decode('utf-8') if isinstance(key, bytes) else key for key in redis_client.keys('*')]
+    uids = get_online_room_ids()
+
     if not uids:
         return Response({"code": 0, "data": {"lives_info": [], "page": page, "total_pages": 0, "total": 0}})
 
     # 2. 查询 RoomInfo 获取 room_id，只查 Redis 在线的
-    room_infos = RoomInfo.objects.filter(room_id__in=uids)
+    room_infos = RoomInfo.objects.filter(room_id__in=uids).exclude(is_show=1)
 
     # 3. 如果有 tags 搜索，则过滤 room_infos
     if search_tag:
@@ -112,13 +115,14 @@ def get_all_lives(request):
         # ===== 修改部分：image_path 返回完整 URL 并处理中文 =====
         if character_card:
             image_name = character_card.image_name
-            # urlquote 对中文进行编码，保证 JSON 序列化不会报错
-            image_path = request.build_absolute_uri(character_card.image_path.url)
+            # ✅ 使用工具方法拼接完整 URL
+            image_path = build_full_image_url(request, character_card.image_path.url)
         else:
             image_name = ""
+            # 随机选择默认图片
             default_image_relative = random.choice(default_images)
-            image_path = request.build_absolute_uri(
-                f"{settings.MEDIA_URL}{quote(str(default_image_relative), safe='/')}")
+            # ✅ 使用工具方法 + quote 处理中文路径
+            image_path = build_full_image_url(request, quote(str(default_image_relative), safe='/'))
         # ============================================================
 
         online_count = ChatConsumer.get_online_count(room_info.room_id)

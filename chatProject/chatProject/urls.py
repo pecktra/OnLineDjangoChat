@@ -21,6 +21,8 @@ from chatApp.api.anchor import login, chat_data, live, card
 from chatApp.api.client import logins, lives, subscription, follow_live, chat
 from chatApp.api.balance import balance
 from chatApp.api.payment import payment
+from chatApp.api.fork import fork
+
 # 导入静态文件模块，为了显示上传图片
 from django.conf.urls.static import static
 from django.views.generic.base import RedirectView
@@ -65,6 +67,7 @@ urlpatterns = [
     path('api/users/is_google_logged_in/', logins.is_google_logged_in),#检测是否谷歌登录
     path('api/users/google_logout/', logins.google_logout),#退出登录
 
+    #直播首页
     path('api/live/get_all_lives/', lives.get_all_lives),#获取正在直播的直播间列表
     path('api/live/get_ranked_lives/', lives.get_ranked_lives),#获取正在直播的直播间列表（算法排序）
     path('api/live/get_live_info/', lives.get_live_info),#获取单个直播间信息
@@ -105,8 +108,13 @@ urlpatterns = [
 
     #聊天列表
     path('api/chat/get_room_chat/', chat.get_room_chat),  # 聊天列表
-
     path('about/', views.about, name='about'),
+
+    #fork
+    path('api/fork/fork_preview/', fork.fork_preview),#fork预览
+    path('api/fork/fork_confirm/', fork.fork_confirm),#确认fork
+    path('api/fork/forked_list/', fork.forked_list),#我fork的
+    path('api/fork/anchor_forked_by/', fork.anchor_forked_by),#被fork过
 ]
 
 
