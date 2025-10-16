@@ -1,12 +1,15 @@
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from chatApp.models import RoomInfo, CharacterCard ,ForkRelation,Anchor
+from chatApp.models import RoomInfo, CharacterCard ,ForkRelation,Anchor ,ForkTrace
 from chatApp.api.common.common import build_full_image_url,generate_new_room_id, generate_new_room_name
 from pymongo import MongoClient
 from django.conf import settings
 from django.contrib.auth import get_user
 import traceback
 from django.utils import timezone
+from django_redis import get_redis_connection  # 获取 Redis 连接
+
+redis_client = get_redis_connection('default')  # 使用 django-redis 配置
 
 # 初始化 MongoDB 连接
 client = MongoClient(settings.MONGO_URI)
@@ -138,29 +141,23 @@ def fork_preview(request):
 @api_view(['POST'])
 def fork_confirm(request):
     """
-    Fork 确认接口：
-    - 当前登录用户为发起 fork 的人
-    - target_id: 被 fork 的房间所属用户ID（必填）
-    - room_id: 要 fork 的房间ID（必填）
-    - floor: fork 楼层（必填，>=1）
-    - title: 新房间标题（可选）
-    - describe: 新房间描述（可选）
+    Fork 确认接口
     """
     try:
         # 获取当前登录用户
         user = get_user(request)
-        user_name = request.session.get('google_name')
         if not user:
             return Response({"success": False, "message": "用户未登录"}, status=401)
 
+        user_name = request.session.get('google_name', user.username)  # 优先 session 名称，fallback 到 username
+
         # 请求参数
-        target_id = request.data.get('target_id')  # 被 fork 的房间所属用户ID
-        room_id = request.data.get('room_id')      # 被 fork 房间ID
-        floor = request.data.get('floor')          # fork 楼层
+        target_id = request.data.get('target_id')
+        room_id = request.data.get('room_id')
+        floor = request.data.get('last_floor')
         title = request.data.get('title', '')
         describe = request.data.get('describe', '')
 
-        # 参数校验
         if not all([target_id, room_id, floor]):
             return Response({"success": False, "message": "缺少必要参数"}, status=400)
 
@@ -183,9 +180,9 @@ def fork_confirm(request):
         new_room_name = generate_new_room_name(origin_room.room_name, character_name)
         new_room_id, character_date = generate_new_room_id(user.id, character_name)
 
-        # 创建新房间
+        # 创建新房间，使用当前登录用户信息
         new_room = RoomInfo.objects.create(
-            uid=uesr.id,                 # 当前登录用户为新房间拥有者
+            uid=user.id,
             user_name=user_name,
             room_id=new_room_id,
             room_name=new_room_name,
@@ -197,42 +194,99 @@ def fork_confirm(request):
             file_name=origin_room.file_name,
             file_branch='branch',
             is_info=origin_room.is_info,
-            is_show=is_private,          # 与角色卡 is_private 保持一致
+            is_show=is_private,
             created_at=timezone.now()
         )
 
         # 写入 ForkRelation
         ForkRelation.objects.create(
-            from_user_id=uesr.id,       # 当前登录用户
-            target_id=target_id,        # 被 fork 的人
-            room_id=room_id,            # 原房间ID
+            from_user_id=user.id,
+            target_id=target_id,
+            room_id=room_id,
             floor=floor,
             character_name=character_name,
             created_at=timezone.now()
-
         )
 
         # 复制 MongoDB 聊天记录（≤ floor）
+        client = MongoClient(settings.MONGO_URI)
+        db = client[settings.MONGO_DB_NAME]
+
         origin_collection = db[str(room_id)]
         new_collection = db[str(new_room_id)]
+
         chat_records = list(origin_collection.find({}).sort("_id", 1))
         forked_chat_info = []
+
         for index, item in enumerate(chat_records, start=1):
             if index > floor:
                 break
-            new_collection.insert_one(item)
-            data = item.get("data", {})
+            new_item = item.copy()
+            new_item.pop("_id", None)
+            new_item.update({
+                "uid": user.id,
+                "username": user_name,
+                "room_id": new_room_id,
+                "room_name": new_room_name
+            })
+            new_collection.insert_one(new_item)
+
+            data = new_item.get("data", {})
             forked_chat_info.append({
                 "floor": index,
-                "data_type": item.get("data_type"),
+                "data_type": new_item.get("data_type"),
                 "data": {
                     "name": data.get("name"),
                     "is_user": data.get("is_user"),
                     "send_date": data.get("send_date"),
                     "mes": data.get("mes")
                 },
-                "mes_html": item.get("mes_html", "")
+                "mes_html": new_item.get("mes_html", "")
             })
+
+        # 复制角色卡信息
+        try:
+            origin_cards = CharacterCard.objects.filter(room_id=room_id)
+            for card in origin_cards:
+                CharacterCard.objects.create(
+                    room_id=new_room_id,
+                    uid=user.id,
+                    username=user_name,
+                    character_name=card.character_name,
+                    image_name=card.image_name,
+                    image_path=card.image_path,
+                    character_data=card.character_data,
+                    create_date=card.create_date,
+                    language=card.language,
+                    tags=card.tags,
+                    is_private=card.is_private
+                )
+        except Exception as card_err:
+            print("⚠️ 复制 CharacterCard 失败：", card_err)
+
+        # 写入 ForkTrace
+        try:
+            last_trace = ForkTrace.objects.filter(current_room_id=room_id).order_by('-created_at').first()
+            if last_trace:
+                source_room_id = last_trace.source_room_id
+                source_uid = last_trace.source_uid
+            else:
+                source_room_id = origin_room.room_id
+                source_uid = origin_room.uid
+
+            ForkTrace.objects.create(
+                source_room_id=source_room_id,
+                source_uid=source_uid,
+                prev_room_id=room_id,
+                prev_uid=origin_room.uid,
+                current_room_id=new_room_id,
+                current_uid=user.id,
+                created_at=timezone.now()
+            )
+        except Exception as trace_err:
+            print("⚠️ 写入 ForkTrace 失败：", trace_err)
+
+        redis_client.set(new_room_id, "start")
 
         # 返回结果
         return Response({
@@ -240,18 +294,13 @@ def fork_confirm(request):
             "message": "fork 成功",
             "data": {
                 "room_info": {
-                    "room_id": new_room.room_id,
-                    "room_name": new_room.room_name,
-                    "title": new_room.title,
-                    "describe": new_room.describe,
-                    "uid": new_room.uid,
-                    "user_name": new_room.user_name,
-                },
-                "chat_info": forked_chat_info
+                    "room_id": new_room.room_id
+                }
             }
         }, status=200)
 
     except Exception as e:
+        import traceback
         traceback.print_exc()
         return Response({
             "success": False,

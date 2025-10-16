@@ -67,6 +67,13 @@ async  function initializeApp() {
 
     //主播信息端
     await StreamerInfoManager.init(room_id)
+    // 分支按钮
+    StreamerInfoManager.initBranchButton()
+
+    // 在 get_live_info 执行完成后初始化 fork chat inline
+    if (typeof window.initForkChatInline === 'function') {
+        window.initForkChatInline();
+    }
 
 
 

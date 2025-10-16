@@ -9,12 +9,12 @@ def get_online_redis():
     return get_redis_connection("chat-online")
 
 class ChatConsumer(WebsocketConsumer):
-    '''聊天消费者'''
+    """聊天消费者"""
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.room_id = None
         self.room_group_id = None
-        self.user_id = None  # 新增：存储当前用户ID
+        self.user_id = None  # 当前用户ID
 
     def connect(self):
         # 获取当前用户
@@ -29,9 +29,11 @@ class ChatConsumer(WebsocketConsumer):
         self.room_group_id = f'chat_{self.room_id}'
         self.accept()
 
-        # 进入房间，记录到 Redis
         r = get_online_redis()
+        # 记录在线连接（WebSocket）
         r.sadd(f"room:{self.room_id}:users", self.channel_name)
+        # 记录浏览过的用户
+        r.sadd(f"room:{self.room_id}:visited_users", self.user_id)
 
         # 加入组
         async_to_sync(self.channel_layer.group_add)(
@@ -40,7 +42,6 @@ class ChatConsumer(WebsocketConsumer):
         )
 
     def disconnect(self, close_code):
-        # 移除连接
         r = get_online_redis()
         r.srem(f"room:{self.room_id}:users", self.channel_name)
 
@@ -53,12 +54,12 @@ class ChatConsumer(WebsocketConsumer):
         r = get_online_redis()
         muted_set = f"room:{self.room_id}:muted_users"
 
-        # ====== 禁言判断 ======
+        # 禁言判断
         if r.sismember(muted_set, self.user_id):
             self.send(text_data=json.dumps({"error": "You are muted"}))
             return
 
-        # 原有消息处理
+        # 消息转发
         data = json.loads(text_data)
         async_to_sync(self.channel_layer.group_send)(
             self.room_group_id,
@@ -72,12 +73,18 @@ class ChatConsumer(WebsocketConsumer):
         self.send(text_data=json.dumps(event))
 
     def chat_live_message(self, event):
-        """处理从HTTP接口发来的消息"""
+        """处理从 HTTP 接口发来的消息"""
         self.send(text_data=json.dumps(event))
 
     # ====== 辅助函数 ======
     @staticmethod
     def get_online_count(room_id: str) -> int:
-        """获取房间在线人数（从 chat-online 缓存统计）"""
+        """获取房间当前在线人数"""
         r = get_online_redis()
         return r.scard(f"room:{room_id}:users")
+
+    @staticmethod
+    def get_visited_count(room_id: str) -> int:
+        """获取房间浏览过的人数"""
+        r = get_online_redis()
+        return r.scard(f"room:{room_id}:visited_users")

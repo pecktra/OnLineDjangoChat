@@ -40,7 +40,7 @@
 .action-icon:hover::after {
     content: attr(data-tooltip); /* 使用 data-tooltip 属性作为文字 */
     position: absolute;
-    left: calc(100% + 8px); /* 显示在图标右侧，增加间距 */
+    right: 100%; /* 显示在图标右侧，增加间距 */
     top: 50%;
     transform: translateY(-50%);
     background: #343a40; /* 深色背景 */

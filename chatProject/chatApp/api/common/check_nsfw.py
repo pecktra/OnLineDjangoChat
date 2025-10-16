@@ -37,7 +37,7 @@ def is_nsfw(text: str) -> dict:
   "reason": "简短解释，说明检测到的具体 NSFW 内容或无 NSFW 的原因"
 }}
 
-文本：{text[:1000]}"""  # 限制长度以避免 API 超限
+文本：{text}"""  # 限制长度以避免 API 超限
         chat = genai.Chat.create(model="gemini-2.5-flash")
         response = chat.send_message(prompt)
 
@@ -52,58 +52,3 @@ def is_nsfw(text: str) -> dict:
         return {"is_nsfw": None, "score": None, "reason": str(e)}
 
 
-# 1. NSFW 关键词列表，可随时扩展
-NSFW_KEYWORDS = [
-    "阴茎", "乳头", "小穴", "后庭",
-     "淫乱",
-    "性交",  "裸舞", "乳房", "私处",
-    "性行为", "性器官", "诱奸", "猥亵", "性虐",
-    "性幻想", "性冲动", "调情",
-    "做爱", "口交", "肛交", "乳交", "性服务",
-    "色情图片", "成人片", "骚扰", "裸身",
-    "露点", "性交影片", "性录像", "性交易", "淫秽",
-    "性诱惑", "性游戏", "性虐待", "恋足",
-    "性奴", "性癖", "淫欲"
-]
-
-# 2. 编译正则（忽略大小写）
-NSFW_PATTERN = re.compile("|".join(map(re.escape, NSFW_KEYWORDS)), flags=re.IGNORECASE)
-
-
-def is_nsfw_text(text: str) -> dict:
-    """
-    判断文本是否包含 NSFW 关键词
-    """
-    if not text or not text.strip():
-        return {"is_nsfw": None, "score": None, "reason": "文本为空"}
-
-    # 去掉空白字符再匹配
-    text_clean = re.sub(r"\s+", "", text)
-    if NSFW_PATTERN.search(text_clean):
-        return {"is_nsfw": True, "score": 1.0, "reason": "包含 NSFW 关键词"}
-    else:
-        return {"is_nsfw": False, "score": 0.0, "reason": "未检测到 NSFW 内容"}
-
-
-def check_nsfw_in_character_data(character_json: dict) -> dict:
-    """
-    递归检测 character_json['data'] 中所有字符串字段
-    """
-    data = character_json.get('data', {})
-
-    def _check(obj):
-        if isinstance(obj, str) and obj.strip():
-            return is_nsfw_text(obj)
-        elif isinstance(obj, dict):
-            for v in obj.values():
-                result = _check(v)
-                if result.get("is_nsfw"):
-                    return result
-        elif isinstance(obj, list):
-            for item in obj:
-                result = _check(item)
-                if result.get("is_nsfw"):
-                    return result
-        return {"is_nsfw": False, "score": 0.0, "reason": "未检测到 NSFW 内容"}
-
-    return _check(data)

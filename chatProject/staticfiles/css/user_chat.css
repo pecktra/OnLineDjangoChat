@@ -107,8 +107,8 @@
 /* 消息时间戳 */
 .message-time {
     font-size: 0.65rem;
-    color: #6c757d;
-    margin-top: 0.25rem;
+    /* color: #6c757d; */
+    /* margin-top: 0.25rem; */
     align-self: flex-end;
 }
 

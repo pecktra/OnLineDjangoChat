@@ -458,7 +458,125 @@ static initFollowButton(live_info, follow_info) {
         return document.querySelector('[name=csrfmiddlewaretoken]')?.value || '';
     }
 
+    // 初始化 Branch 按钮
+    static initBranchButton() {
+        // 延迟执行，确保 DOM 和 Bootstrap 都已加载
+        setTimeout(() => {
+            const branchBtn = document.querySelector('.branch-btn');
+            if (!branchBtn) {
+                console.error('Branch button not found');
+                return;
+            }
+
+            branchBtn.addEventListener('click', () => {
+                this.openForkDialog();
+            });
+        }, 100);
+    }
+
+    // 打开 Fork 对话框
+    static openForkDialog(floor = 1) {
+        // 检查 Bootstrap 是否可用
+        if (typeof bootstrap === 'undefined') {
+            console.error('Bootstrap is not loaded');
+            alert('页面加载中，请稍后再试');
+            return;
+        }
+
+        // 检查模态框元素是否存在
+        const modalElement = document.getElementById('forkModal');
+        if (!modalElement) {
+            console.error('Fork modal element not found');
+            alert('页面元素未找到，请刷新页面重试');
+            return;
+        }
+
+        // 获取当前的 title 和 describe
+        const titleEl = document.querySelector('.streamer-title .badge');
+        const describeEl = document.querySelector('.streamer-describe .badge');
+
+        const currentTitle = titleEl ? titleEl.textContent : '';
+        const currentDescribe = describeEl ? describeEl.textContent : '';
+
+        // 设置表单初始值
+        const titleInput = document.getElementById('forkTitle');
+        const describeInput = document.getElementById('forkDescribe');
+
+        if (titleInput) titleInput.value = currentTitle;
+        if (describeInput) describeInput.value = currentDescribe;
+
+        // 显示模态框
+        const forkModal = new bootstrap.Modal(modalElement);
+        forkModal.show();
+
+        // 绑定提交按钮事件（移除旧的事件监听器）
+        const submitBtn = document.getElementById('submitFork');
+        if (submitBtn) {
+            const newSubmitBtn = submitBtn.cloneNode(true);
+            submitBtn.parentNode.replaceChild(newSubmitBtn, submitBtn);
+
+            newSubmitBtn.addEventListener('click', async () => {
+                await this.handleForkSubmit(forkModal, floor);
+            });
+        }
+    }
+
+    // 处理 Fork 提交
+    static async handleForkSubmit(modal, floor = 1) {
+        // 检查登录
+        if (!window.GLOBAL_USER_ID || window.GLOBAL_USER_ID === 'null') {
+            alert('请先登录');
+            const googleLoginLink = document.getElementById('googleLoginLink');
+            if (googleLoginLink) {
+                googleLoginLink.click();
+            }
+            return;
+        }
+
+        const titleInput = document.getElementById('forkTitle');
+        const describeInput = document.getElementById('forkDescribe');
+
+        const title = titleInput.value.trim();
+        const describe = describeInput.value.trim();
+
+        if (!title || !describe) {
+            alert('请填写完整的标题和描述');
+            return;
+        }
+
+        try {
+            const response = await fetch('/api/fork/fork_confirm/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': this.getCSRFToken(),
+                },
+                body: JSON.stringify({
+                    title: title,
+                    describe: describe,
+                    target_id: window.GLOBAL_ANCHOR_ID,
+                    room_id: window.GLOBAL_ROOM_ID || '',
+                    last_floor: floor
+                })
+            });
+
+            const data = await response.json();
+            if (data.success) {
+                modal.hide();
+                window.location.href = `/live/${data.data.room_info.room_id}`;
+            } else {
+                alert('Error');
+            }
+        } catch (error) {
+            console.error('Fork 请求失败:', error);
+            alert('Fork 请求失败，请稍后再试');
+        }
+    }
+
 }
+
+// 将 StreamerInfoManager 暴露到全局，以便其他模块可以访问
+window.StreamerInfoManager = StreamerInfoManager;
 
 export default StreamerInfoManager
 

@@ -136,6 +136,11 @@
             <!-- <button class="btn btn-primary follow-btn follow2-btn">favourite</button>
             <button class="btn btn-primary follow-btn subscription-btn">subscription</button>
             <button class="btn btn-primary follow-btn reward-btn">tip</button> -->
+            <span class="action-icon branch-btn" data-tooltip="Branch">
+                <svg viewBox="0 0 384 512" class="branch-icon">
+                    <path fill="#ffffff" d="M384 144c0-44.2-35.8-80-80-80s-80 35.8-80 80c0 36.4 24.3 67.1 57.5 76.8-.6 16.1-4.2 28.5-11 36.9-15.4 19.2-49.3 22.4-85.2 25.7-28.2 2.6-57.4 5.4-81.3 16.9v-144c32.5-10.2 56-40.5 56-76.3 0-44.2-35.8-80-80-80S0 35.8 0 80c0 35.8 23.5 66.1 56 76.3v199.3C23.5 365.9 0 396.2 0 432c0 44.2 35.8 80 80 80s80-35.8 80-80c0-34-21.2-63.1-51.2-74.6 3.1-5.2 7.8-9.8 14.9-13.4 16.2-8.2 40.4-10.4 66.1-12.8 42.2-3.9 90-8.4 118.2-43.4 14-17.4 21.1-39.8 21.6-67.9 31.6-10.8 54.4-40.7 54.4-75.9zM80 64c8.8 0 16 7.2 16 16s-7.2 16-16 16-16-7.2-16-16 7.2-16 16-16zm0 384c-8.8 0-16-7.2-16-16s7.2-16 16-16 16 7.2 16 16-7.2 16-16 16zm224-320c8.8 0 16 7.2 16 16s-7.2 16-16 16-16-7.2-16-16 7.2-16 16-16z"/>
+                </svg>
+            </span>
             <span class="action-icon follow2-btn" data-tooltip="Favourite">
                 <svg viewBox="0 0 24 24" class="star-icon">
                     <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
@@ -163,6 +168,12 @@
                 <div class="text-center py-4 text-muted loading">
                     <div class="spinner-border spinner-border-sm" role="status"></div>
                     <span>loading...</span>
+                </div>
+            </div>
+            <div id="anchorForkBox" style="display:none; margin-top:8px;">
+                <div class="input-group">
+                    <input type="text" class="form-control" id="forkChatInput" placeholder="Type something..." />
+                    <button class="btn btn-success" id="forkChatSend" type="button">send</button>
                 </div>
             </div>
         </div>
@@ -208,7 +219,7 @@
             </div>
         </div>
         <div class="input-group">
-            <label for="chatMessageInput"></label><input type="text" class="form-control" id="chatMessageInput" placeholder="输入消息" />
+            <label for="chatMessageInput"></label><input type="text" class="form-control" id="chatMessageInput" placeholder="Type something..." />
             <div class="input-group-append">
                 <button class="btn btn-success" id="chatMessageSend" type="button">send</button>
             </div>
@@ -246,4 +257,71 @@
         }
     })();
     </script>
+
+<!-- Fork Dialog Modal -->
+<div class="modal fade" id="forkModal" tabindex="-1" aria-labelledby="forkModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="color:#333">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="forkModalLabel">New Branch</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="forkForm">
+                    <div class="mb-3">
+                        <label for="forkTitle" class="form-label">Title</label>
+                        <input type="text" class="form-control" id="forkTitle" name="title" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="forkDescribe" class="form-label">Description</label>
+                        <textarea class="form-control" id="forkDescribe" name="describe" rows="3" required></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="submitFork">Submit</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+(function(){
+    function initForkChatInline(){
+        try{
+            const box = document.getElementById('anchorForkBox');
+            if(!box) return;
+            // 仅当当前用户为主播本人时显示
+            if(String(window.GLOBAL_USER_ID) === String(window.GLOBAL_ANCHOR_ID)){
+                box.style.display = 'block';
+            } else {
+                box.style.display = 'none';
+                return;
+            }
+
+            const input = document.getElementById('forkChatInput');
+            const sendBtn = document.getElementById('forkChatSend');
+            const send = async () => {
+                const message = (input.value || '').trim();
+                if(!message) return;
+                try{
+                    await fetch('/api/fork/fork_chat/',{
+                        method:'POST',
+                        headers:{'Content-Type':'application/json','X-CSRFToken': (document.querySelector('[name=csrfmiddlewaretoken]')?.value || '')},
+                        body: JSON.stringify({ room_id: window.GLOBAL_ROOM_ID, message })
+                    });
+                    input.value='';
+                }catch(e){ console.error('fork_chat 发送失败', e); }
+            };
+            sendBtn?.addEventListener('click', send);
+            input?.addEventListener('keypress', (e)=>{ if(e.key==='Enter') send(); });
+        }catch(err){ console.error(err); }
+    }
+
+    // 将 initForkChatInline 函数暴露到全局作用域，以便在 StreamerInfoManager.init 完成后调用
+    window.initForkChatInline = initForkChatInline;
+})();
+</script>
+
 {% endblock %}

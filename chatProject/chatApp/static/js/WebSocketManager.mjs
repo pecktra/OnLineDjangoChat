@@ -126,15 +126,18 @@ export default class WebSocketManager {
                 const type = item.data_type
                 if (type === 'ai') {
                     this.chatArea.insertAdjacentHTML('beforeend', this.appendLiveMessage(item));
+                    this.attachMessageBranchEvents();
                     this.conditionalScroll(this.chatArea);
                 } else if (type === 'user') {
                     this.chatArea.insertAdjacentHTML('beforeend', this.appendLiveMessage(item));
+                    this.attachMessageBranchEvents();
                     this.conditionalScroll(this.chatArea);
                 } else {
                     // 若后端未提供 type，则尝试通过字段推断
                     const hasLiveFields = (item.data || item)?.live_message || (item.data || item)?.live_message_html;
                     if (hasLiveFields) {
                         this.chatArea.insertAdjacentHTML('beforeend', this.appendLiveMessage(item));
+                        this.attachMessageBranchEvents();
                         this.conditionalScroll(this.chatArea);
                     } else {
                         this.chatContent.insertAdjacentHTML('beforeend', this.appendUserMessage(item));
@@ -188,6 +191,7 @@ export default class WebSocketManager {
             case 'chat_live_message':
 
                 this.chatArea.insertAdjacentHTML('beforeend', this.appendLiveMessage(data.data));
+                this.attachMessageBranchEvents();
                 this.conditionalScroll(this.chatArea);
                 break;
             case 'chat_user_message':
@@ -325,7 +329,19 @@ export default class WebSocketManager {
                 <div class="chat-message ${msg.data.is_user ? 'user-message' : 'ai-message'} ">
                     <div class="message-content">
                         <div class="message-header">
-                            <div><span class="sender-name">${msg.data.name}</span><span>#${msg.floor}</span><div>
+                            <div><span class="sender-name">${msg.data.name}</span><span>#${msg.floor}</span>
+                                <span class="message-branch-btn" data-floor="${msg.floor}" data-tooltip="Branch" style="margin-left: 8px; cursor: pointer; display: inline-flex; align-items: center;">
+                                    <svg viewBox="0 0 384 512" style="width: 14px; height: 14px; fill: currentColor;">
+                                        <path d="M384 144c0-44.2-35.8-80-80-80s-80 35.8-80 80c0 36.4 24.3 67.1 57.5 76.8-.6 16.1-4.2 28.5-11 36.9-15.4 19.2-49.3 22.4-85.2 25.7-28.2 2.6-57.4 5.4-81.3 16.9v-144c32.5-10.2 56-40.5 56-76.3 0-44.2-35.8-80-80-80S0 35.8 0 80c0 35.8 23.5 66.1 56 76.3v199.3C23.5 365.9 0 396.2 0 432c0 44.2 35.8 80 80 80s80-35.8 80-80c0-34-21.2-63.1-51.2-74.6 3.1-5.2 7.8-9.8 14.9-13.4 16.2-8.2 40.4-10.4 66.1-12.8 42.2-3.9 90-8.4 118.2-43.4 14-17.4 21.1-39.8 21.6-67.9 31.6-10.8 54.4-40.7 54.4-75.9zM80 64c8.8 0 16 7.2 16 16s-7.2 16-16 16-16-7.2-16-16 7.2-16 16-16zm0 384c-8.8 0-16-7.2-16-16s7.2-16 16-16 16 7.2 16 16-7.2 16-16 16zm224-320c8.8 0 16 7.2 16 16s-7.2 16-16 16-16-7.2-16-16 7.2-16 16-16z"/>
+                                    </svg>
+                                </span>
+                                <span class="message-copy-btn" data-tooltip="Copy" title="Copy" style="margin-left: 8px; cursor: pointer; display: inline-flex; align-items: center;">
+                                    <svg viewBox="0 0 640 640" style="width: 14px; height: 14px; fill: currentColor;">
+                                        <path d="M288 64C252.7 64 224 92.7 224 128L224 384C224 419.3 252.7 448 288 448L480 448C515.3 448 544 419.3 544 384L544 183.4C544 166 536.9 149.3 524.3 137.2L466.6 81.8C454.7 70.4 438.8 64 422.3 64L288 64zM160 192C124.7 192 96 220.7 96 256L96 512C96 547.3 124.7 576 160 576L352 576C387.3 576 416 547.3 416 512L416 496L352 496L352 512L160 512L160 256L176 256L176 192L160 192z"/>
+                                    </svg>
+                                </span>
+
+                            </div>
                             <span class="message-time">${this.convertTo24Hour(msg.data.send_date)}</span>
                         </div>
                         <div class="mes_text">
@@ -359,6 +375,102 @@ export default class WebSocketManager {
         } catch (error) {
             console.error('时间转换错误:', error);
             return '无效的时间格式';
+        }
+    }
+
+    // 为消息中的 branch / copy 按钮绑定事件
+    attachMessageBranchEvents() {
+        // 使用 setTimeout 确保 DOM 已更新
+        setTimeout(() => {
+            const messageBranchBtns = document.querySelectorAll('.message-branch-btn:not([data-event-attached])');
+            messageBranchBtns.forEach(btn => {
+                btn.setAttribute('data-event-attached', 'true');
+                btn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const floor = btn.getAttribute('data-floor');
+                    // 调用 StreamerInfoManager 的方法，传递 floor 参数
+                    if (window.StreamerInfoManager) {
+                        window.StreamerInfoManager.openForkDialog(floor);
+                    } else {
+                        console.error('StreamerInfoManager not available');
+                    }
+                });
+            });
+
+            const copyBtns = document.querySelectorAll('.message-copy-btn:not([data-event-attached])');
+            copyBtns.forEach(btn => {
+                btn.setAttribute('data-event-attached', 'true');
+                btn.addEventListener('click', async (e) => {
+                    e.preventDefault();
+                    try {
+                        const messageContent = btn.closest('.message-content');
+                        const mesText = messageContent ? messageContent.querySelector('.mes_text') : null;
+                        const text = mesText ? mesText.textContent.trim() : '';
+
+                        if (navigator.clipboard && navigator.clipboard.writeText) {
+                            await navigator.clipboard.writeText(text);
+                        } else {
+                            const textarea = document.createElement('textarea');
+                            textarea.value = text;
+                            textarea.style.position = 'fixed';
+                            textarea.style.opacity = '0';
+                            document.body.appendChild(textarea);
+                            textarea.select();
+                            document.execCommand('copy');
+                            document.body.removeChild(textarea);
+                        }
+                        // 使用 Toast 提示
+                        this.showToast('Copied to clipboard');
+                    } catch (err) {
+                        console.error('复制失败:', err);
+                        alert('复制失败');
+                    }
+                });
+            });
+        }, 10);
+    }
+
+    // 显示全局 Toast 提示（Bootstrap 5）
+    showToast(message) {
+        try {
+            // 如果没有 Bootstrap，则回退到 alert
+            if (typeof bootstrap === 'undefined') {
+                alert(message);
+                return;
+            }
+
+            // 容器（复用）
+            let container = document.getElementById('global-toast-container');
+            if (!container) {
+                container = document.createElement('div');
+                container.id = 'global-toast-container';
+                container.style.position = 'fixed';
+                container.style.right = '20px';
+                container.style.bottom = '20px';
+                container.style.zIndex = '1080';
+                document.body.appendChild(container);
+            }
+
+            // 构建 toast 元素
+            const toast = document.createElement('div');
+            toast.className = 'toast align-items-center bg-white border';
+            toast.setAttribute('role', 'alert');
+            toast.setAttribute('aria-live', 'assertive');
+            toast.setAttribute('aria-atomic', 'true');
+            toast.innerHTML = `
+                <div class="d-flex">
+                    <div class="toast-body" style="color:#333333;">${message}</div>
+                    <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+            `;
+            container.appendChild(toast);
+
+            const bsToast = new bootstrap.Toast(toast, { delay: 1500 });
+            toast.addEventListener('hidden.bs.toast', () => toast.remove());
+            bsToast.show();
+        } catch (e) {
+            // 兜底
+            alert(message);
         }
     }
 

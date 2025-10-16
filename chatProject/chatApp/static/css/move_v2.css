@@ -81,7 +81,7 @@
 
     /* 调整 .live-container 内部的 .streamer-info 和 .chat-area */
     .live-container .streamer-info {
-        flex: unset;
+        flex: 0 0 15%;
         min-height: 10% !important;
         padding: 0.5rem !important; /* 减小内边距以适应小高度 */
     }

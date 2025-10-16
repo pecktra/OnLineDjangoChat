@@ -3,7 +3,7 @@ from django.http import JsonResponse
 from django.conf import settings
 from pymongo import MongoClient
 from chatApp.models import CharacterCard, Anchor
-from chatApp.api.common.check_nsfw import check_nsfw_in_character_data,is_nsfw
+from chatApp.api.common.check_nsfw import is_nsfw
 import json
 import hashlib
 import os
@@ -78,13 +78,6 @@ def import_card(request):
                         tags_list.append("NSFW")
                         is_private = 1
                         break
-
-            # AI 没检测到，再用关键词匹配
-            if is_private == 0:
-                nsfw_result = check_nsfw_in_character_data(character_json)
-                if nsfw_result.get("is_nsfw"):
-                    tags_list.append("NSFW")
-                    is_private = 1
 
         tags = ",".join(tags_list) if tags_list else None
 

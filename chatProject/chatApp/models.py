@@ -365,4 +365,26 @@ class ForkRelation(models.Model):
 
     def __str__(self):
         return f"ForkRelation {self.id} from {self.from_user_id} to {self.target_id}"
+
+class ForkTrace(models.Model):
+    """
+    记录 fork 链路信息
+    """
+    # 源头房间信息（最初的房间）
+    source_room_id = models.CharField(max_length=32)
+    source_uid = models.CharField(max_length=22)
+
+    # 上一层房间信息（当前被 fork 的房间）
+    prev_room_id = models.CharField(max_length=32)
+    prev_uid = models.CharField(max_length=22)
+
+    # 当前新 fork 房间信息
+    current_room_id = models.CharField(max_length=32)
+    current_uid = models.CharField(max_length=22)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'fork_trace'
+
         

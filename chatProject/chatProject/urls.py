@@ -22,7 +22,7 @@ from chatApp.api.client import logins, lives, subscription, follow_live, chat
 from chatApp.api.balance import balance
 from chatApp.api.payment import payment
 from chatApp.api.fork import fork
-
+from chatApp.api.fork import fork_chat
 # 导入静态文件模块，为了显示上传图片
 from django.conf.urls.static import static
 from django.views.generic.base import RedirectView
@@ -115,6 +115,8 @@ urlpatterns = [
     path('api/fork/fork_confirm/', fork.fork_confirm),#确认fork
     path('api/fork/forked_list/', fork.forked_list),#我fork的
     path('api/fork/anchor_forked_by/', fork.anchor_forked_by),#被fork过
+
+    path('api/fork/fork_chat/', fork_chat.fork_chat),#fork后续聊天
 ]
 
 
