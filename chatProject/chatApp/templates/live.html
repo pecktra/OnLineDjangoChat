@@ -99,6 +99,42 @@
         display: block;
     }
 }
+
+/* 等待中的跳动省略号动画 */
+.typing-dots {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+}
+
+.typing-dots span {
+    font-size: 24px;
+    line-height: 1;
+    animation: typingDot 1.4s infinite;
+}
+
+.typing-dots span:nth-child(1) {
+    animation-delay: 0s;
+}
+
+.typing-dots span:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.typing-dots span:nth-child(3) {
+    animation-delay: 0.4s;
+}
+
+@keyframes typingDot {
+    0%, 60%, 100% {
+        opacity: 0.3;
+        transform: translateY(0);
+    }
+    30% {
+        opacity: 1;
+        transform: translateY(-8px);
+    }
+}
 </style>
     <!--中间live聊天-->
 <div class="total-chat" >
@@ -302,20 +338,156 @@
 
             const input = document.getElementById('forkChatInput');
             const sendBtn = document.getElementById('forkChatSend');
+            const chatArea = document.querySelector('.chat-area');
+            let isSending = false; // 防重复发送标志
+
+            // HTML 转义函数，防止 XSS
+            const escapeHtml = (text) => {
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            };
+
             const send = async () => {
+                // 防止重复发送
+                if (isSending) {
+                    return;
+                }
+
                 const message = (input.value || '').trim();
                 if(!message) return;
+
+                // 立即标记正在发送
+                isSending = true;
+
+                // 立即清空输入框
+                input.value = '';
+
+                // 保存按钮原始文本
+                const originalButtonText = sendBtn.textContent;
+
+                // 禁用输入框和按钮
+                if (input) {
+                    input.disabled = true;
+                    input.style.opacity = '0.6';
+                }
+                if (sendBtn) {
+                    sendBtn.disabled = true;
+                    sendBtn.textContent = 'Sending...';
+                    sendBtn.style.opacity = '0.6';
+                    sendBtn.style.cursor = 'not-allowed';
+                }
+
+                // 先立即显示用户发送的消息（临时）
+                const tempUserId = 'temp-user-' + Date.now();
+                if (chatArea) {
+                    const currentTime = new Date().toLocaleString('en-US', {
+                        year: 'numeric',
+                        month: 'short',
+                        day: '2-digit',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        hour12: false
+                    }).replace(',', '');
+
+                    const userMessageHTML = `
+                        <div id="${tempUserId}" class="chat-message user-message">
+                            <div class="message-content">
+                                <div class="message-header">
+                                    <div><span class="sender-name">${escapeHtml(window.GLOBAL_USER_NAME || 'You')}</span><span>#--</span></div>
+                                    <span class="message-time">${currentTime}</span>
+                                </div>
+                                <div class="mes_text">${escapeHtml(message)}</div>
+                            </div>
+                        </div>
+                    `;
+                    chatArea.insertAdjacentHTML('beforeend', userMessageHTML);
+                    chatArea.scrollTop = chatArea.scrollHeight;
+                }
+
+                // 添加等待中的 AI 回复占位符（使用和46楼一样的样式）
+                const loadingId = 'ai-loading-' + Date.now();
+                if (chatArea) {
+                    const loadingHTML = `
+                        <div id="${loadingId}" class="chat-message ai-message">
+                            <div class="message-content">
+                                <div class="message-header">
+                                    <div><span class="sender-name"></span><span></span></div>
+                                    <span class="message-time"></span>
+                                </div>
+                                <div class="mes_text">
+                                    <span class="typing-dots">
+                                        <span>.</span><span>.</span><span>.</span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    chatArea.insertAdjacentHTML('beforeend', loadingHTML);
+                    chatArea.scrollTop = chatArea.scrollHeight;
+                }
+
+                // 发送消息到服务器
                 try{
                     await fetch('/api/fork/fork_chat/',{
                         method:'POST',
                         headers:{'Content-Type':'application/json','X-CSRFToken': (document.querySelector('[name=csrfmiddlewaretoken]')?.value || '')},
                         body: JSON.stringify({ room_id: window.GLOBAL_ROOM_ID, message })
                     });
-                    input.value='';
-                }catch(e){ console.error('fork_chat 发送失败', e); }
+
+                    // 成功后移除等待动画和临时用户消息（真实消息会通过轮询显示）
+                    const loadingElement = document.getElementById(loadingId);
+                    if (loadingElement) {
+                        loadingElement.remove();
+                    }
+                    const tempUserElement = document.getElementById(tempUserId);
+                    if (tempUserElement) {
+                        tempUserElement.remove();
+                    }
+
+                } catch(e) {
+                    console.error('fork_chat 发送失败', e);
+
+                    // 移除等待动画和临时用户消息
+                    const loadingElement = document.getElementById(loadingId);
+                    if (loadingElement) {
+                        loadingElement.remove();
+                    }
+                    const tempUserElement = document.getElementById(tempUserId);
+                    if (tempUserElement) {
+                        tempUserElement.remove();
+                    }
+
+                    // 发送失败时恢复消息到输入框
+                    if (input) {
+                        input.value = message;
+                    }
+                    alert('发送消息失败，请重试');
+                } finally {
+                    // 重新启用输入框和按钮
+                    isSending = false;
+
+                    if (input) {
+                        input.disabled = false;
+                        input.style.opacity = '1';
+                        input.focus();
+                    }
+                    if (sendBtn) {
+                        sendBtn.disabled = false;
+                        sendBtn.textContent = originalButtonText;
+                        sendBtn.style.opacity = '1';
+                        sendBtn.style.cursor = 'pointer';
+                    }
+                }
             };
+
             sendBtn?.addEventListener('click', send);
-            input?.addEventListener('keypress', (e)=>{ if(e.key==='Enter') send(); });
+            input?.addEventListener('keypress', (e)=>{
+                if(e.key==='Enter') {
+                    e.preventDefault();
+                    send();
+                }
+            });
         }catch(err){ console.error(err); }
     }
 
