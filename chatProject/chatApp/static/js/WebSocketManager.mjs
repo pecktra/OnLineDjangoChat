@@ -20,6 +20,7 @@ export default class WebSocketManager {
 
         // 滚动控制
         this.isInitialLoad = true; // 标记是否首次加载
+        this.shouldForceScroll = false; // 标记是否需要强制滚动
 
         // DOM 元素
         this.chatArea = document.querySelector('.chat-area');
@@ -45,6 +46,12 @@ export default class WebSocketManager {
 
     // 条件滚动：只在用户在底部时滚动
     conditionalScroll(element) {
+        // 如果需要强制滚动（如用户刚发送消息），则强制滚动
+        if (this.shouldForceScroll) {
+            element.scrollTop = element.scrollHeight;
+            this.shouldForceScroll = false; // 滚动后重置标志
+            return;
+        }
         // 如果是首次加载，不滚动
         if (this.isInitialLoad) {
             return;
@@ -101,6 +108,25 @@ export default class WebSocketManager {
         }, this.pollingIntervalMs);
     }
 
+    // 根据楼层号查找页面中已有的消息
+    findMessageByFloor(floor) {
+        // 在 chatArea 中查找包含该楼层号的消息
+        const messages = this.chatArea.querySelectorAll('.chat-message');
+        for (const message of messages) {
+            // 获取消息头部的所有 span 元素
+            const spans = message.querySelectorAll('.message-header span');
+            for (const span of spans) {
+                const text = span.textContent || span.innerText;
+                // 匹配 #数字 格式
+                const match = text.match(/^#(\d+)$/);
+                if (match && parseInt(match[1]) === floor) {
+                    return message;
+                }
+            }
+        }
+        return null;
+    }
+
     // 从后端拉取消息并仅追加新增项
     async fetchAndAppendNewMessages() {
         try {
@@ -124,21 +150,55 @@ export default class WebSocketManager {
                 // this.seenMessageIds.add(rawId);
 
                 const type = item.data_type
+
+                // 检查页面中是否已有相同楼层的消息
+                const existingMessage = this.findMessageByFloor(item.floor);
+
                 if (type === 'ai') {
-                    this.chatArea.insertAdjacentHTML('beforeend', this.appendLiveMessage(item));
+                    const newMessageHtml = this.appendLiveMessage(item);
+                    if (existingMessage) {
+                        // 替换现有消息（保存滚动位置）
+                        const scrollBefore = this.chatArea.scrollTop;
+                        existingMessage.outerHTML = newMessageHtml;
+                        // 恢复滚动位置（避免跳动）
+                        this.chatArea.scrollTop = scrollBefore;
+                    } else {
+                        // 追加新消息
+                        this.chatArea.insertAdjacentHTML('beforeend', newMessageHtml);
+                        this.conditionalScroll(this.chatArea);
+                    }
                     this.attachMessageBranchEvents();
-                    this.conditionalScroll(this.chatArea);
                 } else if (type === 'user') {
-                    this.chatArea.insertAdjacentHTML('beforeend', this.appendLiveMessage(item));
+                    const newMessageHtml = this.appendLiveMessage(item);
+                    if (existingMessage) {
+                        // 替换现有消息（保存滚动位置）
+                        const scrollBefore = this.chatArea.scrollTop;
+                        existingMessage.outerHTML = newMessageHtml;
+                        // 恢复滚动位置（避免跳动）
+                        this.chatArea.scrollTop = scrollBefore;
+                    } else {
+                        // 追加新消息
+                        this.chatArea.insertAdjacentHTML('beforeend', newMessageHtml);
+                        this.conditionalScroll(this.chatArea);
+                    }
                     this.attachMessageBranchEvents();
-                    this.conditionalScroll(this.chatArea);
                 } else {
                     // 若后端未提供 type，则尝试通过字段推断
                     const hasLiveFields = (item.data || item)?.live_message || (item.data || item)?.live_message_html;
                     if (hasLiveFields) {
-                        this.chatArea.insertAdjacentHTML('beforeend', this.appendLiveMessage(item));
+                        const newMessageHtml = this.appendLiveMessage(item);
+                        if (existingMessage) {
+                            // 替换现有消息（保存滚动位置）
+                            const scrollBefore = this.chatArea.scrollTop;
+                            existingMessage.outerHTML = newMessageHtml;
+                            // 恢复滚动位置（避免跳动）
+                            this.chatArea.scrollTop = scrollBefore;
+                        } else {
+                            // 追加新消息
+                            this.chatArea.insertAdjacentHTML('beforeend', newMessageHtml);
+                            this.conditionalScroll(this.chatArea);
+                        }
                         this.attachMessageBranchEvents();
-                        this.conditionalScroll(this.chatArea);
                     } else {
                         this.chatContent.insertAdjacentHTML('beforeend', this.appendUserMessage(item));
                         this.conditionalScroll(this.chatContent);
