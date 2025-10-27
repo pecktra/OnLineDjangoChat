@@ -177,7 +177,9 @@ def fork_confirm(request):
         is_private = int(character_card.is_private) if character_card else 0
 
         # 生成新房间 name 和 id
-        new_room_name = generate_new_room_name(origin_room.room_name, character_name)
+        new_room_name = generate_new_room_name(origin_room.uid, character_name)
+        print(new_room_name)
+
         new_room_id, character_date = generate_new_room_id(user.id, character_name)
 
         # 创建新房间，使用当前登录用户信息
