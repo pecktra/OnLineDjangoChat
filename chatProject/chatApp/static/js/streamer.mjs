@@ -458,6 +458,44 @@ static initFollowButton(live_info, follow_info) {
         return document.querySelector('[name=csrfmiddlewaretoken]')?.value || '';
     }
 
+    // 显示全局 Loading 覆盖
+    static showLoadingOverlay(text = 'loading...') {
+        let overlay = document.getElementById('global-loading-overlay');
+        if (!overlay) {
+            overlay = document.createElement('div');
+            overlay.id = 'global-loading-overlay';
+            overlay.style.position = 'fixed';
+            overlay.style.inset = '0';
+            overlay.style.background = 'rgba(0,0,0,0.35)';
+            overlay.style.display = 'flex';
+            overlay.style.alignItems = 'center';
+            overlay.style.justifyContent = 'center';
+            overlay.style.zIndex = '20000';
+            const box = document.createElement('div');
+            box.style.minWidth = '160px';
+            box.style.padding = '16px 20px';
+            box.style.borderRadius = '10px';
+            box.style.background = '#ffffff';
+            box.style.color = '#333';
+            box.style.fontSize = '14px';
+            box.style.boxShadow = '0 8px 24px rgba(0,0,0,0.18)';
+            box.id = 'global-loading-overlay-box';
+            box.textContent = text;
+            overlay.appendChild(box);
+            document.body.appendChild(overlay);
+        } else {
+            const box = document.getElementById('global-loading-overlay-box');
+            if (box) box.textContent = text;
+            overlay.style.display = 'flex';
+        }
+    }
+
+    // 隐藏全局 Loading 覆盖
+    static hideLoadingOverlay() {
+        const overlay = document.getElementById('global-loading-overlay');
+        if (overlay) overlay.style.display = 'none';
+    }
+
     // 初始化 Branch 按钮
     static initBranchButton() {
         // 延迟执行，确保 DOM 和 Bootstrap 都已加载
@@ -522,7 +560,7 @@ static initFollowButton(live_info, follow_info) {
     }
 
     // 处理 Fork 提交
-    static async handleForkSubmit(modal, floor = 1) {
+    static async handleForkSubmit(modal, floor = 1, params = null) {
         // 检查登录
         if (!window.GLOBAL_USER_ID || window.GLOBAL_USER_ID === 'null') {
             alert('请先登录');
@@ -533,11 +571,17 @@ static initFollowButton(live_info, follow_info) {
             return;
         }
 
-        const titleInput = document.getElementById('forkTitle');
-        const describeInput = document.getElementById('forkDescribe');
-
-        const title = titleInput.value.trim();
-        const describe = describeInput.value.trim();
+        let title = '';
+        let describe = '';
+        if (params && (params.title || params.describe)) {
+            title = (params.title || '').trim();
+            describe = (params.describe || '').trim();
+        } else {
+            const titleInput = document.getElementById('forkTitle');
+            const describeInput = document.getElementById('forkDescribe');
+            title = (titleInput?.value || '').trim();
+            describe = (describeInput?.value || '').trim();
+        }
 
         if (!title || !describe) {
             alert('请填写完整的标题和描述');
@@ -545,6 +589,8 @@ static initFollowButton(live_info, follow_info) {
         }
 
         try {
+            // 显示 Loading，直到跳转或失败
+            this.showLoadingOverlay('loading...');
             const response = await fetch('/api/fork/fork_confirm/', {
                 method: 'POST',
                 headers: {
@@ -562,15 +608,47 @@ static initFollowButton(live_info, follow_info) {
 
             const data = await response.json();
             if (data.success) {
-                modal.hide();
+                if (modal && typeof modal.hide === 'function') {
+                    modal.hide();
+                }
                 window.location.href = `/live/${data.data.room_info.room_id}`;
             } else {
-                alert('Error');
+                this.hideLoadingOverlay();
+                alert('create branch error');
             }
         } catch (error) {
             console.error('Fork 请求失败:', error);
-            alert('Fork 请求失败，请稍后再试');
+            this.hideLoadingOverlay();
+            alert('create branch error');
         }
+    }
+
+    // 直接根据当前房间信息与可见标题/描述创建分支（无需弹窗）
+    static async createBranchDirect(floor = 1) {
+        const titleEl = document.querySelector('.streamer-title .badge');
+        const describeEl = document.querySelector('.streamer-describe .badge');
+        const currentTitle = titleEl ? (titleEl.textContent || '').trim() : '';
+        const currentDescribe = describeEl ? (describeEl.textContent || '').trim() : '';
+
+        // 若页面没有提供，给出兜底文案
+        const title = currentTitle || (window.GLOBAL_ROOM_NAME ? String(window.GLOBAL_ROOM_NAME) : 'New Branch');
+        const describe = currentDescribe || 'Auto created from message branch';
+
+        await this.handleForkSubmit(null, Number(floor) || 1, { title, describe });
+    }
+
+    // 绑定消息内的 Branch 按钮，使其直接创建分支
+    static attachMessageBranchEvents() {
+        const nodes = document.querySelectorAll('.message-branch-btn');
+        nodes.forEach((el) => {
+            if (el.dataset.branchBound === '1') return;
+            el.dataset.branchBound = '1';
+            el.addEventListener('click', (e) => {
+                e.preventDefault();
+                const floor = el.getAttribute('data-floor') || '1';
+                StreamerInfoManager.createBranchDirect(floor);
+            });
+        });
     }
 
 }

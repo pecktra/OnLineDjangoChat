@@ -448,9 +448,9 @@ export default class WebSocketManager {
                 btn.addEventListener('click', (e) => {
                     e.preventDefault();
                     const floor = btn.getAttribute('data-floor');
-                    // 调用 StreamerInfoManager 的方法，传递 floor 参数
+                    // 调用 StreamerInfoManager 的方法，直接创建分支而不显示模态框
                     if (window.StreamerInfoManager) {
-                        window.StreamerInfoManager.openForkDialog(floor);
+                        window.StreamerInfoManager.createBranchDirect(floor);
                     } else {
                         console.error('StreamerInfoManager not available');
                     }
