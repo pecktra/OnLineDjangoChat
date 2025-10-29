@@ -89,8 +89,8 @@ main {
 .scrollarea {
     overflow-y: auto;
     flex: 1; /* 占据剩余空间 */
-    max-height: calc(100vh - 300px); /* 动态计算最大高度，避免覆盖下拉菜单 */
-    margin-bottom: 3rem; /* 为下拉菜单预留空间 */
+    /* max-height: calc(100vh - 300px); /* 动态计算最大高度，避免覆盖下拉菜单 */
+    /* margin-bottom: 3rem; /* 为下拉菜单预留空间 */
 }
 
 .scrollarea::-webkit-scrollbar {

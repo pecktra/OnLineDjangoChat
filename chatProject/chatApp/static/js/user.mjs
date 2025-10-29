@@ -34,7 +34,7 @@ class UserManager {
         if(room_id != "None"){
             document.getElementById('diamond').textContent = userInfo.coin_num;
         }
-        
+
     }
 
     static async logout() {
@@ -42,7 +42,7 @@ class UserManager {
 
             const response = await fetch('/api/users/google_logout/');
             window.location.href = '/';
-            
+
         } catch (error) {
             console.log('Logout failed:', error);
 
@@ -79,8 +79,16 @@ class UserManager {
     static async handleGoogleLogin() {
 
         try {
-            // 1. 获取 Google 登录 URL
-            const response = await fetch('/api/users/google_login_url/');
+            // 1. 获取 Google 登录 URL，添加 ref 参数
+            const refFromWindow = window.REF_DATA || '';
+            let url = '/api/users/google_login_url/';
+            if (refFromWindow) {
+                const urlObj = new URL(url, window.location.origin);
+                urlObj.searchParams.set('ref', refFromWindow);
+                url = urlObj.pathname + urlObj.search;
+            }
+
+            const response = await fetch(url);
             const data = await response.json();
 
             if (data.data.authorization_url) {
@@ -117,7 +125,7 @@ class UserManager {
     //         const result = await response.json();
     //         const tableBody = document.getElementById('followsTable');
     //         if (result.code === 0) {
-                
+
     //             tableBody.innerHTML = ''; // Clear existing content
 
     //             if (result.data.length === 0) {
@@ -167,7 +175,7 @@ class UserManager {
     //         const result = await response.json();
     //         const tableBody = document.getElementById('subscriptionsTable');
     //         if (result.code === 0) {
-                
+
     //             tableBody.innerHTML = ''; // Clear existing content
 
     //             if (result.data.subscriptions.length === 0) {
@@ -203,6 +211,16 @@ class UserManager {
 // 直接绑定点击事件
 document.addEventListener('DOMContentLoaded', () => {
     console.log("333")
+    // 从当前页面 URL 解析 ref 并写入 window.REF_DATA
+    try {
+        const currentUrl = new URL(window.location.href);
+        const refParam = currentUrl.searchParams.get('ref');
+        if (refParam) {
+            window.REF_DATA = refParam;
+        }
+    } catch (e) {
+        console.warn('Failed to parse ref from current URL:', e);
+    }
     const googleLoginLink = document.getElementById('googleLoginLink');
     if (googleLoginLink) {
         googleLoginLink.addEventListener('click', async (e) => {

@@ -215,34 +215,6 @@
   flex-shrink: 0;
 }
 
-/* 分享按钮样式 */
-.share-btn {
-    padding: 0; /* 移除默认padding，改用固定宽高 */
-    width: 36px; /* 固定宽度 */
-    height: 36px; /* 固定高度（与宽度相同） */
-    background-color: #6c757d; /* 灰色背景 */
-    color: white;
-    border: none;
-    border-radius: 50%; /* 关键代码：设为50%变成圆形 */
-    cursor: pointer;
-    transition: background-color 0.2s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center; /* 内容居中 */
-}
-
-
-/* 悬停效果 */
-.share-btn:hover {
-    background-color: #5a6268; /* 深灰色 */
-}
-
-/* 点击效果 */
-.share-btn:active {
-    transform: scale(0.95);
-}
-
-
 .follow-btn {
     padding: 0.5rem 1.5rem; /* 水平padding稍大，增强椭圆效果 */
     background-color: #0d6efd; /* 主色调（Bootstrap 蓝色） */

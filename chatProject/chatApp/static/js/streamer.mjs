@@ -497,20 +497,20 @@ static initFollowButton(live_info, follow_info) {
     }
 
     // 初始化 Branch 按钮
-    static initBranchButton() {
-        // 延迟执行，确保 DOM 和 Bootstrap 都已加载
-        setTimeout(() => {
-            const branchBtn = document.querySelector('.branch-btn');
-            if (!branchBtn) {
-                console.error('Branch button not found');
-                return;
-            }
+    // static initBranchButton() {
+    //     // 延迟执行，确保 DOM 和 Bootstrap 都已加载
+    //     setTimeout(() => {
+    //         const branchBtn = document.querySelector('.branch-btn');
+    //         if (!branchBtn) {
+    //             console.error('Branch button not found');
+    //             return;
+    //         }
 
-            branchBtn.addEventListener('click', () => {
-                this.openForkDialog();
-            });
-        }, 100);
-    }
+    //         branchBtn.addEventListener('click', () => {
+    //             this.openForkDialog();
+    //         });
+    //     }, 100);
+    // }
 
     // 打开 Fork 对话框
     static openForkDialog(floor = 1) {
