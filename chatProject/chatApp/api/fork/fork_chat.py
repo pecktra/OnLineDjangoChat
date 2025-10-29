@@ -66,7 +66,7 @@ def fork_chat(request):
         "username": user_name,
         "uid": user_id,
         "character_name": character_name,
-        "character_date": character_date,
+        "character_date": "",
         "room_id": room_id,
         "room_name": "",
         "data_type": "user",
@@ -97,12 +97,15 @@ def fork_chat(request):
     # 从 MongoDB 查询聊天记录并添加到 contents
     try:
 
-        chat_records = list(collection.find({}).sort("_id", 1))
-
+        # chat_records = list(collection.find({}).sort("_id", 1))
+        chat_records = list(collection.find({}).sort("_id", -1).limit(10))
+        chat_records.reverse()
+        
         for item in chat_records:
             data = item.get("data", {})
             is_user = data.get("is_user")
             mes = data.get("mes")
+
             if not mes or not isinstance(mes, str):
                 continue
             role = "user" if is_user  else "model"
@@ -143,13 +146,13 @@ def fork_chat(request):
 
         # 初始化模型
         model = genai.GenerativeModel(
-            model_name="gemini-2.0-flash",
+            model_name="gemini-2.5-flash",
             generation_config={
                 "candidate_count": 1,
                 "temperature": 1.15,
                 "top_p": 0.98,
                 "top_k": 40,
-                "max_output_tokens": 90000,
+                "max_output_tokens": 65535,
                 "frequency_penalty": 0,
                 "presence_penalty": 0,
             },
@@ -176,6 +179,8 @@ def fork_chat(request):
 
         # 调用 generate_content（非流式）
         response = model.generate_content(contents)
+        # print("*********")
+        # print(response)
         response_text = response.text
         # mes_html = messageFormatting(response_text,character_name,False,False)
         # mes_html = format_message(
@@ -187,8 +192,8 @@ def fork_chat(request):
         #     sanitizerOverrides={},
         #     isReasoning=False
         # )
-        print("response_text*")
-        print(response_text)
+        # print("response_text*")
+        # print(response_text)
         mes_html = format_message(
             content=response_text,
             placement=2,  # AI_OUTPUT
@@ -212,7 +217,7 @@ def fork_chat(request):
             "username": user_name,
             "uid": user_id,
             "character_name": character_name,
-            "character_date": character_date,
+            "character_date": "",
             "room_id": room_id,
             "room_name": "",
             "data_type": "ai",
