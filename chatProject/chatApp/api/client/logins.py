@@ -1,11 +1,14 @@
-import re
+
 import random
 import string
 import requests
+import urllib.parse
+import uuid
 from django.contrib.auth import login, get_user_model
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
 from django.contrib.auth.hashers import make_password
+import os
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from chatApp.models  import ChatUser,UserBalance
@@ -21,6 +24,8 @@ from django.shortcuts import redirect
 from django.contrib.auth import get_user
 from rest_framework.response import Response
 from django.contrib.auth import logout
+from chatApp.api.common.common import add_diamond_balance
+
 
 def generate_random_username():
     """生成一个随机的游客用户名"""
@@ -31,9 +36,29 @@ def generate_random_username():
 @api_view(['GET'])
 def google_oauth2_url(request):
     """
-    返回 Google OAuth2 授权 URL，前端可通过此 URL 跳转到 Google 登录页面。
+    获取 Google OAuth2 授权 URL（前端跳转用）
+    支持携带 ref 参数（例如推荐码、来源等）
     """
-    authorization_url = f"https://accounts.google.com/o/oauth2/auth?client_id={settings.SOCIAL_AUTH_GOOGLE_OAUTH2_KEY}&redirect_uri={settings.SOCIAL_AUTH_GOOGLE_OAUTH2_REDIRECT_URI}&response_type=code&scope=openid%20email%20profile"
+    ref = request.GET.get("ref")  # 可选参数
+    state = str(uuid.uuid4())  # 生成随机 state 防止 CSRF 攻击
+
+    # 基础授权参数
+    params = {
+        "client_id": settings.SOCIAL_AUTH_GOOGLE_OAUTH2_KEY,
+        "redirect_uri": settings.SOCIAL_AUTH_GOOGLE_OAUTH2_REDIRECT_URI,
+        "response_type": "code",
+        "scope": "openid email profile",
+        "state": state,  # 这里传 state 防止伪造请求
+        "access_type": "offline",
+        "prompt": "consent"
+    }
+
+    # 如果前端传了 ref，就追加到 state 或 redirect_uri 上
+    if ref:
+        params["state"] = f"{state}|ref={ref}"
+
+    authorization_url = f"https://accounts.google.com/o/oauth2/auth?{urllib.parse.urlencode(params)}"
+
     return Response({
         "code": 0,
         "message": "Authorization URL generated successfully",
@@ -46,10 +71,11 @@ def google_oauth2_url(request):
 @api_view(['GET'])
 def google_oauth2_callback(request):
     """
-    使用授权码获取 Google 访问令牌，并获取用户信息（Google ID、邮箱、头像等）。
-    如果用户不存在则创建用户，已存在则更新用户信息。
+    Google 回调：使用授权码换取 access_token，并获取用户信息。
+    支持从 state 中恢复 ref 参数。
     """
     code = request.GET.get('code')
+    state = request.GET.get('state')
 
     if not code:
         return Response({
@@ -58,7 +84,15 @@ def google_oauth2_callback(request):
             "data": {}
         }, status=400)
 
-    # 使用授权码获取访问令牌
+    # 提取 ref 参数（从 state 中安全获取）
+    referrer_id = None
+    if state and "|ref=" in state:
+        try:
+            referrer_id = int(state.split("|ref=")[1])
+        except ValueError:
+            referrer_id = None
+
+    # 交换 token
     url = 'https://oauth2.googleapis.com/token'
     data = {
         'code': code,
@@ -71,73 +105,85 @@ def google_oauth2_callback(request):
     response = requests.post(url, data=data)
     tokens = response.json()
 
-    if 'access_token' in tokens:
-        # 使用访问令牌获取用户信息
-        user_info_url = 'https://www.googleapis.com/oauth2/v1/userinfo'
-        headers = {'Authorization': f"Bearer {tokens['access_token']}"}
-        user_info_response = requests.get(user_info_url, headers=headers)
-        user_info = user_info_response.json()
+    if 'access_token' not in tokens:
+        return Response({
+            "code": 2,
+            "message": "Failed to retrieve access token from Google",
+            "data": tokens
+        }, status=400)
 
-        if 'email' not in user_info or 'id' not in user_info:
-            return Response({
-                "code": 1,
-                "message": "Failed to retrieve Google user information",
-                "data": {}
-            }, status=400)
-
-        google_email = user_info['email']
-        google_name = user_info.get('name')
-        google_avatar = user_info.get('picture')
-        google_id = user_info.get('id')
-
-        # 查找或创建用户
-        user, created = ChatUser.objects.get_or_create(
-            google_id=google_id,  # 根据 Google ID 查找或创建
-            defaults={
-                'email': google_email,
-                'avatar': google_avatar,
-                'username': google_name  # 将 google_name 存入 username
-            }
-        )
-
-        # 如果用户已存在，检查是否有变化并更新信息
-        if not created:
-            # 如果信息发生变化，则更新用户
-            user_updated = False
-            if user.email != google_email:
-                user.email = google_email
-                user_updated = True
-            if user.username != google_name:
-                user.username = google_name
-                user_updated = True
-            if user.avatar != google_avatar:
-                user.avatar = google_avatar
-                user_updated = True
-
-            # 如果有任何变化，保存用户信息
-            if user_updated:
-                user.save()
-
-        # 登录用户
-        login(request, user)
-        request.session['google_name'] = google_name
-        request.session['google_email'] = google_email
-        request.session['google_id'] = google_id
-        request.session['user_id'] = user.id
-        request.session.save()  # 显式保存会话
+    # 请求 Google 用户信息
+    user_info_url = 'https://www.googleapis.com/oauth2/v1/userinfo'
+    headers = {'Authorization': f"Bearer {tokens['access_token']}"}
+    user_info_response = requests.get(user_info_url, headers=headers)
+    user_info = user_info_response.json()
 
 
-        redirect_url = request.META.get('HTTP_REFERER','/')
+    if 'email' not in user_info or 'id' not in user_info:
+        return Response({
+            "code": 3,
+            "message": "Failed to retrieve Google user information",
+            "data": {}
+        }, status=400)
+
+    google_email = user_info['email']
+    google_name = user_info.get('name')
+    google_avatar = user_info.get('picture')
+    google_id = user_info.get('id')
+
+    # 查找或创建用户
+    user, created = ChatUser.objects.get_or_create(
+        google_id=google_id,
+        defaults={
+            'email': google_email,
+            'avatar': google_avatar,
+            'username': google_name,
+            'referrer_id': referrer_id
+        }
+    )
+
+    # 如果存在则更新
+    user_updated = False
+    if user.email != google_email:
+        user.email = google_email
+        user_updated = True
+    if user.username != google_name:
+        user.username = google_name
+        user_updated = True
+    if user.avatar != google_avatar:
+        user.avatar = google_avatar
+        user_updated = True
+    if not user.referrer_id and referrer_id:
+        user.referrer_id = referrer_id
+        user_updated = True
+
+    if user_updated:
+        user.save()
 
 
-        # 重定向到上一个页面
-        return redirect(redirect_url)
+    # 登录并保存会话
+    login(request, user)
+    request.session['google_name'] = google_name
+    request.session['google_email'] = google_email
+    request.session['google_id'] = google_id
+    request.session['user_id'] = user.id
+    request.session.save()
 
-    return Response({
-        "code": 1,
-        "message": "Failed to retrieve access token from Google",
-        "data": {}
-    }, status=400)
+    # if referrer_id:
+    #     try:
+    #         reward_amount = 10  # 每人奖励钻石数量
+    #         # 被邀请人奖励
+    #         add_diamond_balance(user.id, reward_amount)
+    #         # 邀请人奖励
+    #         add_diamond_balance(referrer_id, reward_amount)
+    #         print(f"[Reward] Inviter {referrer_id} and Invitee {user.id} each received {reward_amount} diamonds.")
+    #     except Exception as e:
+    #         print(f"[Reward Error] {e}")
+
+    # 成功后重定向（例如跳转前端首页或来源页）
+
+    site_domain = os.environ.get('SITE_DOMAIN')
+    return redirect(site_domain)
 
 
 @api_view(['GET'])
