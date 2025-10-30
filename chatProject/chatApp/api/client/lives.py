@@ -6,7 +6,7 @@ from django.conf import settings
 import json
 import random
 from django.shortcuts import redirect, render
-from chatApp.models import ChatUserChatHistory,UserBalance,  RoomInfo, AnchorBalance,UserFollowedRoom, PaymentLiveroomEntryRecord,CharacterCard
+from chatApp.models import ChatUserChatHistory,UserBalance,  RoomInfo, AnchorBalance, PaymentLiveroomEntryRecord,CharacterCard
 from django.utils import timezone
 from django.db.models import Subquery, OuterRef
 import hashlib
@@ -108,7 +108,8 @@ def get_all_lives(request):
             send_date_str = last_ai_doc["data"].get("send_date")
 
         character_card = CharacterCard.objects.filter(
-            room_id=room_info.room_id
+            uid=room_info.uid,
+            character_name=room_info.character_name
         ).order_by('-create_date').first()
 
         # ===== 修改部分：如果数据库没有图片就随机使用默认图片 =====
@@ -314,19 +315,22 @@ def get_live_info(request):
     """
     room_id = request.GET.get("room_id")
     user = get_user(request)
+
     if not room_id:
-        return Response({"code": 1, "message": "Missing room_name parameter"}, status=400)
+        return Response({"code": 1, "message": "Missing room_id parameter"}, status=400)
 
     try:
         room_info = RoomInfo.objects.filter(room_id=room_id).first()
         if not room_info:
             return Response({"code": 1, "message": "Room not found"}, status=404)
 
+        # 检查直播状态
         status_str = redis_client.get(room_id)
         live_status = status_str.decode('utf-8').strip().lower() == "start" if status_str else False
 
         username = room_info.user_name
 
+        # VIP 信息
         vip_info = {
             "room_type": room_info.room_type,
             "vip_status": False,
@@ -340,6 +344,7 @@ def get_live_info(request):
             if vip_subscription:
                 vip_info["vip_status"] = True
 
+        # 订阅信息
         subscription_info = {"subscription_status": False, "amount": 0}
         redis_client_subscribe = get_redis_connection('subscribe')
         subscription_key = f"subscription:{user.id}:{room_info.uid}"
@@ -352,15 +357,10 @@ def get_live_info(request):
             except json.JSONDecodeError:
                 print("Error decoding subscription data:", subscription_data)
 
-        follow_info = {"follow_status": False}
-        followed_room = UserFollowedRoom.objects.filter(user_id=user.id, room_id=room_info.room_id).first()
-        if followed_room and followed_room.status:
-            follow_info["follow_status"] = True
-
+        # 角色卡信息
         character_card = CharacterCard.objects.filter(room_id=room_info.room_id).order_by('-create_date').first()
         if character_card:
             image_name = character_card.image_name
-            # ✅ 中文文件名处理并返回完整 URL
             image_path = request.build_absolute_uri(character_card.image_path.url)
             tags = character_card.tags.split(",") if character_card.tags else []
             language = character_card.language or "en"
@@ -372,7 +372,7 @@ def get_live_info(request):
             tags = []
             language = "en"
 
-        # 计算最近一小时 AI 是否回复
+        # 检查最近一小时 AI 是否有回复
         collection_name = room_info.room_id
         one_hour_ago = timezone.now() - timezone.timedelta(hours=1)
         last_ai_doc = db[collection_name].find_one({"data_type": "ai"}, sort=[("data.send_date", -1)])
@@ -393,6 +393,11 @@ def get_live_info(request):
                 except Exception as e:
                     print(f"Error parsing send_date: {e}")
 
+        follow_info = {
+            "follow_status": False
+        }
+
+        # 返回数据
         live_info = {
             "room_id": room_info.room_id,
             "room_name": room_info.room_name,
@@ -400,7 +405,7 @@ def get_live_info(request):
             "username": username,
             "character_name": room_info.character_name,
             "image_name": image_name,
-            "image_path": image_path,  # ✅ 修改这里
+            "image_path": image_path,
             "tags": tags,
             "language": language,
             "live_status": live_status,
@@ -415,8 +420,9 @@ def get_live_info(request):
             "data": {
                 "live_info": live_info,
                 "vip_info": vip_info,
-                "follow_info": follow_info,
-                "subscription_info": subscription_info
+                "subscription_info": subscription_info,
+                "follow_info":follow_info
+
             }
         })
 
