@@ -92,6 +92,7 @@ class ChatUser(AbstractBaseUser):
     # 使用默认的模型管理器
     objects = models.Manager()
 
+    referrer_id = models.BigIntegerField(null=True, blank=True, verbose_name="邀请人ID")
     # 登录字段
     USERNAME_FIELD = 'username'  # 登录时使用的字段
     REQUIRED_FIELDS = ['email']  # 注册时必须提供的字段（不包括用户名和密码）
@@ -187,25 +188,21 @@ class AnchorBalance(models.Model):
 
 
 
-
 #用户关注/取消关注模型
-class UserFollowedRoom(models.Model):
-    user_id = models.IntegerField()  # 用户ID
-    room_id = models.CharField(max_length=255,null=True)  # 直播间ID
-    room_name = models.CharField(max_length=255)  # 直播间名称
+class UserFollowRelation(models.Model):
+    follower_id = models.CharField(max_length=255)  # 关注发起方用户ID
+    followed_id = models.CharField(max_length=255)  # 被关注方用户ID
     followed_at = models.DateTimeField(auto_now_add=True)  # 关注时间
-    status = models.BooleanField(default=True)  # 关注状态，True 为关注，False 为取消关注
-
-
+    status = models.BooleanField(default=True)  # 关注状态：True 为关注，False 为取消关注
 
     class Meta:
-        db_table = 'user_followed_room'  # 显式指定表名
+        db_table = 'user_follow_relation'  # 显式指定表名
         constraints = [
-            models.UniqueConstraint(fields=['user_id', 'room_name'], name='unique_user_room')
+            models.UniqueConstraint(fields=['follower_id', 'followed_id'], name='unique_user_follow')
         ]
 
     def __str__(self):
-        return f"User {self.user_id} follows room {self.room_name} (status: {self.status})"
+        return f"User {self.follower_id} follows user {self.followed_id} (status: {self.status})"
 
 class RoomInfo(models.Model):
     # 房间类型的选择项
@@ -387,4 +384,21 @@ class ForkTrace(models.Model):
     class Meta:
         db_table = 'fork_trace'
 
-        
+class Favorite(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    uid = models.CharField(max_length=150, verbose_name="用户ID")
+    room_id = models.CharField(max_length=150, verbose_name="角色卡 room_id")
+    status = models.SmallIntegerField(default=1, verbose_name="收藏状态")  # 1=已收藏, 0=取消收藏
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="收藏时间")
+    updated_at = models.DateTimeField(auto_now=True, verbose_name="更新时间")
+
+    class Meta:
+        db_table = "favorite"
+        unique_together = ("uid", "room_id")
+        verbose_name = "收藏"
+        verbose_name_plural = verbose_name
+
+    def __str__(self):
+        return f"UID {self.uid} 收藏房间 {self.room_id} 状态 {self.status}"
+
+
