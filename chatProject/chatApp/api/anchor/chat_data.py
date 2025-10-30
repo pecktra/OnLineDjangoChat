@@ -8,7 +8,7 @@ import json
 import hashlib
 from chatApp.models import RoomInfo, CharacterCard
 from django_redis import get_redis_connection  # 获取 Redis 连接
-
+from django.views.decorators.csrf import csrf_exempt
 # 建立 MongoDB 连接
 client = MongoClient(settings.MONGO_URI)
 db = client[settings.MONGO_DB_NAME]
@@ -32,7 +32,7 @@ async def send_to_websocket(room_id, send_data):
 # 包装为同步函数
 sync_send_to_websocket = async_to_sync(send_to_websocket)
 
-
+@csrf_exempt
 @api_view(['POST'])
 def chat_data(request):
     """
@@ -122,7 +122,7 @@ def chat_data(request):
                 return Response({"code": 1, "message": "Room with the given uid and character_name already exists."},
                                 status=400)
 
-            file_name = request.data.get("file_name")
+            file_name = request.data.get("file_name","0")
             file_branch = "main"
             if file_name and "Branch" in file_name:
                 file_branch = "branch"
