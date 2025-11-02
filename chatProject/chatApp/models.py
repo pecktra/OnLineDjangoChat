@@ -292,9 +292,7 @@ class PaymentExpenditureRecord(models.Model):
     payment_type = models.CharField(max_length=20, choices=PAYMENT_TYPE_CHOICES, verbose_name="支付类型")
     payment_source = models.CharField(max_length=20, choices=PAYMENT_SOURCE_CHOICES, verbose_name="支付来源")
     amount = models.DecimalField(max_digits=12, decimal_places=2, verbose_name="支付金额")
-    currency = models.CharField(max_length=10, default="USD", verbose_name="支付货币")
-    crypto_amount = models.DecimalField(max_digits=18, decimal_places=8, null=True, blank=True, verbose_name="USDT支付金额")
-    crypto_currency = models.CharField(max_length=10, default="USDT", verbose_name="加密货币类型")
+    currency = models.CharField(max_length=10, default="ZS", verbose_name="支付货币")
     payment_date = models.DateTimeField(default=timezone.now, verbose_name="支付时间")
 
     class Meta:
@@ -311,9 +309,7 @@ class PaymentLiveroomEntryRecord(models.Model):
     anchor_id = models.CharField(max_length=22, verbose_name="主播ID")
     room_name = models.CharField(max_length=255, verbose_name="房间名称")
     amount = models.DecimalField(max_digits=12, decimal_places=2, verbose_name="支付金额")
-    currency = models.CharField(max_length=10, default="USD", verbose_name="支付货币")
-    crypto_amount = models.DecimalField(max_digits=18, decimal_places=8, null=True, blank=True, verbose_name="USDT支付金额")
-    crypto_currency = models.CharField(max_length=10, default="USDT", verbose_name="加密货币类型")
+    currency = models.CharField(max_length=10, default="ZS", verbose_name="支付货币")
 
     class Meta:
         db_table = "payment_liveroom_entry_records"
@@ -402,3 +398,29 @@ class Favorite(models.Model):
         return f"UID {self.uid} 收藏房间 {self.room_id} 状态 {self.status}"
 
 
+
+class PaymentDiamondFlow(models.Model):
+    PAYMENT_ACTION_CHOICES = (
+        ('donation', 'Donation'),
+        ('subscription', 'Subscription'),
+        ('room_entry', 'Room Entry'),
+        ('gift', 'Gift'),
+        ('other', 'Other'),
+    )
+
+    user_id = models.IntegerField(verbose_name="用户ID")
+    anchor_id = models.CharField(max_length=22, null=True, blank=True, verbose_name="主播ID")
+    payment_action = models.CharField(
+        max_length=20,
+        choices=PAYMENT_ACTION_CHOICES,
+        verbose_name="消费类型"
+    )
+    amount = models.DecimalField(max_digits=12, decimal_places=2, verbose_name="支付金额")
+    currency = models.CharField(max_length=10, default="ZS", verbose_name="支付货币")
+    details = models.CharField(max_length=255, null=True, blank=True, verbose_name="附加信息")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="支付时间")
+
+    class Meta:
+        db_table = "payment_diamond_flow"
+        verbose_name = "平台币流水"
+        verbose_name_plural = verbose_name

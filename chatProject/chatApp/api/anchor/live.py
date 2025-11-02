@@ -7,7 +7,7 @@ from chatApp.models import RoomInfo, Anchor
 from django.http import JsonResponse
 import json
 from django.utils import timezone
-
+from django.views.decorators.csrf import csrf_exempt
 # 初始化 MongoDB 连接
 client = MongoClient(settings.MONGO_URI)
 db = client.chat_db  # 连接到 chat_db 数据库
@@ -168,7 +168,7 @@ def add_room_info(request):
 
 
 
-
+@csrf_exempt
 @api_view(['POST'])
 def check_api_limit(request):
     """

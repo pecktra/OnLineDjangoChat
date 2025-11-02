@@ -18,7 +18,7 @@ from django.contrib import admin
 from django.urls import path
 # from chatApp.views import home,user_login,user_signup,user_logout
 from chatApp.api.anchor import login, chat_data, live, card
-from chatApp.api.client import logins, lives, subscription, follow_live, chat
+from chatApp.api.client import logins, lives, subscription, follow, chat ,feedhome,favorite
 from chatApp.api.balance import balance
 from chatApp.api.payment import payment
 from chatApp.api.fork import fork
@@ -69,7 +69,6 @@ urlpatterns = [
 
     #直播首页
     path('api/live/get_all_lives/', lives.get_all_lives),#获取正在直播的直播间列表
-    path('api/live/get_ranked_lives/', lives.get_ranked_lives),#获取正在直播的直播间列表（算法排序）
     path('api/live/get_live_info/', lives.get_live_info),#获取单个直播间信息
     path('api/live/get_live_chat_history/', lives.get_live_chat_history),#获取当前直播间主播历史消息数据
     path('api/live/get_user_chat_history/', lives.get_user_chat_history),#获取当前直播间用户历史消息数据   只获取最后20条数据
@@ -98,8 +97,8 @@ urlpatterns = [
     path('api/subscription/get_subscriptions/', subscription.get_subscriptions),# 用户订阅列表
 
     #关注
-    path('api/follow_live/toggle_follow_room/', follow_live.toggle_follow_room), # 用户关注直播间
-    path('api/follow_live/get_followed_rooms/', follow_live.get_followed_rooms),  # 用户关注直播间列表
+    path('api/follow/toggle_follow_user/', follow.toggle_follow_user), # 关注
+    path('api/follow/get_followed_users/', follow.get_followed_users),  # 用户关注列表
 
     #支付
     path('api/payment/process_recharge/', payment.process_recharge),  # 充值
@@ -115,8 +114,18 @@ urlpatterns = [
     path('api/fork/fork_confirm/', fork.fork_confirm),#确认fork
     path('api/fork/forked_list/', fork.forked_list),#我fork的
     path('api/fork/anchor_forked_by/', fork.anchor_forked_by),#被fork过
-
     path('api/fork/fork_chat/', fork_chat.fork_chat),#fork后续聊天
+
+    #feed
+    path('api/feed/get_latest_ai_rooms/', feedhome.get_latest_ai_rooms),#信息流页面
+    path('api/feed/get_fork_relations/', feedhome.get_fork_relations),#fork信息
+    path('api/feed/random_fork_card/', feedhome.random_fork_card),#随机foek信息
+
+    #favorite
+    path('api/favorite/favorite_card/', favorite.favorite_card),#收藏、取消收藏
+    path('api/favorite/favorite_list/', favorite.favorite_list),#收藏列表
+
+
 ]
 
 

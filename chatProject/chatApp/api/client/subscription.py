@@ -87,9 +87,7 @@ def subscribe_to_anchor(request):
 #                 payment_type='subscription',
 #                 payment_source='subscription',
 #                 amount=amount,
-#                 currency='USD',
-#                 crypto_amount=crypto_amount,
-#                 crypto_currency='USDT'
+#                 currency='ZS',
 #             )
 
             # 保存订阅信息到 Redis（过期30天）

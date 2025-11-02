@@ -1,10 +1,12 @@
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from django.db.models import Sum
-from chatApp.models import Anchor,AnchorBalance, ChatUser,UserBalance , PaymentExpenditureRecord # 假设已经定义了相关模型
+from chatApp.models import Anchor,AnchorBalance, ChatUser,UserBalance , PaymentExpenditureRecord ,PaymentDiamondFlow# 假设已经定义了相关模型
 from rest_framework import status
 from django.db import transaction
 from decimal import Decimal
+from chatApp.api.common.payment import process_diamond_payment
+
 
 # 获取用户的所有打赏记录
 @api_view(['GET'])
@@ -213,32 +215,14 @@ def make_donation(request):
                             status=status.HTTP_404_NOT_FOUND)
         anchor_name = anchor.username
 
-        # 计算 crypto_amount（1:5）
-        crypto_amount = amount / Decimal('5')
-
-        # 使用事务保证一致性
-        with transaction.atomic():
-            # 扣除用户余额
-            user_balance.balance -= amount
-            user_balance.save()
-
-            # 更新主播余额
-            anchor_balance.balance += amount
-            anchor_balance.total_received += amount
-            anchor_balance.save()
-
-            # 写入支出记录
-            expenditure_record = PaymentExpenditureRecord.objects.create(
-                user_id=user_id,
-                anchor_id=anchor_id,
-                payment_type='donation',
-                payment_source='donation',
-                amount=amount,
-                currency='USD',
-                crypto_amount=crypto_amount,
-                crypto_currency='USDT',
-            )
-
+        expenditure_record = process_diamond_payment(
+            user_id=user_id,
+            anchor_id=anchor_id,
+            amount=amount,
+            payment_type='donation',
+            payment_source='donation',
+            details=f"打赏主播 {anchor_name}（ID: {anchor_id}）"
+        )
         # 返回值保持和之前一样
         return Response({
             "code": 0,

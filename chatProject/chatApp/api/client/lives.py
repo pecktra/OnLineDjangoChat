@@ -4,28 +4,23 @@ from django_redis import get_redis_connection
 from pymongo import MongoClient
 from django.conf import settings
 import json
-import random
 from django.shortcuts import redirect, render
 from chatApp.models import ChatUserChatHistory,UserBalance,  RoomInfo, AnchorBalance, PaymentLiveroomEntryRecord,CharacterCard
 from django.utils import timezone
 from django.db.models import Subquery, OuterRef
-import hashlib
 from django.shortcuts import get_object_or_404
 from decimal import Decimal
 from django.db import transaction
-from datetime import timedelta
 from django.contrib.auth import get_user
 from django.http import JsonResponse
 import chatProject.settings as setting
-from datetime import datetime
 from chatApp.consumers import ChatConsumer
 from datetime import datetime, timedelta, timezone
 from django.utils.dateparse import parse_datetime
 import random
-from math import ceil
 from django.utils import timezone
-from urllib.parse import quote
 from chatApp.api.common.common import get_online_room_ids,build_full_image_url
+from chatApp.api.common.payment import process_diamond_payment
 
 # 获取 Redis 连接
 redis_client = get_redis_connection('default')
@@ -107,25 +102,7 @@ def get_all_lives(request):
         if last_ai_doc and "data" in last_ai_doc:
             send_date_str = last_ai_doc["data"].get("send_date")
 
-        character_card = CharacterCard.objects.filter(
-            uid=room_info.uid,
-            character_name=room_info.character_name
-        ).order_by('-create_date').first()
-
-        # ===== 修改部分：如果数据库没有图片就随机使用默认图片 =====
-        # ===== 修改部分：image_path 返回完整 URL 并处理中文 =====
-        if character_card:
-            image_name = character_card.image_name
-            # ✅ 使用工具方法拼接完整 URL
-            image_path = build_full_image_url(request, character_card.image_path.url)
-        else:
-            image_name = ""
-            # 随机选择默认图片
-            default_image_relative = random.choice(default_images)
-            # ✅ 使用工具方法 + quote 处理中文路径
-            image_path = build_full_image_url(request, quote(str(default_image_relative), safe='/'))
-        # ============================================================
-
+        image_info = build_full_image_url(request, room_info.uid, room_info.character_name)
         online_count = ChatConsumer.get_online_count(room_info.room_id)
 
         live_status_list.append({
@@ -136,10 +113,10 @@ def get_all_lives(request):
             "live_num": online_count,
             "character_name": room_info.character_name,
             "character_date": room_info.character_date,
-            "image_name": image_name,
-            "image_path": image_path,
-            "tags": character_card.tags.split(",") if character_card and character_card.tags else [],
-            "language": character_card.language if character_card else "en",
+            "image_name": image_info['image_name'],
+            "image_path": image_info['image_path'],
+            "tags": image_info['tags'],
+            "language": image_info['language'],
             "room_info": {
                 "title": room_info.title or "",
                 "describe": room_info.describe or "",
@@ -195,117 +172,6 @@ def to_naive_datetime(send_date_str):
     return dt
 
 
-@api_view(['GET'])
-def get_ranked_lives(request):
-    """
-    获取按照活跃度分数排序的正在直播的直播间列表
-    GET /api/live/get_ranked_lives
-    """
-    try:
-        # 1. 获取 Redis 中所有在线房间 UID
-        uids = [key.decode('utf-8') if isinstance(key, bytes) else key for key in redis_client.keys('*')]
-        if not uids:
-            return Response({"code": 0, "status": "success", "data": {"lives_info": []}})
-
-        room_infos = RoomInfo.objects.filter(room_id__in=uids)
-        live_status_list = []
-
-        now = datetime.utcnow()  # 使用 naive UTC datetime
-
-        for room_info in room_infos:
-            collection_name = room_info.room_id
-
-            # 2. 获取最近一条 AI 回复
-            last_ai_doc = db[collection_name].find_one(
-                {"data_type": "ai"},
-                sort=[("data.send_date", -1)]
-            )
-
-            send_date_str = None
-            ai_reply_count = 0
-            if last_ai_doc and "data" in last_ai_doc:
-                send_date_str = last_ai_doc["data"].get("send_date")
-                ai_reply_count = db[collection_name].count_documents({"data_type": "ai"})
-
-            # 3. 获取角色卡
-            character_card = CharacterCard.objects.filter(
-                room_id=room_info.room_id
-            ).order_by('-create_date').first()
-
-            # ===== 修改部分：如果数据库没有图片就随机使用默认图片 =====
-            # ===== 修改部分：image_path 返回完整 URL 并处理中文 =====
-            if character_card:
-                image_name = character_card.image_name
-                # urlquote 对中文进行编码，保证 JSON 序列化不会报错
-                image_path = request.build_absolute_uri(character_card.image_path.url)
-            else:
-                image_name = ""
-                default_image_relative = random.choice(default_images)
-                image_path = request.build_absolute_uri(
-                    f"{settings.MEDIA_URL}{quote(str(default_image_relative), safe='/')}")
-            # ============================================================
-
-            # 4. 获取在线人数
-            online_count = ChatConsumer.get_online_count(room_info.room_id)
-
-            # 5. 计算最近回复加成
-            recent_reply_bonus = 0
-            if send_date_str:
-                send_date = to_naive_datetime(send_date_str)
-                if send_date:
-                    diff = now - send_date
-                    if diff < timedelta(minutes=5):
-                        recent_reply_bonus = 10
-                    elif diff < timedelta(minutes=30):
-                        recent_reply_bonus = 5
-                    elif diff < timedelta(hours=2):
-                        recent_reply_bonus = 3
-
-            # 6. 计算活跃度分数
-            score = (online_count * 2) + (ai_reply_count * 1.5) + recent_reply_bonus
-
-            # 7. 组装返回数据
-            live_status_list.append({
-                "room_id": room_info.room_id,
-                "room_name": room_info.room_name,
-                "uid": room_info.uid,
-                "username": room_info.user_name,
-                "live_num": online_count,
-                "character_name": room_info.character_name,
-                "character_date": room_info.character_date,
-                "image_name": image_name,
-                "image_path": image_path,
-                "tags": character_card.tags.split(",") if character_card and character_card.tags else [],
-                "language": character_card.language if character_card else "en",
-                "room_info": {
-                    "title": room_info.title or "",
-                    "describe": room_info.describe or "",
-                    "coin_num": room_info.coin_num if room_info.coin_num is not None else 0,
-                    "room_type": room_info.room_type or 0
-                },
-                "last_ai_reply": send_date_str,
-                "ai_reply_count": ai_reply_count,
-                "score": score
-            })
-
-        # 8. 按 score 降序排序
-        live_status_list.sort(key=lambda x: x["score"], reverse=True)
-
-        return Response({
-            "code": 0,
-            "status": "success",
-            "data": {"lives_info": live_status_list}
-        })
-
-    except Exception as e:
-        import traceback
-        print(f"错误详情: {traceback.format_exc()}")
-        return Response({
-            "code": 1,
-            "status": "error",
-            "message": str(e)
-        }, status=500)
-
 
 @api_view(['GET'])
 def get_live_info(request):
@@ -357,21 +223,7 @@ def get_live_info(request):
             except json.JSONDecodeError:
                 print("Error decoding subscription data:", subscription_data)
 
-        # 角色卡信息
-        character_card = CharacterCard.objects.filter(room_id=room_info.room_id).order_by('-create_date').first()
-        if character_card:
-            image_name = character_card.image_name
-            image_path = request.build_absolute_uri(character_card.image_path.url)
-            tags = character_card.tags.split(",") if character_card.tags else []
-            language = character_card.language or "en"
-        else:
-            image_name = ""
-            default_image_relative = random.choice(default_images)
-            image_path = request.build_absolute_uri(
-                f"{settings.MEDIA_URL}{quote(str(default_image_relative), safe='/')}")
-            tags = []
-            language = "en"
-
+        image_info = build_full_image_url(request, room_info.uid, room_info.character_name)
         # 检查最近一小时 AI 是否有回复
         collection_name = room_info.room_id
         one_hour_ago = timezone.now() - timezone.timedelta(hours=1)
@@ -404,10 +256,10 @@ def get_live_info(request):
             "uid": room_info.uid,
             "username": username,
             "character_name": room_info.character_name,
-            "image_name": image_name,
-            "image_path": image_path,
-            "tags": tags,
-            "language": language,
+            "image_name": image_info['image_name'],
+            "image_path": image_info['image_path'],
+            "tags": image_info['tags'],
+            "language": image_info['language'],
             "live_status": live_status,
             "title": room_info.title,
             "describe": room_info.describe,
@@ -667,43 +519,14 @@ def pay_vip_coin(request):
             defaults={'balance': Decimal(0), 'total_received': Decimal(0)}
         )
 
-        # 计算 crypto_amount，按 5:1 比例
-        crypto_amount = pay_coin_num / Decimal(5)
-
-        with transaction.atomic():
-            # 扣除用户余额
-            user_balance.balance -= pay_coin_num
-            user_balance.save()
-
-            # 增加主播余额
-            anchor_balance.balance += pay_coin_num
-            anchor_balance.total_received += pay_coin_num
-            anchor_balance.save()
-
-            # 创建直播间进入记录
-            entry_record = PaymentLiveroomEntryRecord.objects.create(
-                user_id=user_id,
-                anchor_id=anchor_id,
-                room_name=room_name,
-                amount=pay_coin_num,
-                currency="USD",
-                crypto_amount=crypto_amount,
-                crypto_currency="USDT"
-            )
-
-        # 返回值保持原接口格式
-        return Response({
-            "code": 0,
-            "message": "VIP payment successful",
-            "data": {
-                "user_id": user_id,
-                "room_name": room_name,
-                "anchor_id": anchor_id,
-                "pay_coin_num": float(pay_coin_num),
-                "entry_date": entry_record.id,  # 用 id 代替时间字段
-                "remaining_balance": float(user_balance.balance)
-            }
-        }, status=200)
+        expenditure_record = process_diamond_payment(
+            user_id=user_id,
+            anchor_id=anchor_id,
+            amount=pay_coin_num,
+            payment_type='room_entry',  # ✅ 指明类型
+            payment_source='room_entry',  # ✅ 保留字段
+            details=f"进入VIP房间 {room_name}（主播ID: {anchor_id}）"
+        )
 
     except Exception as e:
         return Response({"code": 1, "message": f"Internal server error: {str(e)}"}, status=500)

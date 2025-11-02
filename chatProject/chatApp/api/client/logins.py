@@ -24,7 +24,7 @@ from django.shortcuts import redirect
 from django.contrib.auth import get_user
 from rest_framework.response import Response
 from django.contrib.auth import logout
-from chatApp.api.common.common import add_diamond_balance
+from chatApp.api.common.payment import process_referral_reward
 
 
 def generate_random_username():
@@ -153,10 +153,6 @@ def google_oauth2_callback(request):
     if user.avatar != google_avatar:
         user.avatar = google_avatar
         user_updated = True
-    if not user.referrer_id and referrer_id:
-        user.referrer_id = referrer_id
-        user_updated = True
-
     if user_updated:
         user.save()
 
@@ -169,18 +165,17 @@ def google_oauth2_callback(request):
     request.session['user_id'] = user.id
     request.session.save()
 
-    # if referrer_id:
-    #     try:
-    #         reward_amount = 10  # 每人奖励钻石数量
-    #         # 被邀请人奖励
-    #         add_diamond_balance(user.id, reward_amount)
-    #         # 邀请人奖励
-    #         add_diamond_balance(referrer_id, reward_amount)
-    #         print(f"[Reward] Inviter {referrer_id} and Invitee {user.id} each received {reward_amount} diamonds.")
-    #     except Exception as e:
-    #         print(f"[Reward Error] {e}")
+    # ✅ 仅在用户首次绑定时设置邀请人
+    if not user.referrer_id and referrer_id:
+        user.referrer_id = referrer_id
+        user_updated = True
+        # 首次绑定才发放邀请奖励
+        process_referral_reward(user.id, referrer_id)
 
-    # 成功后重定向（例如跳转前端首页或来源页）
+    if user_updated:
+        user.save()
+
+    #成功后重定向（例如跳转前端首页或来源页）
 
     site_domain = os.environ.get('SITE_DOMAIN')
     return redirect(site_domain)

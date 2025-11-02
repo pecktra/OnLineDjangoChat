@@ -63,21 +63,18 @@ def import_card(request):
         nsfw_keywords = {"Not Safe for Work", "NotSafeforWork", "NSFW", "nsfw"}
         is_private = 1 if any(tag.strip() in nsfw_keywords for tag in tags_list) else 0
 
-        # NSFW 检测逻辑：AI 检测关键字段 -> 关键词匹配
+        # NSFW 检测逻辑：如果未标记 NSFW，则直接把整个 character_json 传给 AI
         if is_private == 0:
-            # 先用 AI 检测关键字段
-            for text in [
-                data.get("description", ""),
-                data.get("first_mes", ""),
-                data.get("personality", ""),
-                data.get("background_story", "")
-            ]:
-                if text and text.strip():
-                    ai_result = is_nsfw(text.strip())
-                    if ai_result.get("is_nsfw"):
-                        tags_list.append("NSFW")
-                        is_private = 1
-                        break
+            # 将 JSON 转字符串，并限制长度避免超限
+            json_text = json.dumps(character_json, ensure_ascii=False)
+            MAX_LENGTH = 250000 # 根据 API 限制，可调整
+            json_text = json_text[:MAX_LENGTH]
+
+            ai_result = is_nsfw(json_text)
+            print(ai_result)
+            if ai_result.get("is_nsfw"):
+                tags_list.append("NSFW")
+                is_private = 1
 
         tags = ",".join(tags_list) if tags_list else None
 

@@ -45,6 +45,7 @@ def fork_chat(request):
     current_message = request.data.get('message')
 
     character_card = CharacterCard.objects.filter(room_id=room_id).first()
+
     character_name = character_card.character_name
     character_date = character_card.character_data
     character_user_name = character_card.username
@@ -79,13 +80,21 @@ def fork_chat(request):
 
     # 构造 Gemini API 的 contents
     contents = []
-
-    entries = character_data_json.get("data").get("character_book").get("entries")
-    character_description = character_data_json.get("description")
-    character_regex_scripts = character_data_json.get("data").get("extensions").get("regex_scripts")
     entrie = ""
-    for row in entries:
-        entrie += row.get("content")
+    character_regex_scripts = ""
+    character_book = character_data_json.get("data").get("character_book","")
+    
+    if character_book:
+        entries = character_book.get("entries","")
+        if entries:
+            for row in entries:
+                entrie += row.get("content")
+    character_description = character_data_json.get("description","")
+    extensions = character_data_json.get("data").get("extensions","")
+    if extensions:
+        character_regex_scripts = extensions.get("regex_scripts")
+
+
 
     first_mes = first_mes_model.replace('{{character_description}}', character_description).replace('{{entrie}}', entrie).replace('{{user}}', character_user_name)
     # contents.append({"text":first_mes})
@@ -203,8 +212,8 @@ def fork_chat(request):
             depth=0,
             character_regex_scripts=character_regex_scripts
         )
-        print("mes_html")
-        print(mes_html)
+        # print("mes_html")
+        # print(mes_html)
         # 获取当前日期时间（或指定日期时间）
         current_date = datetime.now()  # 当前时间
         # 或者指定具体日期时间，例如：

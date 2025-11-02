@@ -155,8 +155,6 @@ def fork_confirm(request):
         target_id = request.data.get('target_id')
         room_id = request.data.get('room_id')
         floor = request.data.get('last_floor')
-        title = request.data.get('title', '')
-        describe = request.data.get('describe', '')
 
         if not all([target_id, room_id, floor]):
             return Response({"success": False, "message": "缺少必要参数"}, status=400)
@@ -172,13 +170,12 @@ def fork_confirm(request):
             return Response({"success": False, "message": "原房间不存在"}, status=404)
 
         # 获取角色卡信息
-        character_card = CharacterCard.objects.filter(room_id=room_id).first()
+        character_card = CharacterCard.objects.filter(uid=origin_room.uid,character_name=origin_room.character_name).first()
         character_name = character_card.character_name if character_card else "UnknownCharacter"
         is_private = int(character_card.is_private) if character_card else 0
 
         # 生成新房间 name 和 id
         new_room_name = generate_new_room_name(origin_room.uid, character_name)
-        print(new_room_name)
 
         new_room_id, character_date = generate_new_room_id(user.id, character_name)
 
@@ -190,8 +187,6 @@ def fork_confirm(request):
             room_name=new_room_name,
             character_name=character_name,
             character_date=character_date,
-            title=title,
-            describe=describe,
             room_type=origin_room.room_type,
             file_name=origin_room.file_name,
             file_branch='branch',
@@ -248,7 +243,7 @@ def fork_confirm(request):
 
         # 复制角色卡信息
         try:
-            origin_cards = CharacterCard.objects.filter(room_id=room_id)
+            origin_cards = CharacterCard.objects.filter(uid=origin_room.uid,character_name=origin_room.character_name)
             for card in origin_cards:
                 CharacterCard.objects.create(
                     room_id=new_room_id,
