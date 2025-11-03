@@ -91,8 +91,12 @@ def chat_data(request):
         # 设置 Redis
         redis_client.set(room_id, "start")
 
-        # MongoDB 插入数据
+        # MongoDB 插入数据（带楼层）
         collection = db[room_id]
+
+        # ✅ 每条消息都是一层楼
+        floor_count = collection.count_documents({}) + 1
+
         collection.insert_one({
             "username": username,
             "uid": uid,
@@ -102,9 +106,9 @@ def chat_data(request):
             "room_name": room_name,
             "data_type": data_type,
             "data": data,
-            "mes_html": mes_html
+            "mes_html": mes_html,
+            "floor": floor_count  # ✅ 新增楼层字段
         })
-
         # 准备转发数据
         send_data = {
             'uid': uid,

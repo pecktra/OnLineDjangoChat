@@ -31,12 +31,14 @@ def get_room_chat(request):
 
     try:
         collection = db[room_id]
-        chat_records = list(collection.find({}).sort("_id", 1))  # 按时间排序
+        # ✅ 用 floor 字段排序，而不是 _id
+        chat_records = list(collection.find({}).sort("floor", 1))
 
         result = []
-        for index, item in enumerate(chat_records, start=1):
-            # ✅ 跳过 <= last_floor 的记录，只取比它新的
-            if index <= last_floor:
+        for item in chat_records:
+            floor = item.get("floor", 0)
+            # ✅ 跳过 <= last_floor 的记录
+            if floor <= last_floor:
                 continue
 
             data = item.get("data", {})
@@ -48,9 +50,9 @@ def get_room_chat(request):
             }
 
             result.append({
-                "floor": index,
+                "floor": floor,
                 "data_type": item.get("data_type"),
-                "data": filtered_data,  # ✅ 精简后的 data
+                "data": filtered_data,
                 "mes_html": item.get("mes_html", "")
             })
 
