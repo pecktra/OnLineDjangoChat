@@ -59,10 +59,11 @@ def fork_chat(request):
     
     # 格式化为 "September 30, 2025 5:51pm"
     formatted_date = current_date.strftime("%B %d, %Y %I:%M%p").replace("AM", "am").replace("PM", "pm")
-    
+
     
     #将数据写入mongodb
     collection = db[room_id]
+    floor_user = collection.count_documents({}) + 1
     collection.insert_one({
         "username": user_name,
         "uid": user_id,
@@ -72,7 +73,8 @@ def fork_chat(request):
         "room_name": "",
         "data_type": "user",
         "data": {"name":user_name,"is_user":True,"send_date":formatted_date,"mes":current_message},
-        "mes_html": current_message
+        "mes_html": current_message,
+        "floor": floor_user
     })
 
 
@@ -222,6 +224,8 @@ def fork_chat(request):
         # 格式化为 "September 30, 2025 5:51pm"
         formatted_date = current_date.strftime("%B %d, %Y %I:%M%p").replace("AM", "am").replace("PM", "pm")
 
+        floor_ai = collection.count_documents({}) + 1
+
         collection.insert_one({
             "username": user_name,
             "uid": user_id,
@@ -231,7 +235,8 @@ def fork_chat(request):
             "room_name": "",
             "data_type": "ai",
             "data": {"name":character_name,"is_user":False,"send_date":formatted_date,"mes":response_text},
-            "mes_html": mes_html
+            "mes_html": mes_html,
+            "floor": floor_ai
         })
         return Response({
             "code": 0,
