@@ -68,6 +68,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'chatApp.middleware.ip_rate_limit.IpRateLimitMiddleware'
 ]
 
 # 启用压缩和缓存（可选）

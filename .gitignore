@@ -11,3 +11,4 @@ backup.sql
 *.txt
 nohup.out
 .env
++chatProject/staticfiles/
