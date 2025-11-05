@@ -424,3 +424,22 @@ class PaymentDiamondFlow(models.Model):
         db_table = "payment_diamond_flow"
         verbose_name = "平台币流水"
         verbose_name_plural = verbose_name
+
+        
+class IPBlacklist(models.Model):
+    """
+    IP 黑名单表：记录被封禁的 IP 及其访问的接口
+    """
+    ip = models.GenericIPAddressField(verbose_name="IP 地址", unique=True)
+    path = models.CharField(max_length=255, null=True, blank=True, verbose_name="访问接口路径")
+    reason = models.CharField(max_length=255, null=True, blank=True, verbose_name="封禁原因")
+    is_active = models.BooleanField(default=True, verbose_name="是否启用封禁")
+    created_at = models.DateTimeField(default=timezone.now, verbose_name="创建时间")
+
+    class Meta:
+        db_table = "ip_blacklist"
+        verbose_name = "IP 黑名单"
+        verbose_name_plural = "IP 黑名单"
+
+    def __str__(self):
+        return f"{self.ip} - {'封禁中' if self.is_active else '已解封'}"
