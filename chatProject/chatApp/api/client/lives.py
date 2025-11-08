@@ -29,13 +29,6 @@ redis_client = get_redis_connection('default')
 client = MongoClient(settings.MONGO_URI)
 db = client[settings.MONGO_DB_NAME]
 
-
-# 默认图片列表
-default_images = [
-    "headimage/default_image1.png",
-    "headimage/default_image2.png"
-]
-
 def parse_send_date(send_date_str):
     """
     将 MongoDB 中的 send_date 字符串解析为 datetime 对象

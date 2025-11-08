@@ -7,6 +7,7 @@ import redis
 from django_redis import get_redis_connection
 import random
 from chatApp.models import CharacterCard
+import os
 # 建立 Redis 连接
 redis_client = get_redis_connection('default')
 
@@ -18,17 +19,15 @@ def build_full_image_url(request, uid, character_name):
     1. 查询 CharacterCard 获取最新记录：
         - 存在记录：返回 image_name、完整 image_path、tags（列表）、language
         - 不存在记录：随机选择默认图片，image_name 空，tags 空，language 'en'
-
-    :param request: 当前 Django request 对象
-    :param uid: 角色所属用户 uid
-    :param character_name: 角色名
-    :return: dict 包含 image_name, image_path, tags, language
     """
-    # 默认图片列表（相对路径）
+    # 默认图片相对路径
     default_images = [
-        "/static/images/default1.png",
-        "/static/images/default2.png",
+        "media/headimage/default_image1.png",
+        "media/headimage/default_image2.png"
     ]
+
+    # 从 settings 读取站点域名
+    site_domain = getattr(settings, "SITE_DOMAIN")
 
     character_card = CharacterCard.objects.filter(
         uid=uid,
@@ -42,8 +41,9 @@ def build_full_image_url(request, uid, character_name):
         language = character_card.language or "en"
     else:
         image_name = ""
+        # 拼接域名与默认路径
         default_image_relative = random.choice(default_images)
-        image_path = request.build_absolute_uri(quote(str(default_image_relative), safe='/'))
+        image_path = f"{site_domain}/{quote(default_image_relative, safe='/')}"
         tags = []
         language = "en"
 
@@ -53,7 +53,6 @@ def build_full_image_url(request, uid, character_name):
         "tags": tags,
         "language": language
     }
-
 
 
 def generate_new_room_id(user_id: str, character_name: str) -> str:
