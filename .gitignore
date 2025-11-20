@@ -12,3 +12,16 @@ backup.sql
 nohup.out
 .env
 +chatProject/staticfiles/
+chatProject/staticfiles/admin/css/*
+chatProject/staticfiles/admin/img/*
+chatProject/staticfiles/admin/js/*
+chatProject/staticfiles/css/*
+chatProject/staticfiles/images/*
+chatProject/staticfiles/js/*
+chatProject/staticfiles/lib/*
+chatProject/staticfiles/rest_framework/css/*
+chatProject/staticfiles/rest_framework/docs/*
+chatProject/staticfiles/rest_framework/fonts/*
+chatProject/staticfiles/rest_framework/img/*
+chatProject/staticfiles/rest_framework/js/*
+chatProject/staticfiles/svg/*
