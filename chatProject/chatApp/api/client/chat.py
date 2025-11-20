@@ -3,8 +3,11 @@ from rest_framework.response import Response
 from pymongo import MongoClient
 from django.conf import settings
 import traceback
+from datetime import timezone                  # ← 正确导入 UTC
+from dateutil import parser                    # ← 万能时间解析
 
-# ✅ 统一初始化 MongoDB 连接
+
+# 统一初始化 MongoDB 连接
 client = MongoClient(settings.MONGO_URI)
 db = client[settings.MONGO_DB_NAME]
 
@@ -23,7 +26,6 @@ def get_room_chat(request):
     if not room_id:
         return Response({"code": 1, "message": "Missing room_id parameter"}, status=400)
 
-    # 默认从 0 楼开始（即全量拉取）
     try:
         last_floor = int(request.GET.get("last_floor", 0))
     except ValueError:
@@ -31,21 +33,24 @@ def get_room_chat(request):
 
     try:
         collection = db[room_id]
-        # ✅ 用 floor 字段排序，而不是 _id
         chat_records = list(collection.find({}).sort("floor", 1))
 
         result = []
         for item in chat_records:
             floor = item.get("floor", 0)
-            # ✅ 跳过 <= last_floor 的记录
             if floor <= last_floor:
                 continue
 
             data = item.get("data", {})
+
+            send_date_str = data.get("send_date")
+            send_date = parser.parse(send_date_str).astimezone(timezone.utc).isoformat(timespec='seconds') + 'Z' \
+                if send_date_str else None
+
             filtered_data = {
                 "name": data.get("name"),
                 "is_user": data.get("is_user"),
-                "send_date": data.get("send_date"),
+                "send_date": send_date,
                 "mes": data.get("mes")
             }
 

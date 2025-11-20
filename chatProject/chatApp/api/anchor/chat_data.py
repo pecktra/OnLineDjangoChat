@@ -88,9 +88,6 @@ def chat_data(request):
         room_id = hashlib.sha1(f"{uid}_{character_name}_{character_date}".encode('utf-8')).hexdigest()[:16]
         room_name = f"{uid}_{character_name}_{character_date}"
 
-        # 设置 Redis
-        redis_client.set(room_id, "start")
-
         # MongoDB 插入数据（带楼层）
         collection = db[room_id]
 
@@ -109,16 +106,16 @@ def chat_data(request):
             "mes_html": mes_html,
             "floor": floor_count  # ✅ 新增楼层字段
         })
-        # 准备转发数据
-        send_data = {
-            'uid': uid,
-            'username': username,
-            'is_user': data.get('is_user', False),
-            'sender_name': data.get('name') if data.get('is_user', False) else character_name,
-            'send_date': data.get('send_date', ''),
-            'live_message': data.get('mes', ''),
-            'live_message_html': mes_html
-        }
+        # # 准备转发数据
+        # send_data = {
+        #     'uid': uid,
+        #     'username': username,
+        #     'is_user': data.get('is_user', False),
+        #     'sender_name': data.get('name') if data.get('is_user', False) else character_name,
+        #     'send_date': data.get('send_date', ''),
+        #     'live_message': data.get('mes', ''),
+        #     'live_message_html': mes_html
+        # }
 
         # 如果是创建房间，插入 MySQL
         if isNewCreated:

@@ -228,6 +228,7 @@ class RoomInfo(models.Model):
     is_info = models.IntegerField(verbose_name="是否添加info",null=True)
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="房间创建时间")
     updated_at = models.DateTimeField(auto_now=True, verbose_name="房间最后更新时间")
+    last_ai_reply_timestamp = models.FloatField(default=0, verbose_name="最后 AI 回复时间戳")
 
     class Meta:
         db_table = 'room_info'  # 设置表名
@@ -425,7 +426,7 @@ class PaymentDiamondFlow(models.Model):
         verbose_name = "平台币流水"
         verbose_name_plural = verbose_name
 
-        
+
 class IPBlacklist(models.Model):
     """
     IP 黑名单表：记录被封禁的 IP 及其访问的接口
@@ -443,3 +444,25 @@ class IPBlacklist(models.Model):
 
     def __str__(self):
         return f"{self.ip} - {'封禁中' if self.is_active else '已解封'}"
+
+
+
+class Preset(models.Model):
+    """
+    主播预设
+    """
+    room_id = models.CharField(max_length=255, verbose_name="room_id")
+    preset_settings_openai = models.CharField(max_length=255, verbose_name="预设名称")
+    temp_openai = models.FloatField(max_length=10, verbose_name="")
+    top_k_openai = models.IntegerField(max_length=10, verbose_name="")
+    top_p_openai = models.FloatField(max_length=10, verbose_name="")
+    openai_max_context = models.IntegerField(max_length=10, verbose_name="")
+    openai_max_tokens = models.IntegerField(max_length=10, verbose_name="")
+    google_model = models.CharField(max_length=255, verbose_name="模型名称")
+    model_n  = models.IntegerField(max_length=10, verbose_name="")
+    preset_json = models.TextField(verbose_name="")
+
+    class Meta:
+        db_table = "preset"
+
+

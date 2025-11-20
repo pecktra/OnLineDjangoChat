@@ -5,8 +5,10 @@ from pymongo import MongoClient
 from django.conf import settings
 import json
 from django.shortcuts import redirect, render
-from chatApp.models import ChatUserChatHistory,UserBalance,  RoomInfo, AnchorBalance, PaymentLiveroomEntryRecord,CharacterCard
+from chatApp.models import ChatUserChatHistory, UserBalance, RoomInfo, AnchorBalance, PaymentLiveroomEntryRecord, \
+    ChatUser, CharacterCard,UserFollowRelation
 from django.utils import timezone
+from datetime import datetime
 from django.db.models import Subquery, OuterRef
 from django.shortcuts import get_object_or_404
 from decimal import Decimal
@@ -15,12 +17,13 @@ from django.contrib.auth import get_user
 from django.http import JsonResponse
 import chatProject.settings as setting
 from chatApp.consumers import ChatConsumer
-from datetime import datetime, timedelta, timezone
 from django.utils.dateparse import parse_datetime
-import random
-from django.utils import timezone
-from chatApp.api.common.common import get_online_room_ids,build_full_image_url
+from chatApp.api.common.common import get_online_room_ids, build_full_image_url, IDCursorPagination
 from chatApp.api.common.payment import process_diamond_payment
+from rest_framework.pagination import CursorPagination
+from rest_framework.decorators import permission_classes
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.pagination import PageNumberPagination
 
 # 获取 Redis 连接
 redis_client = get_redis_connection('default')
@@ -28,6 +31,7 @@ redis_client = get_redis_connection('default')
 # 初始化 MongoDB 连接
 client = MongoClient(settings.MONGO_URI)
 db = client[settings.MONGO_DB_NAME]
+
 
 def parse_send_date(send_date_str):
     """
@@ -45,105 +49,105 @@ def parse_send_date(send_date_str):
             return None
 
 
+
+
 @api_view(['GET'])
 def get_all_lives(request):
     """
-    获取正在直播的直播间列表，支持 tags 搜索 + 分页
-    GET /api/live/get_all_lives?tags=<tag>&page=<page>
+    获取正在直播的直播间列表，支持 tags 搜索 + CursorPagination
+    GET /api/live/get_all_lives?tags=<tag>
     """
-    # 获取 tags 参数
     search_tag = request.GET.get("tags", "").strip()
-    page = int(request.GET.get("page", 1))  # 当前页，默认 1
-    per_page = 12  # 每页 12 条
 
-    # 1. 获取 Redis 中所有 uid
-    uids = get_online_room_ids()
+    # 1️⃣ 查询 RoomInfo，只查公开房间
+    room_infos = RoomInfo.objects.filter(is_show=0, file_branch='main')
 
-    if not uids:
-        return Response({"code": 0, "data": {"lives_info": [], "page": page, "total_pages": 0, "total": 0}})
-
-    # 2. 查询 RoomInfo 获取 room_id，只查 Redis 在线的
-    room_infos = RoomInfo.objects.filter(room_id__in=uids).exclude(is_show=1)
-
-    # 3. 如果有 tags 搜索，则过滤 room_infos
+    # 2️⃣ 处理 tags 过滤
     if search_tag:
-        filtered_room_ids = []
-        for room_info in room_infos:
-            character_card = CharacterCard.objects.filter(room_id=room_info.room_id).order_by('-create_date').first()
-            if not character_card:
+        filtered_ids = []
+        for room in room_infos:
+            card = CharacterCard.objects.filter(room_id=room.room_id).order_by(
+                '-create_date').first()
+            if not card:
                 continue
+            if search_tag in ['en', 'cn'] and card.language == search_tag:
+                filtered_ids.append(room.room_id)
+            elif card.tags and search_tag in card.tags.split(','):
+                filtered_ids.append(room.room_id)
+        room_infos = room_infos.filter(room_id__in=filtered_ids)
 
-            if search_tag in ['en', 'cn']:
-                if character_card.language == search_tag:
-                    filtered_room_ids.append(room_info.room_id)
-            else:
-                if character_card.tags and search_tag in character_card.tags.split(','):
-                    filtered_room_ids.append(room_info.room_id)
-
-        room_infos = room_infos.filter(room_id__in=filtered_room_ids)
-
-    live_status_list = []
-    for room_info in room_infos:
-        collection_name = room_info.room_id
-
-        last_ai_doc = db[collection_name].find_one(
+    # 3️⃣ 更新每个 room 的 last_ai_reply_timestamp
+    for room in room_infos:
+        collection = db[room.room_id]
+        last_ai_doc = collection.find_one(
             {"data_type": "ai"},
             sort=[("data.send_date", -1)]
         )
-
-        send_date_str = None
         if last_ai_doc and "data" in last_ai_doc:
             send_date_str = last_ai_doc["data"].get("send_date")
+            dt = parse_send_date(send_date_str)
+            if dt:
+                timestamp = dt.timestamp()
+                if room.last_ai_reply_timestamp != timestamp:
+                    RoomInfo.objects.filter(pk=room.pk).update(last_ai_reply_timestamp=timestamp)
 
-        image_info = build_full_image_url(request, room_info.uid, room_info.character_name)
-        online_count = ChatConsumer.get_online_count(room_info.room_id)
+    # ✅ 直接调用你封装好的 IDCursorPagination（带无域名 next/previous）
+    paginator = IDCursorPagination()
+    paginator.ordering = '-last_ai_reply_timestamp'
+    paginated_rooms = paginator.paginate_queryset(room_infos, request)
 
-        live_status_list.append({
-            "room_id": room_info.room_id,
-            "room_name": room_info.room_name,
-            "uid": room_info.uid,
-            "username": room_info.user_name,
+    # 5️⃣ 构建返回数据（去除 nickname）
+    lives_info = []
+
+    for room in paginated_rooms:
+        image_info = build_full_image_url(request, room.uid, room.character_name)
+        online_count = ChatConsumer.get_online_count(room.room_id)
+
+        # 删除了获取 nickname 的部分
+        lives_info.append({
+            "room_id": room.room_id,
+            "room_name": room.room_name,
+            "uid": room.uid,
+            "username": room.user_name,
             "live_num": online_count,
-            "character_name": room_info.character_name,
-            "character_date": room_info.character_date,
+            "character_name": room.character_name,
+            "character_date": room.character_date,
             "image_name": image_info['image_name'],
             "image_path": image_info['image_path'],
             "tags": image_info['tags'],
             "language": image_info['language'],
             "room_info": {
-                "title": room_info.title or "",
-                "describe": room_info.describe or "",
-                "coin_num": room_info.coin_num if room_info.coin_num is not None else 0,
-                "room_type": room_info.room_type or 0
+                "title": room.title or "",
+                "describe": room.describe or "",
+                "coin_num": room.coin_num if room.coin_num is not None else 0,
+                "room_type": room.room_type or 0
             },
-            "last_ai_reply": send_date_str,
+            "last_ai_reply_timestamp": room.last_ai_reply_timestamp
         })
 
-    # 排序：按 last_ai_reply 降序，无 AI 回复排后面
-    live_status_list.sort(
-        key=lambda x: (
-            x["last_ai_reply"] is None,
-            -(parse_send_date(x["last_ai_reply"]).timestamp() if x["last_ai_reply"] else 0)
-        )
-    )
+    # ✅ 使用你封装好的分页响应结构
+    # 获取分页后的 URL，并确保它们是完整的 URL
+    next_link = paginator.get_next_link()
+    previous_link = paginator.get_previous_link()
 
-    # ===== 分页逻辑 =====
-    # total = len(live_status_list)
-    # total_pages = ceil(total / per_page)
-    # start = (page - 1) * per_page
-    # end = start + per_page
-    # paginated_list = live_status_list[start:end]
-    # ==================
+    # 如果分页链接存在，转化为完整的 URL
+    if next_link:
+        next_link = request.build_absolute_uri(next_link)
 
+    if previous_link:
+        previous_link = request.build_absolute_uri(previous_link)
+
+    # 返回分页后的响应
     return Response({
         "code": 0,
+        "message": "Success",
         "data": {
-            "lives_info": live_status_list
-            # "page": page,
-            # "total_pages": total_pages,
-            # "total": total
+            "next": next_link,
+            "previous": previous_link,
+            "results": lives_info
         }
     })
+
 
 def to_naive_datetime(send_date_str):
     """
@@ -165,7 +169,6 @@ def to_naive_datetime(send_date_str):
     return dt
 
 
-
 @api_view(['GET'])
 def get_live_info(request):
     """
@@ -182,10 +185,6 @@ def get_live_info(request):
         room_info = RoomInfo.objects.filter(room_id=room_id).first()
         if not room_info:
             return Response({"code": 1, "message": "Room not found"}, status=404)
-
-        # 检查直播状态
-        status_str = redis_client.get(room_id)
-        live_status = status_str.decode('utf-8').strip().lower() == "start" if status_str else False
 
         username = room_info.user_name
 
@@ -217,30 +216,52 @@ def get_live_info(request):
                 print("Error decoding subscription data:", subscription_data)
 
         image_info = build_full_image_url(request, room_info.uid, room_info.character_name)
-        # 检查最近一小时 AI 是否有回复
-        collection_name = room_info.room_id
-        one_hour_ago = timezone.now() - timezone.timedelta(hours=1)
-        last_ai_doc = db[collection_name].find_one({"data_type": "ai"}, sort=[("data.send_date", -1)])
 
+        # ✅ 使用 RoomInfo 的 last_ai_reply_timestamp 判断最近一小时 AI 是否有回复
+        one_hour_ago = timezone.now() - timezone.timedelta(hours=1)
         ai_replied_recently = False
-        if last_ai_doc and "data" in last_ai_doc:
-            send_date_str = last_ai_doc["data"].get("send_date")
-            if send_date_str:
-                try:
-                    from datetime import datetime
-                    try:
-                        send_date = datetime.strptime(send_date_str, "%B %d, %Y %I:%M%p")
-                    except ValueError:
-                        send_date = datetime.strptime(send_date_str, "%Y-%m-%d %H:%M:%S")
-                    send_date = timezone.make_aware(send_date, timezone.get_current_timezone())
-                    if send_date >= one_hour_ago:
-                        ai_replied_recently = True
-                except Exception as e:
-                    print(f"Error parsing send_date: {e}")
+        if room_info.last_ai_reply_timestamp:
+            last_ai_time = datetime.fromtimestamp(room_info.last_ai_reply_timestamp, tz=timezone.get_current_timezone())
+            if last_ai_time >= one_hour_ago:
+                ai_replied_recently = True
+
+        # 收藏状态
+        favorite_status = 0
+        try:
+            favorite = Favorite.objects.filter(uid=user.id, room_id=room_id, status=1).first()
+            if favorite:
+                favorite_status = 1
+        except:
+            favorite_status = 0
+
+        favorite_info = {
+            "favorite_status": favorite_status
+        }
+
+        follow_status = False
+        try:
+            follow_relation = UserFollowRelation.objects.filter(
+                follower_id=str(user.id),
+                followed_id=str(room_info.uid),
+                status=True  # 只算有效关注
+            ).first()
+            if follow_relation:
+                follow_status = True
+        except Exception as e:
+            print("Error fetching follow status:", e)
+            follow_status = False
 
         follow_info = {
-            "follow_status": False
+            "follow_status": follow_status
         }
+
+        nickname = ""
+        try:
+            chat_user = ChatUser.objects.filter(id=user.id).first()
+            if chat_user and chat_user.nickname:
+                nickname = chat_user.nickname
+        except:
+            nickname = ""
 
         # 返回数据
         live_info = {
@@ -248,12 +269,12 @@ def get_live_info(request):
             "room_name": room_info.room_name,
             "uid": room_info.uid,
             "username": username,
+            "nickname": nickname,
             "character_name": room_info.character_name,
             "image_name": image_info['image_name'],
             "image_path": image_info['image_path'],
             "tags": image_info['tags'],
             "language": image_info['language'],
-            "live_status": live_status,
             "title": room_info.title,
             "describe": room_info.describe,
             "live_num": ChatConsumer.get_online_count(room_info.room_id),
@@ -266,77 +287,19 @@ def get_live_info(request):
                 "live_info": live_info,
                 "vip_info": vip_info,
                 "subscription_info": subscription_info,
-                "follow_info":follow_info
-
+                "follow_info": follow_info,
+                "favorite_info": favorite_info
             }
         })
 
     except Exception as e:
         return Response({"code": 1, "message": f"Internal server error: {str(e)}"}, status=500)
 
-@api_view(['GET'])
-def get_live_chat_history(request):
-    """
-    获取当前直播间主播历史消息数据
-    GET /api/live/get_live_chat_history?room_name=<room_name>
-    """
-    room_id = request.GET.get("room_id")
-    if not room_id:
-        return Response({"code": 1, "message": "Missing room_id"}, status=400)
+class ChatHistoryPagination(PageNumberPagination):
+    page_size = 10  # 每页返回的条目数
+    page_size_query_param = 'page_size'  # 可选的分页大小参数
+    max_page_size = 100  # 最大页大小
 
-    try:
-        # 使用 room_name 访问集合
-        collection = db[room_id]
-        room_data = collection.find_one({"room_id": room_id})
-
-        if not room_data:
-            return Response({"code": 1, "message": "Room not found in database."}, status=404)
-
-        # # 提取 uid 和 character_name
-        # uid = room_name[:room_name.rfind('_')]
-        # character_name = room_name[room_name.rfind('_') + 1:]
-
-        # 使用 room_id 访问聊天数据集合
-        collection = db.get_collection(room_id)
-        chat_history = collection.find()
-
-        # 获取主播的 username（从 room_data 中提取）
-        username = room_data.get("username")
-        room_name = room_data.get("room_name")
-        uid = room_data.get("uid")
-        # 格式化聊天历史
-        chat_info = []
-        for message in chat_history:
-            data = message.get("data", {})
-            live_message = data.get("mes")
-            live_message_html = message.get("mes_html","")
-            send_date = data.get("send_date")
-            message_username = data.get("name", "Unknown")
-            is_user = data.get("is_user", False)
-
-            sender_name = message_username if is_user else message.get("character_name", "ai")
-            chat_info.append({
-                "is_user": is_user,
-                "live_message": live_message,
-                "live_message_html":live_message_html,
-                "sender_name": sender_name,
-                "send_date": send_date
-            })
-
-
-        return Response({
-            "code": 0,
-            "data": {
-                "room_name": room_name,
-                "room_id": room_id,
-                "uid": uid,
-                "username": username,  # 使用主播的 username
-                "chat_info": chat_info
-            }
-        })
-
-    except Exception as e:
-        return Response({"code": 1, "message": f"Internal server error: {str(e)}"}, status=500)
 
 @api_view(['GET'])
 def get_user_chat_history(request):
@@ -356,119 +319,91 @@ def get_user_chat_history(request):
         if not room_data:
             return Response({"code": 1, "message": "Room not found in database."}, status=404)
 
-
-        character_name = room_data.get("character_name")
-        uid = room_data.get("uid")
-        room_name = room_data.get("room_name")
-
         # 使用 room_name 作为查询条件
         chat_history = ChatUserChatHistory.objects.raw("""
-            SELECT * 
-            FROM (
-                SELECT * 
-                FROM chatApp_chatuser_chat_history 
-                WHERE room_id = %s 
-                ORDER BY send_date DESC 
-                LIMIT 50
-            ) AS subquery 
-            ORDER BY send_date ASC
-        """, [room_id])
+                                                       SELECT *
+                                                       FROM (SELECT *
+                                                             FROM chatApp_chatuser_chat_history
+                                                             WHERE room_id = %s
+                                                             ORDER BY send_date DESC LIMIT 50) AS subquery
+                                                       ORDER BY send_date DESC
+                                                       """, [room_id])
 
-        chat_info = [
-            {
+        # 分页处理
+        paginator = ChatHistoryPagination()
+        paginated_chat_history = paginator.paginate_queryset(chat_history, request)
+
+        # 获取聊天记录和处理每个消息的时间和昵称
+        chat_info = []
+        for message in paginated_chat_history:
+            # 获取用户昵称
+            user = ChatUser.objects.filter(id=message.uid).first()
+            message_nickname = user.nickname if user else ""  # 如果找不到用户，返回空字符串
+
+            # # 格式化时间为 UTC 格式
+
+            send_date = message.send_date.astimezone(timezone.get_current_timezone())
+
+            # 格式化时间为 UTC 格式
+            send_date = send_date.isoformat() + 'Z'
+
+            chat_info.append({
                 "uid": message.uid,
                 "username": message.username,
-                "send_date": message.send_date.strftime('%b %d, %Y %I:%M%p'),
+                "nickname": message_nickname,  # 获取对应的昵称
+                "send_date": send_date,
                 "user_message": message.user_message
-            } for message in chat_history
-        ]
+            })
 
         return Response({
             "code": 0,
-            "data": {
-                "room_name": room_name,
-                "room_id": room_id,
-                "uid": uid,
-                "username": character_name,
-                "chat_info": chat_info
+            "message": "Success",
+            "data":{
+                "next": paginator.get_next_link(),
+                "previous": paginator.get_previous_link(),
+                "results": chat_info
             }
         })
 
     except Exception as e:
         return Response({"code": 1, "message": f"Internal server error: {str(e)}"}, status=500)
 
-@api_view(['GET'])
-def redirect_to_random_room(request):
-    """
-    随机选择一个正在直播的房间，并重定向到该房间的页面
-    GET /api/live/redirect_to_random_room
-    """
-    try:
-        # 获取所有 key
-        keys = redis_client.keys('*')  # '*' 匹配所有 key
-
-        # 转换为字符串列表
-        live_rooms = [key.decode('utf-8') if isinstance(key, bytes) else key for key in keys]
-        if not live_rooms:
-            return Response({"code": 1, "message": "No live rooms available."}, status=404)
-
-        random_room_id = random.choice(live_rooms)
-        collection = db[random_room_id]
-        room_data = collection.find_one({"room_id": random_room_id})
-
-        if not room_data:
-            return Response({"code": 1, "message": "Room not found in database."}, status=404)
-
-        room_id = room_data.get("room_id")
-        redirect_url = f"/live/{room_id}/"
-        return redirect(redirect_url)
-
-    except Exception as e:
-        return Response({"code": 1, "message": f"Internal server error: {str(e)}"}, status=500)
-
-
-def live_to_room(request,  room_id):
-
-    """渲染直播间页面"""
-    return render(request, 'live.html', {'room_id': room_id , "build_universe_url":setting.build_universe_url})
-
-
-
-def home_view(request):
-    return render(request, 'home.html', {'room_id': None, "build_universe_url":setting.build_universe_url})
-
 
 @api_view(['POST'])
+@permission_classes([IsAuthenticated])  # 确保只有认证用户可以访问
 def save_user_chat_history(request):
     """
     保存用户聊天历史数据
     POST /api/live/save_user_chat_history
     """
 
-    user = get_user(request)  # 获取当前用户
-
-    if not user:
-        return JsonResponse({"code": 1, "message": "User not authenticated"}, status=400)
+    # 当前用户信息通过 request.user 获取
+    user = request.user
 
     room_id = request.data.get("room_id")
-    room_name = request.data.get("room_name")
-    username = request.data.get("username")
     user_message = request.data.get("user_message")
 
-    if not all([room_id,room_name, username, user_message]):
+    if not all([room_id, user_message]):
         return Response({"code": 1, "message": "缺少必填参数"}, status=400)
 
     try:
-        if request.user.is_authenticated:
-            username = request.user.username
-            uid = str(request.user.id)
-            identity = 1
-        else:
-            uid = "0"
-            identity = 0
+        # 使用 request.user 获取认证的用户信息
+        uid = str(user.id)  # 用户 ID
+        username = user.username  # 用户名
 
+        # 获取房间名称
+        room_info = RoomInfo.objects.filter(room_id=room_id).first()
+        if not room_info:
+            return Response({"code": 1, "message": "房间未找到"}, status=404)
+
+        room_name = room_info.room_name  # 获取房间名
+
+        # identity 设置为 1，因为用户是认证过的
+        identity = 1
+
+        # 创建聊天记录
         ChatUserChatHistory.objects.create(
-            room_id = room_id,
+            room_id=room_id,
             room_name=room_name,
             uid=uid,
             username=username,
@@ -476,11 +411,22 @@ def save_user_chat_history(request):
             send_date=timezone.now(),
             identity=identity
         )
+
         return Response({"code": 0, "message": "操作成功，聊天记录已保存"})
 
     except Exception as e:
         return Response({"code": 1, "message": f"服务器内部错误: {str(e)}"}, status=500)
 
+
+
+
+def live_to_room(request, room_id):
+    """渲染直播间页面"""
+    return render(request, 'live.html', {'room_id': room_id, "build_universe_url": setting.build_universe_url})
+
+
+def home_view(request):
+    return render(request, 'home.html', {'room_id': None, "build_universe_url": setting.build_universe_url})
 
 
 @api_view(['POST'])
@@ -525,40 +471,3 @@ def pay_vip_coin(request):
         return Response({"code": 1, "message": f"Internal server error: {str(e)}"}, status=500)
 
 
-@api_view(['GET'])
-def get_all_tags(request):
-    """
-    获取所有角色卡标签，语言本身也作为标签，去掉 NSFW 标签
-    GET /api/card/get_all_tags/
-    """
-    try:
-        cards = CharacterCard.objects.all().values('language', 'tags')
-        all_tags = set()
-        nsfw_keywords = {"Not Safe for Work", "NotSafeforWork", "NSFW", "nsfw"}
-
-        for card in cards:
-            language = card['language'] or 'en'
-            all_tags.add(language)  # 将语言本身作为标签
-
-            tags_str = card['tags'] or ''
-            tags_list = [tag.strip() for tag in tags_str.split(',') if tag.strip()]
-
-            # 过滤 NSFW 标签
-            tags_list = [tag for tag in tags_list if tag not in nsfw_keywords]
-
-            all_tags.update(tags_list)
-
-        return JsonResponse({
-            "code": 0,
-            "status": "success",
-            "tags": sorted(list(all_tags))
-        })
-
-    except Exception as e:
-        import traceback
-        print(f"错误详情: {traceback.format_exc()}")
-        return JsonResponse({
-            "code": 1,
-            "status": "error",
-            "message": str(e)
-        }, status=500)

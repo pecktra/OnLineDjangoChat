@@ -219,6 +219,7 @@ AUTH_USER_MODEL="chatApp.ChatUser"
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
         'chatApp.api.auth.CsrfExemptSessionAuthentication',
     ),
     'DEFAULT_PERMISSION_CLASSES': (
@@ -255,15 +256,24 @@ SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = os.getenv("SOCIAL_AUTH_GOOGLE_OAUTH2_KEY")
 SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = os.getenv("SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET")
 SOCIAL_AUTH_GOOGLE_OAUTH2_REDIRECT_URI = os.getenv("SOCIAL_AUTH_GOOGLE_OAUTH2_REDIRECT_URI")
 
-# 使用数据库存储会话数据（默认）
-SESSION_ENGINE = 'django.contrib.sessions.backends.db'
-SESSION_COOKIE_AGE = 7 * 24 * 60 * 60  # 会话有效期，单位为秒（1小时）
-SESSION_COOKIE_NAME = 'sessionid'  # 默认 session cookie 名
-SESSION_COOKIE_SECURE = True  # 只有在 HTTPS 请求中才会发送 session cookie
-SESSION_COOKIE_HTTPONLY = True  # 确保 JavaScript 无法访问 session cookie
-SESSION_COOKIE_SAMESITE = 'None'  # 配置 SameSite 属性，通常设置为 'Lax' 或 'Strict'
-SESSION_EXPIRE_AT_BROWSER_CLOSE = False  # 会话在浏览器关闭时过期（可以设置为 True）
-CORS_ORIGIN_ALLOW_ALL = True  # 或者具体允许的域名
+
+SIMPLE_JWT = {
+    # 访问令牌有效期（Access Token）
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=1),
+    # 刷新令牌有效期（Refresh Token）
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
+
+    'ROTATE_REFRESH_TOKENS': False,
+    'BLACKLIST_AFTER_ROTATION': True,
+
+    'ALGORITHM': 'HS256',
+    'SIGNING_KEY': 'pecktra',  # 使用项目的 SECRET_KEY 进行签名
+
+    # 如果你的前端是跨域请求
+    'AUTH_HEADER_TYPES': ('Bearer',),  # 前端请求头格式: Authorization: Bearer <token>
+    'AUTH_HEADER_NAME': 'HTTP_AUTHORIZATION',
+
+}
 
 
 AUTHENTICATION_BACKENDS = [

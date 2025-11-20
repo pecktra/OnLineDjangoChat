@@ -7,6 +7,13 @@ import redis
 from django_redis import get_redis_connection
 import random
 from chatApp.models import CharacterCard
+from base64 import b64encode
+from urllib import parse
+from urllib.parse import urlparse
+from collections import OrderedDict
+from rest_framework.response import Response
+from rest_framework.pagination import CursorPagination
+from rest_framework.utils.urls import replace_query_param
 import os
 # 建立 Redis 连接
 redis_client = get_redis_connection('default')
@@ -86,4 +93,78 @@ def get_online_room_ids(pattern: str = '*') -> list:
     except Exception as e:
         print(f"[Redis Error] 获取在线房间失败: {e}")
         return []
+
+
+# ======================================================
+# ✅ 通用分页类封装（支持 page_size、自定义 ordering、去域名）
+# ======================================================
+
+class IDCursorPagination(CursorPagination):
+    ordering = '-id'
+    page_size = 20
+    page_size_query_param = 'page_size'
+    max_page_size = 100
+
+    def paginate_queryset(self, queryset, request, view=None):
+        self.request = request
+        return super().paginate_queryset(queryset, request, view)
+
+    def get_ordering(self, request, queryset, view):
+        if getattr(view, 'ordering', None):
+            ordering = view.ordering
+        else:
+            ordering = self.ordering
+        if isinstance(ordering, str):
+            return (ordering,)
+        return tuple(ordering)
+
+    def encode_cursor(self, cursor):
+        """
+        生成游标的 Base64 编码。
+        """
+        tokens = {}
+        if cursor.offset != 0:
+            tokens['o'] = str(cursor.offset)
+        if cursor.reverse:
+            tokens['r'] = '1'
+        if cursor.position is not None:
+            tokens['p'] = cursor.position
+
+        querystring = parse.urlencode(tokens, doseq=True)
+        encoded = b64encode(querystring.encode('ascii')).decode('ascii')
+        return replace_query_param(self.request.get_full_path(),
+                                   self.cursor_query_param, encoded)
+
+    def get_next_link(self):
+        if not self.has_next:
+            return None
+        url = super().get_next_link()
+        if not url:
+            return None
+        parsed = urlparse(url)
+        return f"{parsed.path}?{parsed.query}" if parsed.query else parsed.path
+
+    def get_previous_link(self):
+        if not self.has_previous:
+            return None
+        url = super().get_previous_link()
+        if not url:
+            return None
+        parsed = urlparse(url)
+        return f"{parsed.path}?{parsed.query}" if parsed.query else parsed.path
+
+    def get_paginated_response(self, data):
+        """
+        最终返回结构中添加 code/data 外层包装
+        """
+        pagination_data = OrderedDict([
+            ('next', self.get_next_link()),
+            ('previous', self.get_previous_link()),
+            ('results', data)
+        ])
+        return Response({
+            "code": 0,
+            "data": pagination_data
+        })
+
 

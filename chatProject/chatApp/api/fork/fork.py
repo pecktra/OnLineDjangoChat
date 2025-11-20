@@ -1,13 +1,18 @@
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from chatApp.models import RoomInfo, CharacterCard ,ForkRelation,Anchor ,ForkTrace
+from chatApp.models import RoomInfo, CharacterCard ,ForkRelation,Anchor ,ForkTrace,ChatUser
 from chatApp.api.common.common import build_full_image_url,generate_new_room_id, generate_new_room_name
 from pymongo import MongoClient
 from django.conf import settings
 from django.contrib.auth import get_user
+from rest_framework_simplejwt.tokens import AccessToken, RefreshToken
+from rest_framework_simplejwt.authentication import JWTAuthentication
+from rest_framework.decorators import authentication_classes, permission_classes
+from rest_framework.permissions import IsAuthenticated
 import traceback
 from django.utils import timezone
 from django_redis import get_redis_connection  # 获取 Redis 连接
+from rest_framework.pagination import PageNumberPagination
 
 redis_client = get_redis_connection('default')  # 使用 django-redis 配置
 
@@ -15,143 +20,29 @@ redis_client = get_redis_connection('default')  # 使用 django-redis 配置
 client = MongoClient(settings.MONGO_URI)
 db = client.get_database()
 
-#预览
-@api_view(['GET'])
-def fork_preview(request):
-    """
-    Fork 预览接口：
-    查询被 fork 的房间信息及聊天记录（已 fork 楼层 <= last_floor）
-
-    请求参数：
-    - room_id: 要 fork 的房间ID【必填】
-    - last_floor: 已 fork 的最后楼层【必填，整数 >=1】
-
-    返回：
-    {
-        "code": 0,
-        "success": true,
-        "message": "获取成功",
-        "data": {
-            "room_info": {...},
-            "chat_info": [...]
-        }
-    }
-    """
-    room_id = request.GET.get('room_id')
-    last_floor_str = request.GET.get('last_floor')
-
-    # 参数检查
-    if  not room_id or last_floor_str is None:
-        return Response({
-            "code": 1,
-            "success": False,
-            "message": " room_id 和 last_floor 都必须提供"
-        }, status=400)
-
-    # 验证 last_floor
-    try:
-        last_floor = int(last_floor_str)
-        if last_floor < 1:
-            return Response({
-                "code": 1,
-                "success": False,
-                "message": "last_floor 必须 >= 1"
-            }, status=400)
-    except ValueError:
-        return Response({
-            "code": 1,
-            "success": False,
-            "message": "last_floor 必须是整数"
-        }, status=400)
-
-    # 查询房间信息
-    try:
-        room = RoomInfo.objects.get(room_id=room_id)
-    except RoomInfo.DoesNotExist:
-        return Response({
-            "code": 1,
-            "success": False,
-            "message": "房间不存在"
-        }, status=404)
-
-    # 查询角色卡信息
-    character_info = {}
-    try:
-        character_card = CharacterCard.objects.filter(room_id=room.room_id).first()
-        if character_card:
-            image_path = build_full_image_url(request, character_card.image_path.url)
-            character_info = {
-                "character_name": character_card.character_name,
-                "image_name": character_card.image_name,
-                "image_path": image_path
-            }
-    except Exception:
-        character_info = {}
-
-    # 查询 MongoDB 聊天记录
-    chat_info = []
-    try:
-        collection = db[room.room_id]
-        chat_records = list(collection.find({}).sort("_id", 1))
-
-        for index, item in enumerate(chat_records, start=1):
-            if index > last_floor:
-                break
-
-            data = item.get("data", {})
-            filtered_data = {
-                "name": data.get("name"),
-                "is_user": data.get("is_user"),
-                "send_date": data.get("send_date"),
-                "mes": data.get("mes")
-            }
-
-            chat_info.append({
-                "floor": index,
-                "data_type": item.get("data_type"),
-                "data": filtered_data,
-                "mes_html": item.get("mes_html", "")
-            })
-    except Exception as e:
-        return Response({
-            "code": 1,
-            "message": f"获取聊天历史失败: {str(e)}"
-        }, status=500)
-
-    # 返回结果
-    return Response({
-        "code": 0,
-        "message": "获取成功",
-        "data": {
-            "room_info": {
-                "uid": room.uid,
-                "user_name": room.user_name,
-                "room_id": room.room_id,
-                "room_name": room.room_name,
-                "title": room.title,
-                "describe": room.describe,
-                **character_info
-            },
-            "chat_info": chat_info
-        }
-    })
-
+class ForkedListPagination(PageNumberPagination):
+    page_size = 10  # 每页返回的条目数
+    page_size_query_param = 'page_size'  # 可选的分页大小参数
+    max_page_size = 100  # 最大页大小
 
 #fork
 @api_view(['POST'])
+@permission_classes([IsAuthenticated])
 def fork_confirm(request):
     """
     Fork 确认接口
     """
     try:
-        # 获取当前登录用户
-        user = get_user(request)
+        # ------------------ 获取当前登录用户 ------------------
+        user = request.user
         if not user:
             return Response({"success": False, "message": "用户未登录"}, status=401)
 
-        user_name = request.session.get('google_name', user.username)  # 优先 session 名称，fallback 到 username
+        # 只获取 id 和 username
+        user_id = user.id
+        user_name = getattr(user, "username", "")
 
-        # 请求参数
+        # ------------------ 请求参数 ------------------
         target_id = request.data.get('target_id')
         room_id = request.data.get('room_id')
         floor = request.data.get('last_floor')
@@ -163,25 +54,27 @@ def fork_confirm(request):
         if floor < 1:
             return Response({"success": False, "message": "floor 必须 >= 1"}, status=400)
 
-        # 查询原房间
+        # ------------------ 查询原房间 ------------------
         try:
             origin_room = RoomInfo.objects.get(room_id=room_id)
         except RoomInfo.DoesNotExist:
             return Response({"success": False, "message": "原房间不存在"}, status=404)
 
-        # 获取角色卡信息
-        character_card = CharacterCard.objects.filter(uid=origin_room.uid,character_name=origin_room.character_name).first()
+        # ------------------ 获取角色卡信息 ------------------
+        character_card = CharacterCard.objects.filter(
+            uid=origin_room.uid,
+            character_name=origin_room.character_name
+        ).first()
         character_name = character_card.character_name if character_card else "UnknownCharacter"
         is_private = int(character_card.is_private) if character_card else 0
 
-        # 生成新房间 name 和 id
+        # ------------------ 生成新房间 name 和 id ------------------
         new_room_name = generate_new_room_name(origin_room.uid, character_name)
+        new_room_id, character_date = generate_new_room_id(user_id, character_name)
 
-        new_room_id, character_date = generate_new_room_id(user.id, character_name)
-
-        # 创建新房间，使用当前登录用户信息
+        # ------------------ 创建新房间 ------------------
         new_room = RoomInfo.objects.create(
-            uid=user.id,
+            uid=user_id,
             user_name=user_name,
             room_id=new_room_id,
             room_name=new_room_name,
@@ -195,9 +88,9 @@ def fork_confirm(request):
             created_at=timezone.now()
         )
 
-        # 写入 ForkRelation
+        # ------------------ 写入 ForkRelation ------------------
         ForkRelation.objects.create(
-            from_user_id=user.id,
+            from_user_id=user_id,
             target_id=target_id,
             room_id=room_id,
             floor=floor,
@@ -205,7 +98,7 @@ def fork_confirm(request):
             created_at=timezone.now()
         )
 
-        # 复制 MongoDB 聊天记录（≤ floor）
+        # ------------------ 复制 MongoDB 聊天记录（≤ floor） ------------------
         client = MongoClient(settings.MONGO_URI)
         db = client[settings.MONGO_DB_NAME]
 
@@ -221,7 +114,7 @@ def fork_confirm(request):
             new_item = item.copy()
             new_item.pop("_id", None)
             new_item.update({
-                "uid": user.id,
+                "uid": user_id,
                 "username": user_name,
                 "room_id": new_room_id,
                 "room_name": new_room_name
@@ -241,13 +134,16 @@ def fork_confirm(request):
                 "mes_html": new_item.get("mes_html", "")
             })
 
-        # 复制角色卡信息
+        # ------------------ 复制角色卡信息 ------------------
         try:
-            origin_cards = CharacterCard.objects.filter(uid=origin_room.uid,character_name=origin_room.character_name)
+            origin_cards = CharacterCard.objects.filter(
+                uid=origin_room.uid,
+                character_name=origin_room.character_name
+            )
             for card in origin_cards:
                 CharacterCard.objects.create(
                     room_id=new_room_id,
-                    uid=user.id,
+                    uid=user_id,
                     username=user_name,
                     character_name=card.character_name,
                     image_name=card.image_name,
@@ -261,7 +157,7 @@ def fork_confirm(request):
         except Exception as card_err:
             print("⚠️ 复制 CharacterCard 失败：", card_err)
 
-        # 写入 ForkTrace
+        # ------------------ 写入 ForkTrace ------------------
         try:
             last_trace = ForkTrace.objects.filter(current_room_id=room_id).order_by('-created_at').first()
             if last_trace:
@@ -277,15 +173,13 @@ def fork_confirm(request):
                 prev_room_id=room_id,
                 prev_uid=origin_room.uid,
                 current_room_id=new_room_id,
-                current_uid=user.id,
+                current_uid=user_id,
                 created_at=timezone.now()
             )
         except Exception as trace_err:
             print("⚠️ 写入 ForkTrace 失败：", trace_err)
 
-        redis_client.set(new_room_id, "start")
-
-        # 返回结果
+        # ------------------ 返回结果 ------------------
         return Response({
             "success": True,
             "message": "fork 成功",
@@ -306,38 +200,67 @@ def fork_confirm(request):
 
 
 @api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def forked_list(request):
     """
-    获取当前用户已 fork 的房间列表
+    获取当前用户已 fork 的新房间列表
     返回 fork_id、target_id，以及房间信息（room_id、room_name、title、describe、username）
     """
-    user = get_user(request)
-    if not user:
-        return Response({"code":1 , "message": "用户未登录"}, status=401)
+    user = request.user
 
-    forks = ForkRelation.objects.filter(from_user_id=user.id).order_by('-created_at')
+    # 获取当前用户的所有 fork 记录
+    forks = ForkTrace.objects.filter(current_uid=user.id).order_by('-created_at')
+
+    # 使用分页器进行分页
+    paginator = ForkedListPagination()
+    result_page = paginator.paginate_queryset(forks, request)
 
     result_list = []
-    for fork in forks:
-        # 获取原房间信息
+    for fork in result_page:
         try:
-            room = RoomInfo.objects.get(room_id=fork.room_id)
-        except RoomInfo.DoesNotExist:
-            continue
 
-        result_list.append({
-            "fork_id": fork.id,
-            "target_id": fork.target_id,
-            "room_id": room.room_id,
-            "room_name": room.room_name,
-            "title": room.title,
-            "describe": room.describe,
-            "username": room.user_name
-        })
+            # 获取当前新房间的 RoomInfo 信息
+            room_info = RoomInfo.objects.get(room_id=fork.current_room_id)
+
+            # 获取房间的图片信息
+            image_info = build_full_image_url(request, room_info.uid, room_info.character_name)
+
+            nickname_obj = ChatUser.objects.filter(id=room_info.uid).first()
+            nickname = nickname_obj.nickname if nickname_obj and nickname_obj.nickname else ""
+
+            # 构建返回的结果
+            result_list.append({
+                "room_id": room_info.room_id,
+                "room_name": room_info.room_name,
+                "uid": room_info.uid,
+                "username": room_info.user_name,
+                "nickname": nickname,
+                "character_name": room_info.character_name,
+                "character_date": room_info.character_date,
+                "image_name": image_info['image_name'],
+                "image_path": image_info['image_path'],
+                "tags": image_info['tags'],
+                "language": image_info['language'],
+                "room_info": {
+                    "title": room_info.title or "",
+                    "describe": room_info.describe or "",
+                    "coin_num": room_info.coin_num if room_info.coin_num is not None else 0,
+                    "room_type": room_info.room_type or 0,
+                },
+                "last_ai_reply_timestamp": room_info.last_ai_reply_timestamp
+            })
+
+        except RoomInfo.DoesNotExist:
+            continue  # 如果房间信息不存在，跳过该项
 
     return Response({
         "code": 0,
-        "data": result_list
+        "message": "Success",
+        "data": {
+            "next": paginator.get_next_link(),  # 下一页的链接
+            "previous": paginator.get_previous_link(),  # 上一页的链接
+            "results": result_list  # 当前页面的房间列表
+        }
     }, status=200)
 
 
