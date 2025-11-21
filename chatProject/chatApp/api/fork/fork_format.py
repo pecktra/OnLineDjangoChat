@@ -363,7 +363,7 @@ def format_message(content: str, placement: int = 2,
         character_regex_scripts=character_regex_scripts
     )
     mes = replace_quotes(mes)
-    print(mes)
+
     return mes
 
 

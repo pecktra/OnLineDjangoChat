@@ -6,7 +6,7 @@ import re
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from chatApp.models import Preset, CharacterCard
+from chatApp.models import Preset, CharacterCard,ForkTrace
 from chatApp.api.common.common import build_full_image_url,generate_new_room_id, generate_new_room_name
 from pymongo import MongoClient
 from django.conf import settings
@@ -46,17 +46,23 @@ def fork_chat(request):
     user_name = user.username
     user_id = user.id
     room_id = request.data.get('room_id')
+
+
+
+    fork_room_info = ForkTrace.objects.filter(current_room_id=room_id).first()
+    source_room_id = fork_room_info.source_room_id
+
+
     current_message = request.data.get('message')
 
-    character_card = CharacterCard.objects.filter(room_id=room_id).first()
+    character_card = CharacterCard.objects.filter(room_id=source_room_id).first()
 
     character_name = character_card.character_name
     character_date = character_card.character_data
     character_user_name = character_card.username
     character_data_json = json.loads(character_date)
 
-    print("fork_chat")
-    print(room_id)
+
     # room_id = hashlib.sha1(f"{user_id}_{character_name}_{character_date}".encode('utf-8')).hexdigest()[:16]
 
 
@@ -157,11 +163,9 @@ def fork_chat(request):
 
     contents = []
     #获取当前房间的预设
-    preset_info = Preset.objects.filter(room_id=room_id).first()
+    preset_info = Preset.objects.filter(room_id=source_room_id).first()
     #已经保存了预设
-    print("来了*********8")
     if preset_info:
-        print("有预设")
         preset_settings_openai = preset_info.preset_settings_openai
         temperature            = preset_info.temp_openai
         top_k           = preset_info.top_k_openai
@@ -176,6 +180,7 @@ def fork_chat(request):
         for data in preset_json_list:
             identifier = data.get("identifier","")
             content = data.get("content","")
+
             content = content.replace('{{character_description}}', character_description).replace('{{entrie}}', entrie).replace('{{user}}', character_user_name).replace('{{lastUserMessage}}', current_message)
             if identifier != "chatHistory":
                 contents.append({
@@ -187,7 +192,7 @@ def fork_chat(request):
                 contents.extend(chat_history_contents)
     #未保存预设
     else:
-        print("无预设")
+
         first_mes = first_mes_model.replace('{{character_description}}', character_description).replace('{{entrie}}', entrie).replace('{{user}}', character_user_name)
         # contents.append({"text":first_mes})
         contents.append({
@@ -214,20 +219,20 @@ def fork_chat(request):
                 role = "user"
             elif role == "assistant":
                 role = "model"
+            if role:
 
-            if len(contents_final) >0 and role == contents_final[-1].get("role"):
-                # 拼接内容
-                current_content = row.get("parts")[0].get("text")
-                existing_content = contents_final[-1].get("parts")[0].get("text")
-                contents_final[-1]["parts"] =[{"text":  existing_content + "\n\n" + current_content}]
-            else:
-                contents_final.append({
-                    "role": role,
-                    "parts": [{"text": row.get("parts")[0].get("text")}]
-                });
+                if len(contents_final) >0 and role == contents_final[-1].get("role"):
+                    # 拼接内容
+                    current_content = row.get("parts")[0].get("text")
+                    existing_content = contents_final[-1].get("parts")[0].get("text")
+                    contents_final[-1]["parts"] =[{"text":  existing_content + "\n\n" + current_content}]
+                else:
+                    contents_final.append({
+                        "role": role,
+                        "parts": [{"text": row.get("parts")[0].get("text")}]
+                    });
 
 
-    print(contents_final)
 
     # 调用 Gemini API
     try:
