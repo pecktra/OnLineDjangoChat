@@ -37,8 +37,7 @@ ALLOWED_HOSTS = ['*',]  # 开放访问权限
 
 
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [BASE_DIR / "templates/static"]
-STATIC_ROOT = BASE_DIR / "staticfiles"
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -226,12 +225,6 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.AllowAny',
     ),
 }
-
-
-# 设置登陆、登出页面
-from django.urls import reverse_lazy
-LOGIN_REDIRECT_URL = reverse_lazy('login')
-LOGIN_URL = reverse_lazy('login')
 
 # 用于图像上传
 import os

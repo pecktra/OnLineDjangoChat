@@ -417,18 +417,6 @@ def save_user_chat_history(request):
     except Exception as e:
         return Response({"code": 1, "message": f"服务器内部错误: {str(e)}"}, status=500)
 
-
-
-
-def live_to_room(request, room_id):
-    """渲染直播间页面"""
-    return render(request, 'live.html', {'room_id': room_id, "build_universe_url": setting.build_universe_url})
-
-
-def home_view(request):
-    return render(request, 'home.html', {'room_id': None, "build_universe_url": setting.build_universe_url})
-
-
 @api_view(['POST'])
 def pay_vip_coin(request):
     """

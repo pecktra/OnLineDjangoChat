@@ -3,7 +3,6 @@ from django.http import JsonResponse
 from django.conf import settings
 from pymongo import MongoClient
 from chatApp.models import CharacterCard, Anchor
-from chatApp.api.common.check_nsfw import is_nsfw
 import json
 import hashlib
 import os
@@ -55,28 +54,30 @@ def import_card(request):
                 }
             })
 
-            # 处理 tags
+        # 处理 tags
         tags_list = character_json.get('tags', [])
         if not isinstance(tags_list, list):
             tags_list = []
 
+        # NSFW 检测逻辑：保留，用于给 tags 打标签
         nsfw_keywords = {"Not Safe for Work", "NotSafeforWork", "NSFW", "nsfw"}
-        is_private = 1 if any(tag.strip() in nsfw_keywords for tag in tags_list) else 0
+        is_private_flag = 1 if any(tag.strip() in nsfw_keywords for tag in tags_list) else 0
 
-        # NSFW 检测逻辑：如果未标记 NSFW，则直接把整个 character_json 传给 AI
-        if is_private == 0:
+        if is_private_flag == 0:
             # 将 JSON 转字符串，并限制长度避免超限
             json_text = json.dumps(character_json, ensure_ascii=False)
-            MAX_LENGTH = 250000 # 根据 API 限制，可调整
+            MAX_LENGTH = 250000
             json_text = json_text[:MAX_LENGTH]
 
+            from chatApp.api.common.check_nsfw import is_nsfw
             ai_result = is_nsfw(json_text)
-            print(ai_result)
             if ai_result.get("is_nsfw"):
                 tags_list.append("NSFW")
-                is_private = 1
 
         tags = ",".join(tags_list) if tags_list else None
+
+        # 强制所有上传都标记为不可见
+        is_private = 1
 
         # 创建数据库记录
         character_card = CharacterCard.objects.create(
@@ -105,7 +106,7 @@ def import_card(request):
 
         return JsonResponse({
             'status': 'success',
-            'message': '上传成功',
+            'message': '上传成功，已标记为不可见',
             'data': {
                 'id': character_card.id,
                 'image_path': character_card.image_path.url,

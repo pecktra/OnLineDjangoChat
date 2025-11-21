@@ -58,15 +58,12 @@ urlpatterns = [
     # path('api/users/google_oauth2_callback/', logins.google_oauth2_callback),  # Google 登录回调处理
     path('api/users/google_login_callback/', logins.google_login_callback),  # Google 新前端登录回调处理
     path('api/users/update_nickname/', logins.update_nickname),  # 修改昵称
-    path('api/users/google_logout/', logins.google_logout),#退出登录
     path('api/users/get_user_info/', logins.get_user_info),#获取用户信息
 
     #直播首页
     path('api/live/get_all_lives/', lives.get_all_lives),#获取直播间列表
     path('api/live/get_live_info/', lives.get_live_info),#获取单个直播间信息
     path('api/live/get_user_chat_history/', lives.get_user_chat_history),#获取当前直播间用户历史消息数据
-    path('', lives.home_view, name='home'),  # Root path renders room_v3.html
-    path('live/<str:room_id>/', lives.live_to_room, name='live_to_room'),
     path('api/live/save_user_chat_history/', lives.save_user_chat_history),  # 保存用户评论
     path('api/live/pay_vip_coin/', lives.pay_vip_coin), #用户支付 VIP 钻石订阅vip直播间
 
