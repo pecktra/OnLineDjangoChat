@@ -634,3 +634,53 @@ if __name__ == "__main__":
         print(con)
 
 
+    from openai import OpenAI
+
+    # 把这里换成你的代理地址（一定要带 https:// 和 /v1）
+    base_url = "https://api.evopower.net/v1"    # 例如：https://api.gemini-proxy.com/v1
+
+    client = OpenAI(
+        api_key="sk-qaeqm7Tsdm3sWuxvWknKnbCEKHjPzxgnRhNAsxxBF8EUD7O9",  # 大部分国内代理随便填或留空
+        base_url=base_url
+    )
+
+    # response = client.chat.completions.create(
+    #     model="gemini-2.5-pro-c",          # 或者 gemini-1.5-pro、gemini-2.5-flash 等，看代理支持哪个
+    #     messages=contents,            # 你的消息列表，直接传
+    #     temperature=1,
+    #     top_p=1,
+    #     max_tokens=60000,
+    #     # 以下参数大部分代理都支持
+    #     # presence_penalty=0,
+    #     # frequency_penalty=0,
+    # )
+
+
+    messages_openai = []
+    
+    for msg in contents:
+
+        role = msg["role"]
+        parts = msg["parts"]
+        if role == "model":
+            role = "assistant"    # 关键替换
+        
+        messages_openai.append({
+            "role": role,
+            "content": parts[0]["text"]
+        })
+
+    response = client.chat.completions.create(
+        model="gemini-2.5-pro-c",        
+        messages=messages_openai,
+        temperature=0.7,
+        top_p=0.9,
+        max_tokens=1024,
+        stream=False   # 如果要流式就改成 True
+    )
+
+
+
+    # 取结果
+    result = response.choices[0].message.content
+    print(result)

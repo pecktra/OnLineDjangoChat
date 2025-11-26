@@ -1,4 +1,5 @@
 import os
+from openai import OpenAI
 from google import generativeai as genai
 import json
 from dotenv import load_dotenv
@@ -236,56 +237,82 @@ def fork_chat(request):
 
     # 调用 Gemini API
     try:
-        # 初始化模型
-        model = genai.GenerativeModel(
-            model_name="gemini-2.5-flash",
-            generation_config={
-                "candidate_count": 1,
-                "temperature": temperature,
-                "top_p": top_p,
-                "top_k": top_k,
-                "max_output_tokens": max_output_tokens,
-                "frequency_penalty": 0,
-                "presence_penalty": 0,
-            },
-            safety_settings=[
-                {
-                    "category": HarmCategory.HARM_CATEGORY_HARASSMENT,
-                    "threshold": HarmBlockThreshold.BLOCK_ONLY_HIGH
-                },
-                {
-                    "category": HarmCategory.HARM_CATEGORY_HATE_SPEECH,
-                    "threshold": HarmBlockThreshold.BLOCK_ONLY_HIGH
-                },
-                {
-                    "category": HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
-                    "threshold": HarmBlockThreshold.BLOCK_ONLY_HIGH
-                },
-                {
-                    "category": HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
-                    "threshold": HarmBlockThreshold.BLOCK_ONLY_HIGH
-                }
-            ]
-            # system_instruction=system_instruction
+        # # 初始化模型
+        # model = genai.GenerativeModel(
+        #     model_name="gemini-2.5-flash",
+        #     generation_config={
+        #         "candidate_count": 1,
+        #         "temperature": temperature,
+        #         "top_p": top_p,
+        #         "top_k": top_k,
+        #         "max_output_tokens": max_output_tokens,
+        #         "frequency_penalty": 0,
+        #         "presence_penalty": 0,
+        #     },
+        #     safety_settings=[
+        #         {
+        #             "category": HarmCategory.HARM_CATEGORY_HARASSMENT,
+        #             "threshold": HarmBlockThreshold.BLOCK_ONLY_HIGH
+        #         },
+        #         {
+        #             "category": HarmCategory.HARM_CATEGORY_HATE_SPEECH,
+        #             "threshold": HarmBlockThreshold.BLOCK_ONLY_HIGH
+        #         },
+        #         {
+        #             "category": HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
+        #             "threshold": HarmBlockThreshold.BLOCK_ONLY_HIGH
+        #         },
+        #         {
+        #             "category": HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+        #             "threshold": HarmBlockThreshold.BLOCK_ONLY_HIGH
+        #         }
+        #     ]
+        #     # system_instruction=system_instruction
+        # )
+
+        # # 调用 generate_content（非流式）
+        # response = model.generate_content(contents_final)
+
+
+
+
+        # 把这里换成你的代理地址（一定要带 https:// 和 /v1）
+        base_url = "https://api.evopower.net/v1"    # 例如：https://api.gemini-proxy.com/v1
+
+        client = OpenAI(
+            api_key="sk-qaeqm7Tsdm3sWuxvWknKnbCEKHjPzxgnRhNAsxxBF8EUD7O9",  # 大部分国内代理随便填或留空
+            base_url=base_url
         )
 
-        # 调用 generate_content（非流式）
-        response = model.generate_content(contents_final)
-        # print("*********")
-        # print(response)
-        response_text = response.text
-        # mes_html = messageFormatting(response_text,character_name,False,False)
-        # mes_html = format_message(
-        #     mes=response_text,
-        #     ch_name=character_name,
-        #     isSystem=False,
-        #     isUser=False,
-        #     messageId=0,
-        #     sanitizerOverrides={},
-        #     isReasoning=False
-        # )
-        # print("response_text*")
-        # print(response_text)
+        messages_openai = []
+        
+        for msg in contents_final:
+
+            role = msg["role"]
+            parts = msg["parts"]
+            if role == "model":
+                role = "assistant"    # 关键替换
+            
+            messages_openai.append({
+                "role": role,
+                "content": parts[0]["text"]
+            })
+
+        response = client.chat.completions.create(
+            model="gemini-2.5-pro-c",        
+            messages=messages_openai,
+            temperature=temperature,
+            top_p=top_p,
+            max_tokens=max_output_tokens,
+            stream=False   # 如果要流式就改成 True
+        )
+
+
+
+        # 取结果
+        response_text = response.choices[0].message.content
+
+
         mes_html = format_message(
             content=response_text,
             placement=2,  # AI_OUTPUT
@@ -366,7 +393,6 @@ def fork_chat(request):
             "code": 1,
             "message": f"调用 Gemini API 失败: {str(e)}"
         }, status=500)
-
 
 
 
