@@ -18,7 +18,7 @@ from django.http import JsonResponse
 import chatProject.settings as setting
 from chatApp.consumers import ChatConsumer
 from django.utils.dateparse import parse_datetime
-from chatApp.api.common.common import get_online_room_ids, build_full_image_url, IDCursorPagination
+from chatApp.api.common.common import  build_full_image_url, IDCursorPagination
 from chatApp.api.common.payment import process_diamond_payment
 from rest_framework.pagination import CursorPagination
 from rest_framework.decorators import permission_classes
@@ -100,8 +100,7 @@ def get_all_lives(request):
     lives_info = []
 
     for room in paginated_rooms:
-        image_info = build_full_image_url(request, room.uid, room.character_name)
-        online_count = ChatConsumer.get_online_count(room.room_id)
+        image_info = build_full_image_url(request, uid=room.uid, room_id=room.room_id)
 
         # 删除了获取 nickname 的部分
         lives_info.append({
@@ -109,7 +108,6 @@ def get_all_lives(request):
             "room_name": room.room_name,
             "uid": room.uid,
             "username": room.user_name,
-            "live_num": online_count,
             "character_name": room.character_name,
             "character_date": room.character_date,
             "image_name": image_info['image_name'],
@@ -170,6 +168,7 @@ def to_naive_datetime(send_date_str):
 
 
 @api_view(['GET'])
+@permission_classes([IsAuthenticated])  # 确保只有认证用户可以访问
 def get_live_info(request):
     """
     获取单个直播间信息
@@ -215,7 +214,7 @@ def get_live_info(request):
             except json.JSONDecodeError:
                 print("Error decoding subscription data:", subscription_data)
 
-        image_info = build_full_image_url(request, room_info.uid, room_info.character_name)
+        image_info = build_full_image_url(request, uid=room_info.uid, room_id=room_info.room_id)
 
         # ✅ 使用 RoomInfo 的 last_ai_reply_timestamp 判断最近一小时 AI 是否有回复
         one_hour_ago = timezone.now() - timezone.timedelta(hours=1)

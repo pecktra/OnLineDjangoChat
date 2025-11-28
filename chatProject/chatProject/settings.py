@@ -252,7 +252,7 @@ SOCIAL_AUTH_GOOGLE_OAUTH2_REDIRECT_URI = os.getenv("SOCIAL_AUTH_GOOGLE_OAUTH2_RE
 
 SIMPLE_JWT = {
     # 访问令牌有效期（Access Token）
-    'ACCESS_TOKEN_LIFETIME': timedelta(days=1),
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=100),
     # 刷新令牌有效期（Refresh Token）
     'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
 

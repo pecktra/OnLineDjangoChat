@@ -6,31 +6,31 @@ from django.conf import settings
 from pymongo import MongoClient
 import json
 import hashlib
-from chatApp.models import RoomInfo, CharacterCard
+from chatApp.models import RoomImageBinding,RoomInfo, CharacterCard
 from django_redis import get_redis_connection  # 获取 Redis 连接
 from django.views.decorators.csrf import csrf_exempt
 # 建立 MongoDB 连接
 client = MongoClient(settings.MONGO_URI)
 db = client[settings.MONGO_DB_NAME]
 
-# 获取 Channel Layer
-channel_layer = get_channel_layer()
+# # 获取 Channel Layer
+# channel_layer = get_channel_layer()
 
 # 创建 Redis 连接
 redis_client = get_redis_connection('default')  # 使用 django-redis 配置
 
-# 异步发送 WebSocket 消息
-async def send_to_websocket(room_id, send_data):
-    await channel_layer.group_send(
-        "chat_" + room_id,
-        {
-            'type': 'chat_live_message',
-            'data': send_data
-        }
-    )
+# # 异步发送 WebSocket 消息
+# async def send_to_websocket(room_id, send_data):
+#     await channel_layer.group_send(
+#         "chat_" + room_id,
+#         {
+#             'type': 'chat_live_message',
+#             'data': send_data
+#         }
+#     )
 
 # 包装为同步函数
-sync_send_to_websocket = async_to_sync(send_to_websocket)
+# sync_send_to_websocket = async_to_sync(send_to_websocket)
 
 @csrf_exempt
 @api_view(['POST'])
@@ -145,6 +145,29 @@ def chat_data(request):
                 is_show=1  # 不公开 
             )
             room_info.save()
+
+        character_card_id = CharacterCard.objects.filter(
+            uid=uid,
+            character_name=character_name
+        ).order_by('-id').values_list('id', flat=True).first()
+
+        if character_card_id:
+            # 先把同一用户同一卡绑定过的旧房间隐藏
+            old_bindings = RoomImageBinding.objects.filter(
+                uid=uid,
+                image_id=character_card_id
+            ).exclude(room_id=room_id)
+
+            if old_bindings.exists():
+                old_room_ids = old_bindings.values_list('room_id', flat=True)
+                RoomInfo.objects.filter(room_id__in=old_room_ids).update(is_show=0)
+
+            # 更新或创建新的绑定
+            RoomImageBinding.objects.update_or_create(
+                uid=uid,
+                image_id=character_card_id,
+                defaults={'room_id': room_id}
+            )
 
         # 转发 WebSocket 消息（取消注释以启用）
         # if send_data['live_message']:

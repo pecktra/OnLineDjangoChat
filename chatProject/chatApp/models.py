@@ -1,14 +1,16 @@
 from django.db import models
-from django.contrib.auth.models import AbstractUser ,AbstractBaseUser, BaseUserManager
+from django.contrib.auth.models import AbstractUser, AbstractBaseUser, BaseUserManager
 import uuid
 import base64
 from datetime import timedelta
 from django.utils import timezone
 
+
 def generate_short_uuid():
     u = uuid.uuid4()
     b64 = base64.urlsafe_b64encode(u.bytes).rstrip(b'=').decode('ascii')
     return b64
+
 
 class Anchor(models.Model):
     uid = models.CharField(primary_key=True, max_length=22, default=generate_short_uuid, editable=False)
@@ -21,8 +23,6 @@ class Anchor(models.Model):
         db_table = 'chatApp_anchor'
 
 
-
-
 def character_image_upload_path(instance, filename):
     """
     动态生成图片上传路径，例如：
@@ -30,19 +30,19 @@ def character_image_upload_path(instance, filename):
     """
     return os.path.join(instance.username, 'characters', filename)
 
+
 class CharacterCard(models.Model):
-    room_id = models.CharField(max_length=150)  # 房间id
-    uid = models.CharField(max_length=150)  # 用户id
-    username = models.CharField(max_length=150)  # 用户名
-    character_name = models.CharField(max_length=150)  # 角色卡名称
-    image_name = models.CharField(max_length=150)  # 图片名称
+    uid = models.CharField(max_length=150, verbose_name="用户ID")  # 用户id
+    username = models.CharField(max_length=150, verbose_name="用户名")  # 用户名
+    character_name = models.CharField(max_length=150, verbose_name="角色卡名称")  # 角色卡名称
+    image_name = models.CharField(max_length=150, verbose_name="图片名称")  # 图片名称
     image_path = models.ImageField(
-        upload_to=character_image_upload_path,  # 只改这里为 ImageField
+        upload_to=character_image_upload_path,  # 图片存储路径函数
         max_length=255,
         verbose_name="图片存储路径"
     )
-    character_data = models.TextField()  # 角色数据（JSON格式）
-    create_date = models.CharField(max_length=150)  # 上传时间
+    character_data = models.TextField(verbose_name="角色数据（JSON格式）")  # 角色数据
+    create_date = models.CharField(max_length=150, verbose_name="上传时间")  # 上传时间
 
     # 新增字段
     language = models.CharField(
@@ -57,16 +57,37 @@ class CharacterCard(models.Model):
         blank=True,
         verbose_name="标签（逗号分隔或JSON）"
     )
-    is_private = models.BooleanField(
-        default=False,
-        verbose_name="是否私密"
+    source = models.CharField(
+        max_length=2,
+        choices=[('st', 'ST端'), ('pt', 'PT端')],
+        default='pt',
+        verbose_name="数据来源"
     )
 
     class Meta:
         db_table = 'character_card'
+        verbose_name = "角色卡"
+        verbose_name_plural = "角色卡"
 
 
+class RoomImageBinding(models.Model):
+    uid = models.CharField(max_length=150, null=True, blank=True)
+    room_id = models.CharField(max_length=255, verbose_name="房间ID")
+    image_id = models.IntegerField(verbose_name="图片ID")  # 对应 CharacterCard 的自增 id
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="绑定时间")
+    updated_at = models.DateTimeField(auto_now=True, verbose_name="更新时间")
 
+    class Meta:
+        db_table = "room_image_binding"
+        verbose_name = "房间默认图片绑定"
+        verbose_name_plural = "房间默认图片绑定"
+        indexes = [
+            models.Index(fields=["room_id"], name="idx_room_id"),
+            models.Index(fields=["image_id"], name="idx_image_id")
+        ]
+
+    def __str__(self):
+        return f"Room {self.room_id} → Image ID {self.image_id}"
 
 
 class ChatUser(AbstractBaseUser):
@@ -100,6 +121,7 @@ class ChatUser(AbstractBaseUser):
     def __str__(self):
         return self.username
 
+
 class ChatUserChatHistory(models.Model):
     room_id = models.CharField(max_length=255, null=True)
     room_name = models.CharField(max_length=255)
@@ -111,6 +133,7 @@ class ChatUserChatHistory(models.Model):
 
     class Meta:
         db_table = 'chatApp_chatuser_chat_history'  # 映射到正确的表名
+
 
 class UserBalance(models.Model):
     user_id = models.IntegerField(unique=True, null=False, verbose_name="用户ID")
@@ -172,7 +195,8 @@ class AnchorBalance(models.Model):
     anchor_id = models.CharField(max_length=22, unique=True, verbose_name="主播ID")  # 与数据库一致，最大长度为22
     balance = models.DecimalField(max_digits=12, decimal_places=2, default=0.00, verbose_name="平台货币余额（USD等值）")
     usdt_balance = models.DecimalField(max_digits=18, decimal_places=8, default=0.00000000, verbose_name="USDT余额")
-    total_received = models.DecimalField(max_digits=12, decimal_places=2, default=0.00, verbose_name="累计收入（USD等值）")
+    total_received = models.DecimalField(max_digits=12, decimal_places=2, default=0.00,
+                                         verbose_name="累计收入（USD等值）")
     last_updated = models.DateTimeField(auto_now=True, verbose_name="最后更新时间")  # 自动更新时间
 
     class Meta:
@@ -187,8 +211,7 @@ class AnchorBalance(models.Model):
         return f"Anchor {self.anchor_id} Total Received: {self.total_received} Balance: {self.balance} USDT Balance: {self.usdt_balance}"
 
 
-
-#用户关注/取消关注模型
+# 用户关注/取消关注模型
 class UserFollowRelation(models.Model):
     follower_id = models.CharField(max_length=255)  # 关注发起方用户ID
     followed_id = models.CharField(max_length=255)  # 被关注方用户ID
@@ -204,38 +227,39 @@ class UserFollowRelation(models.Model):
     def __str__(self):
         return f"User {self.follower_id} follows user {self.followed_id} (status: {self.status})"
 
+
 class RoomInfo(models.Model):
     # 房间类型的选择项
     ROOM_TYPE_CHOICES = (
         (0, 'Free'),  # 免费房间
-        (1, 'VIP'),   # VIP房间
-        (2, '1v1'),   # 一对一房间
+        (1, 'VIP'),  # VIP房间
+        (2, '1v1'),  # 一对一房间
     )
 
     uid = models.CharField(max_length=255, verbose_name="主播ID")
-    user_name = models.CharField(max_length=255, null=True,verbose_name="主播名称")
-    room_id = models.CharField(max_length=255,null=True, verbose_name="房间ID")
-    room_name = models.CharField(max_length=255,null=True, verbose_name="房间名称")
+    user_name = models.CharField(max_length=255, null=True, verbose_name="主播名称")
+    room_id = models.CharField(max_length=255, null=True, verbose_name="房间ID")
+    room_name = models.CharField(max_length=255, null=True, verbose_name="房间名称")
     character_name = models.CharField(max_length=255, verbose_name="角色名称")
-    character_date = models.CharField(max_length=255, default=timezone.now,verbose_name="角色卡创建时间")
+    character_date = models.CharField(max_length=255, default=timezone.now, verbose_name="角色卡创建时间")
     title = models.CharField(max_length=255, verbose_name="房间标题")
-    describe = models.CharField(max_length=255,null=True, verbose_name="房间描述")
+    describe = models.CharField(max_length=255, null=True, verbose_name="房间描述")
     coin_num = models.IntegerField(verbose_name="钻石数量")
     room_type = models.SmallIntegerField(choices=ROOM_TYPE_CHOICES, default=0, verbose_name="房间类型")
-    file_name = models.CharField(max_length=255,null=True, verbose_name="文件名")
-    file_branch = models.CharField(max_length=255,null=True, verbose_name="文件分支")
+    file_name = models.CharField(max_length=255, null=True, verbose_name="文件名")
+    file_branch = models.CharField(max_length=255, null=True, verbose_name="文件分支")
     is_show = models.IntegerField(default=0, verbose_name="是否展示")
-    is_info = models.IntegerField(verbose_name="是否添加info",null=True)
+    is_info = models.IntegerField(verbose_name="是否添加info", null=True)
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="房间创建时间")
     updated_at = models.DateTimeField(auto_now=True, verbose_name="房间最后更新时间")
     last_ai_reply_timestamp = models.FloatField(default=0, verbose_name="最后 AI 回复时间戳")
+    weight = models.IntegerField(default=0, verbose_name="房间权重")  # 新增字段
 
     class Meta:
         db_table = 'room_info'  # 设置表名
 
     def __str__(self):
         return f"Room: {self.title} (UID: {self.uid}, Character: {self.character_name})"
-
 
 
 class PaymentRechargeRecord(models.Model):
@@ -273,6 +297,7 @@ class PaymentRechargeRecord(models.Model):
     def __str__(self):
         return f"Payment {self.payment_id} - {self.status}"
 
+
 class PaymentExpenditureRecord(models.Model):
     """
     支出记录表（打赏、订阅主播）
@@ -300,6 +325,7 @@ class PaymentExpenditureRecord(models.Model):
         db_table = "payment_expenditure_records"
         verbose_name = "支出,订阅记录"
         verbose_name_plural = "支出,订阅记录"
+
 
 class PaymentLiveroomEntryRecord(models.Model):
     """
@@ -360,6 +386,7 @@ class ForkRelation(models.Model):
     def __str__(self):
         return f"ForkRelation {self.id} from {self.from_user_id} to {self.target_id}"
 
+
 class ForkTrace(models.Model):
     """
     记录 fork 链路信息
@@ -381,6 +408,7 @@ class ForkTrace(models.Model):
     class Meta:
         db_table = 'fork_trace'
 
+
 class Favorite(models.Model):
     id = models.BigAutoField(primary_key=True)
     uid = models.CharField(max_length=150, verbose_name="用户ID")
@@ -397,7 +425,6 @@ class Favorite(models.Model):
 
     def __str__(self):
         return f"UID {self.uid} 收藏房间 {self.room_id} 状态 {self.status}"
-
 
 
 class PaymentDiamondFlow(models.Model):
@@ -446,7 +473,6 @@ class IPBlacklist(models.Model):
         return f"{self.ip} - {'封禁中' if self.is_active else '已解封'}"
 
 
-
 class Preset(models.Model):
     """
     主播预设
@@ -459,10 +485,8 @@ class Preset(models.Model):
     openai_max_context = models.IntegerField(max_length=10, verbose_name="")
     openai_max_tokens = models.IntegerField(max_length=10, verbose_name="")
     google_model = models.CharField(max_length=255, verbose_name="模型名称")
-    model_n  = models.IntegerField(max_length=10, verbose_name="")
+    model_n = models.IntegerField(max_length=10, verbose_name="")
     preset_json = models.TextField(verbose_name="")
 
     class Meta:
         db_table = "preset"
-
-

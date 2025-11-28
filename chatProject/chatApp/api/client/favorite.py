@@ -34,7 +34,7 @@ def favorite_list(request):
             # 获取 RoomInfo 信息
             room_info = RoomInfo.objects.get(room_id=fav.room_id)
 
-            image_info = build_full_image_url(request, room_info.uid, room_info.character_name)
+            image_info = build_full_image_url(request, uid=room_info.uid, room_id=room_info.room_id)
             # 构建返回数据
             data.append({
                 "room_id": room_info.room_id,

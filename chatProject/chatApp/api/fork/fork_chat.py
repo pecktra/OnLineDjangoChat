@@ -7,7 +7,7 @@ import re
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from chatApp.models import Preset, CharacterCard,ForkTrace
+from chatApp.models import Preset, CharacterCard,ForkTrace,RoomImageBinding
 from chatApp.api.common.common import build_full_image_url,generate_new_room_id, generate_new_room_name
 from pymongo import MongoClient
 from django.conf import settings
@@ -56,11 +56,19 @@ def fork_chat(request):
 
     current_message = request.data.get('message')
 
-    character_card = CharacterCard.objects.filter(room_id=source_room_id).first()
+    binding = RoomImageBinding.objects.filter(room_id=source_room_id).first()
+    character_card = None
+    if binding:
+        character_card = CharacterCard.objects.filter(id=binding.image_id).values(
+            "character_name", "character_data", "username"
+        ).first()
 
-    character_name = character_card.character_name
-    character_date = character_card.character_data
-    character_user_name = character_card.username
+    if not character_card:
+        return Response({"success": False, "message": "未找到角色卡绑定信息"}, status=404)
+
+    character_name = character_card['character_name']
+    character_date = character_card['character_data']
+    character_user_name = character_card['username']
     character_data_json = json.loads(character_date)
 
 

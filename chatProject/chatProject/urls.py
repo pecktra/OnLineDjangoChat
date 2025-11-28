@@ -98,9 +98,8 @@ urlpatterns = [
     path('api/fork/fork_chat/', fork_chat.fork_chat),#fork后续聊天
 
     #feed
-    path('api/feed/get_latest_ai_rooms/', feedhome.get_latest_ai_rooms),#信息流页面
-    path('api/feed/get_fork_relations/', feedhome.get_fork_relations),#fork信息
-    path('api/feed/random_fork_card/', feedhome.random_fork_card),#随机foek信息
+    path('api/feed/get_feed_rooms/', feedhome.get_feed_rooms),#信息流页面
+    path('api/feed/get_personal_feed/', feedhome.get_personal_feed),#fork信息
 
     #favorite
     path('api/favorite/favorite_card/', favorite.favorite_card),#收藏、取消收藏

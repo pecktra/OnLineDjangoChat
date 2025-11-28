@@ -1,25 +1,26 @@
-from rest_framework.decorators import api_view
-from rest_framework.response import Response
-from django.conf import settings
-from pymongo import MongoClient
-from datetime import datetime, timezone
-from chatApp.models import RoomInfo, Anchor, ChatUser, ForkTrace,ForkRelation,CharacterCard
 import json
-import random
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.response import Response
+from rest_framework.pagination import PageNumberPagination
+from pymongo import MongoClient
+from datetime import datetime
+from pytz import UTC
+from django.conf import settings
+from chatApp.models import RoomInfo, ChatUser, CharacterCard
 from chatApp.api.common.common import build_full_image_url
-
-def parse_send_date(send_date_str):
-    """解析 send_date 字符串为 datetime"""
-    if not send_date_str:
-        return None
-    try:
-        return datetime.strptime(send_date_str, "%B %d, %Y %I:%M%p")
-    except Exception:
-        return None
+from django_redis import get_redis_connection
+from rest_framework.permissions import IsAuthenticated
 
 
+# ---------- 分页类 ----------
+class StandardResultsSetPagination(PageNumberPagination):
+    page_size = 10
+    page_size_query_param = 'page_size'
+    max_page_size = 100
+
+
+# ---------- 工具函数 ----------
 def safe_parse_json(data_raw):
-    """安全解析 JSON"""
     if isinstance(data_raw, str):
         if not data_raw.strip():
             return {}
@@ -30,202 +31,139 @@ def safe_parse_json(data_raw):
     return data_raw
 
 
-@api_view(['GET'])
-def get_latest_ai_rooms(request):
-    """
-    获取最新的 AI 消息（每个房间最新一条）
-    GET /api/feed/get_latest_ai_rooms/?page=1&page_size=10
-    支持按 uid 查询：?uid=xxx
-    """
-    page = int(request.GET.get("page", 1))
-    page_size = int(request.GET.get("page_size", 10))  # 默认每页 10 条
-    offset = (page - 1) * page_size
-    uid_filter = request.GET.get("uid", None)
+# ---------- 通用信息流函数 ----------
+def _fetch_feed_rooms(request, personal_only=False):
+    redis_conn = get_redis_connection("default")
 
-    # MongoDB 连接
+    # Redis Key 设计
+    if personal_only:
+        user_id = request.user.id
+        cache_key = f"personal_feed:{user_id}"
+    else:
+        cache_key = "feed:all"
+
+    # 尝试读取缓存
+    cached_data = redis_conn.get(cache_key)
+    if cached_data:
+        cached_json = json.loads(cached_data)
+        paginator = StandardResultsSetPagination()
+        page_obj = paginator.paginate_queryset(cached_json, request)
+        return Response({
+            "code": 0,
+            "message": "Success",
+            "data": {
+                "next": paginator.get_next_link(),
+                "previous": paginator.get_previous_link(),
+                "results": page_obj
+            }
+        })
+
+    # ---------- 没有缓存，生成数据 ----------
     client = MongoClient(settings.MONGO_URI)
     db = client[settings.MONGO_DB_NAME]
 
-    # 获取房间列表
-    rooms_query = RoomInfo.objects.filter(is_show=0)  # 只展示 is_show=0
-    if uid_filter:
-        rooms_query = rooms_query.filter(uid=uid_filter)
-    rooms = rooms_query.order_by('-updated_at')
+    rooms_query = RoomInfo.objects.filter(is_show=0, file_branch="branch").order_by('-created_at')
+    if personal_only:
+        rooms_query = rooms_query.filter(uid=request.user.id)
 
     result = []
 
-    for room in rooms:
-        collection_name = room.room_id
-        collection = db[collection_name]
+    for room in rooms_query:
+        collection = db[room.room_id]
 
-        # 获取房间内最新 AI 消息
-        latest_doc = collection.find_one({"data_type": "ai"}, sort=[("_id", -1)])
-        if not latest_doc:
+        # 查找该房间中第一个用户消息（data.is_user == True），按 _id 升序
+        try:
+            first_user_doc = collection.find_one({"data.is_user": True}, sort=[("_id", 1)])
+        except Exception:
+            # 如果数据结构不满足查询条件，尝试退回到最早文档
+            first_user_doc = collection.find_one({}, sort=[("_id", 1)])
+
+        if not first_user_doc:
             continue
 
-        # 安全解析 data
-        data_dict = safe_parse_json(latest_doc.get("data", {}))
+        data_dict = safe_parse_json(first_user_doc.get("data", {}))
+
+        send_date_str = data_dict.get("send_date")
+        if send_date_str:
+            try:
+                dt_obj = datetime.strptime(send_date_str, "%B %d, %Y %I:%M%p").astimezone(UTC)
+                iso_send_date = dt_obj.isoformat(timespec='seconds') + 'Z'
+            except Exception:
+                iso_send_date = ""
+        else:
+            iso_send_date = ""
 
         filtered_data = {
             "name": data_dict.get("name"),
-            "is_user": False,
-            "send_date": data_dict.get("send_date"),
-            "mes": data_dict.get("mes")
+            "is_user": data_dict.get("is_user", 0),
+            "send_date": iso_send_date,
+            "mes": data_dict.get("mes"),
         }
 
-        # 计算楼层（按插入顺序）
-        chat_records = list(collection.find({}).sort("_id", 1))
-        latest_floor = 0
-        for index, item in enumerate(chat_records, start=1):
-            if item.get("_id") == latest_doc.get("_id"):
-                latest_floor = index
-                break
+        # 获取房主信息
+        try:
+            user_obj = ChatUser.objects.get(id=room.uid)
+            user_info = {
+                "username": user_obj.username,
+                "nickname": getattr(user_obj, "nickname", "") or "",
+                "avatar": getattr(user_obj, "avatar", "") or ""
+            }
+        except ChatUser.DoesNotExist:
+            user_info = {
+                "username": room.user_name or "",
+                "nickname": "",
+                "avatar": ""
+            }
 
-        # 获取 username
-        if room.file_branch == "main":
-            try:
-                user_obj = Anchor.objects.get(uid=room.uid)
-                username = user_obj.username
-                source_username = username  # main 分支源头就是它
-            except Anchor.DoesNotExist:
-                username = room.user_name or ""
-                source_username = username
-        else:
-            try:
-                user_obj = ChatUser.objects.get(id=room.uid)
-                username = user_obj.username
-            except ChatUser.DoesNotExist:
-                username = room.user_name or ""
+        # 使用新的 build_full_image_url 签名 (uid, room_id)
+        image_info = build_full_image_url(request, uid=room.uid, room_id=room.room_id)
 
-            # 查 fork 源头
-            fork_trace = ForkTrace.objects.filter(current_room_id=room.room_id).first()
-            if fork_trace:
-                try:
-                    source_anchor = Anchor.objects.get(uid=fork_trace.source_uid)
-                    source_username = source_anchor.username
-                except Anchor.DoesNotExist:
-                    source_username = None
-            else:
-                source_username = None
-
-        send_date_obj = parse_send_date(data_dict.get("send_date"))
-        send_date_str = send_date_obj.strftime("%Y-%m-%d %H:%M:%S") if send_date_obj else None
-
-        result.append({
+        card_info = {
             "room_id": room.room_id,
             "character_name": room.character_name,
+            "image": image_info['image_path'],
             "title": room.title,
             "describe": room.describe,
-            "username": username,
             "file_branch": room.file_branch,
-            "source_username": source_username,
-            "latest_message": filtered_data,
-            "data_type": latest_doc.get("data_type"),
-            "mes_html": latest_doc.get("mes_html", ""),
-            "send_date": send_date_str,
-            "floor": latest_floor
-        })
-
-    # 按发送时间降序
-    result.sort(key=lambda x: x["send_date"] or "", reverse=True)
-
-    # 分页
-    total = len(result)
-    paginated = result[offset: offset + page_size]
-
-    return Response({
-        "code": 0,
-        "data": {
-            "page": page,
-            "page_size": page_size,
-            "total": total,
-            "rooms": paginated
+            "first_user_message": filtered_data,
+            "data_type": first_user_doc.get("data_type"),
+            "mes_html": first_user_doc.get("mes_html", ""),
         }
-    })
-
-
-@api_view(['GET'])
-def get_fork_relations(request):
-    """
-    获取 fork 关系，只返回 id 和 username
-    GET /api/fork/relations/?page=1&page_size=10
-    """
-    page = int(request.GET.get("page", 1))
-    page_size = int(request.GET.get("page_size", 10))
-    offset = (page - 1) * page_size
-
-    fork_qs = ForkRelation.objects.all().order_by('-created_at')
-    total = fork_qs.count()
-    fork_list = fork_qs[offset: offset + page_size]
-
-    result = []
-    for fork in fork_list:
-        # 发起者 username
-        try:
-            from_user = ChatUser.objects.get(id=fork.from_user_id)
-            from_username = from_user.username
-        except ChatUser.DoesNotExist:
-            from_username = f"User {fork.from_user_id}"
-
-        # 目标用户 username
-        target_id = fork.target_id
-        target_username = None
-        if target_id.isdigit():  # 数字 id → 查 ChatUser
-            try:
-                target_user = ChatUser.objects.get(id=int(target_id))
-                target_username = target_user.username
-            except ChatUser.DoesNotExist:
-                target_username = f"User {target_id}"
-        else:  # 字符串 uid → 查 Anchor
-            try:
-                target_user = Anchor.objects.get(uid=target_id)
-                target_username = target_user.username
-            except Anchor.DoesNotExist:
-                target_username = f"User {target_id}"
 
         result.append({
-            "from_id": fork.from_user_id,
-            "from_name": from_username,
-            "target_id": fork.target_id,
-            "target_name": target_username
+            "user": user_info,
+            "card": card_info
         })
+
+    # ---------- 缓存结果到 Redis，设置过期时间（例如 60 秒） ----------
+    try:
+        redis_conn.set(cache_key, json.dumps(result, default=str), ex=60)
+    except Exception:
+        # 缓存失败不影响主流程
+        pass
+
+    # ---------- 分页 ----------
+    paginator = StandardResultsSetPagination()
+    page_obj = paginator.paginate_queryset(result, request)
 
     return Response({
         "code": 0,
+        "message": "Success",
         "data": {
-            "page": page,
-            "page_size": page_size,
-            "total": total,
-            "forks": result
+            "next": paginator.get_next_link(),
+            "previous": paginator.get_previous_link(),
+            "results": page_obj
         }
     })
 
+# ---------- 全量信息流接口 ----------
 @api_view(['GET'])
-def random_fork_card(request):
-    """
-    随机返回 ForkRelation 中一条记录对应的 CharacterCard 的图片、角色名和用户名
-    """
-    # 1. 随机选一条 ForkRelation
-    total_count = ForkRelation.objects.count()
-    if total_count == 0:
-        return Response({"success": False, "message": "ForkRelation 没有数据"}, status=404)
+def get_feed_rooms(request):
+    return _fetch_feed_rooms(request, personal_only=False)
 
-    random_index = random.randint(0, total_count - 1)
-    fork = ForkRelation.objects.all()[random_index]
 
-    # 2. 用 room_id 查 CharacterCard
-    try:
-        card = CharacterCard.objects.get(room_id=fork.room_id)
-    except CharacterCard.DoesNotExist:
-        return Response({"success": False, "message": "CharacterCard 未找到"}, status=404)
-
-    # 3. 返回需要的字段
-    data = {
-        "target_id": fork.target_id,
-        "username": card.username,
-        "character_name": card.character_name,
-        "image_path": build_full_image_url(request, card.image_path.url)
-
-    }
-
-    return Response({"success": True, "data": data})
+# ---------- 个人信息流接口 ----------
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_personal_feed(request):
+    return _fetch_feed_rooms(request, personal_only=True)

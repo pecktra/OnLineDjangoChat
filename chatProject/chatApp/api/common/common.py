@@ -6,7 +6,7 @@ from urllib.parse import quote
 import redis
 from django_redis import get_redis_connection
 import random
-from chatApp.models import CharacterCard
+from chatApp.models import CharacterCard,RoomImageBinding
 from base64 import b64encode
 from urllib import parse
 from urllib.parse import urlparse
@@ -19,38 +19,48 @@ import os
 redis_client = get_redis_connection('default')
 
 
-def build_full_image_url(request, uid, character_name):
+def build_full_image_url(request, uid, room_id):
     """
     获取角色卡片信息，包括 image_name、image_path、tags 和 language。
-    逻辑：
-    1. 查询 CharacterCard 获取最新记录：
-        - 存在记录：返回 image_name、完整 image_path、tags（列表）、language
-        - 不存在记录：随机选择默认图片，image_name 空，tags 空，language 'en'
+    如果有绑定卡片，拼接 SITE_DOMAIN + /media/ + 数据库存储的相对路径
+    如果没有绑定卡片，返回默认图片
     """
-    # 默认图片相对路径
+    import random
+    from urllib.parse import quote
+
     default_images = [
-        "media/headimage/default_image1.png",
-        "media/headimage/default_image2.png"
+        "headimage/default_image1.png",
+        "headimage/default_image2.png"
     ]
 
-    # 从 settings 读取站点域名
-    site_domain = getattr(settings, "SITE_DOMAIN")
+    site_domain = getattr(settings, "SITE_DOMAIN")  # e.g. https://pecktra-dev.roturalabs.com
 
-    character_card = CharacterCard.objects.filter(
-        uid=uid,
-        character_name=character_name
-    ).order_by('-create_date').first()
+    # 查询绑定关系
+    binding = RoomImageBinding.objects.filter(uid=uid, room_id=room_id).first()
 
-    if character_card:
-        image_name = character_card.image_name
-        image_path = request.build_absolute_uri(character_card.image_path.url)
-        tags = character_card.tags.split(",") if character_card.tags else []
-        language = character_card.language or "en"
+    if binding and binding.image_id:
+        character_card = CharacterCard.objects.filter(id=binding.image_id).values(
+            'image_name', 'image_path', 'tags', 'language'
+        ).first()
+
+        if character_card:
+            image_name = character_card['image_name']
+            # 使用 /media/ 拼接路径
+            image_path = f"{site_domain}/media/{quote(character_card['image_path'], safe='/')}"
+            tags = character_card['tags'].split(",") if character_card['tags'] else []
+            language = character_card['language'] or "en"
+        else:
+            # 卡片不存在，返回默认图片
+            image_name = ""
+            default_image_relative = random.choice(default_images)
+            image_path = f"{site_domain}/media/{quote(default_image_relative, safe='/')}"
+            tags = []
+            language = "en"
     else:
+        # 没有绑定关系，返回默认图片
         image_name = ""
-        # 拼接域名与默认路径
         default_image_relative = random.choice(default_images)
-        image_path = f"{site_domain}/{quote(default_image_relative, safe='/')}"
+        image_path = f"{site_domain}/media/{quote(default_image_relative, safe='/')}"
         tags = []
         language = "en"
 
@@ -60,6 +70,7 @@ def build_full_image_url(request, uid, character_name):
         "tags": tags,
         "language": language
     }
+
 
 
 def generate_new_room_id(user_id: str, character_name: str) -> str:
@@ -76,24 +87,6 @@ def generate_new_room_name(uid: str, character_name: str) -> str:
     """
     timestamp_str = timezone.now().strftime("%Y-%m-%d @%Hh %Mm %Ss %fms")
     return f"Branch_{uid}_{character_name}_{timestamp_str}"
-
-
-def get_online_room_ids(pattern: str = '*') -> list:
-    """
-    从 Redis 获取当前在线的房间 room_id 列表
-
-    :param pattern: Redis key 模式，默认匹配所有
-    :return: 在线 room_id 列表（字符串）
-    """
-    try:
-        keys = redis_client.keys(pattern)
-        # 保留原始逻辑：兼容 Redis 未设置 decode_responses 的情况
-        room_ids = [key.decode('utf-8') if isinstance(key, bytes) else key for key in keys]
-        return room_ids
-    except Exception as e:
-        print(f"[Redis Error] 获取在线房间失败: {e}")
-        return []
-
 
 # ======================================================
 # ✅ 通用分页类封装（支持 page_size、自定义 ordering、去域名）
