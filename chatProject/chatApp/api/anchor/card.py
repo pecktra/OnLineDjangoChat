@@ -73,12 +73,6 @@ def import_card(request):
             tags=tags
         )
 
-        RoomImageBinding.objects.update_or_create(
-            uid=user.uid,
-            room_id=room_id,
-            image_id=character_card.id
-        )
-
         # 保存图片文件
         sub_path = os.path.join(username, 'characters', f"{filename}.png")
         full_path = os.path.join(settings.MEDIA_ROOT, sub_path)

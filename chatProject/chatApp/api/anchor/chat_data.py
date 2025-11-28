@@ -164,7 +164,7 @@ def chat_data(request):
                 # 获取旧绑定的房间 ID
                 old_room_ids = binding_qs.values_list('room_id', flat=True)
                 # 把旧房间在 RoomInfo 设置为不展示
-                RoomInfo.objects.filter(room_id__in=old_room_ids).update(is_show=0)
+                RoomInfo.objects.filter(room_id__in=old_room_ids).update(is_show=1)
                 # 覆盖绑定
                 binding_qs.update(room_id=room_id, updated_at=timezone.now())
             else:
