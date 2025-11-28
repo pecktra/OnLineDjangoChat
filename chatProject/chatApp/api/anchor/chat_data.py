@@ -146,29 +146,34 @@ def chat_data(request):
             )
             room_info.save()
 
+        # 获取 character_card_id
         character_card_id = CharacterCard.objects.filter(
             uid=uid,
             character_name=character_name
         ).order_by('-id').values_list('id', flat=True).first()
 
         if character_card_id:
-            # 先把同一用户同一卡绑定过的旧房间隐藏
-            old_bindings = RoomImageBinding.objects.filter(
-                uid=uid,
-                image_id=character_card_id
-            ).exclude(room_id=room_id)
-
-            if old_bindings.exists():
-                old_room_ids = old_bindings.values_list('room_id', flat=True)
-                RoomInfo.objects.filter(room_id__in=old_room_ids).update(is_show=0)
-
-            # 更新或创建新的绑定
-            RoomImageBinding.objects.update_or_create(
+            # 查询是否已有绑定关系
+            binding_qs = RoomImageBinding.objects.filter(
                 uid=uid,
                 image_id=character_card_id,
-                defaults={'room_id': room_id}
+                room_id__isnull=False
             )
 
+            if binding_qs.exists():
+                # 获取旧绑定的房间 ID
+                old_room_ids = binding_qs.values_list('room_id', flat=True)
+                # 把旧房间在 RoomInfo 设置为不展示
+                RoomInfo.objects.filter(room_id__in=old_room_ids).update(is_show=0)
+                # 覆盖绑定
+                binding_qs.update(room_id=room_id, updated_at=timezone.now())
+            else:
+                # 新增绑定
+                RoomImageBinding.objects.create(
+                    uid=uid,
+                    image_id=character_card_id,
+                    room_id=room_id
+                )
         # 转发 WebSocket 消息（取消注释以启用）
         # if send_data['live_message']:
         #     sync_send_to_websocket(room_id, send_data)
