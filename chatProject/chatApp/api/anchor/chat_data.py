@@ -9,6 +9,7 @@ import hashlib
 from chatApp.models import RoomImageBinding,RoomInfo, CharacterCard
 from django_redis import get_redis_connection  # 获取 Redis 连接
 from django.views.decorators.csrf import csrf_exempt
+from django.utils import timezone
 # 建立 MongoDB 连接
 client = MongoClient(settings.MONGO_URI)
 db = client[settings.MONGO_DB_NAME]

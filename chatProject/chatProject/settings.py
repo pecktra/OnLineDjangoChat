@@ -17,6 +17,7 @@ from dotenv import load_dotenv
 # 加载 .env 文件
 load_dotenv()
 
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 build_universe_url = os.getenv('build_universe_url', '')  # 默认值可选
 
