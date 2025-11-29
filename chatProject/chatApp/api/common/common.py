@@ -2,7 +2,7 @@
 from django.conf import settings
 from django.utils import timezone
 import hashlib
-from urllib.parse import quote
+from urllib.parse import quote,unquote_plus
 import redis
 from django_redis import get_redis_connection
 import random
@@ -14,7 +14,7 @@ from collections import OrderedDict
 from rest_framework.response import Response
 from rest_framework.pagination import CursorPagination
 from rest_framework.utils.urls import replace_query_param
-import os
+import re
 # 建立 Redis 连接
 redis_client = get_redis_connection('default')
 
@@ -24,14 +24,10 @@ def build_full_image_url(request, uid, room_id, search_tag=None):
     返回值永远是 dict
     - 匹配用字符串，返回给前端用数组
     """
-
-    import random
-    from urllib.parse import quote
-    from django.conf import settings
-
     default_images = ["headimage/default_image1.png", "headimage/default_image2.png"]
     site_domain = getattr(settings, "SITE_DOMAIN", "")
 
+    # 查绑定
     binding = RoomImageBinding.objects.filter(uid=uid, room_id=room_id).first()
 
     image_name = ""
@@ -41,8 +37,8 @@ def build_full_image_url(request, uid, room_id, search_tag=None):
     image_path = f"{site_domain}/media/{quote(default_path, safe='/')}"
 
     if binding and binding.image_id:
-        card = CharacterCard.objects.filter(id=binding.image_id)\
-            .values('image_name', 'image_path', 'tags', 'language')\
+        card = CharacterCard.objects.filter(id=binding.image_id) \
+            .values('image_name', 'image_path', 'tags', 'language') \
             .first()
         if card:
             image_name = card['image_name']
@@ -53,11 +49,10 @@ def build_full_image_url(request, uid, room_id, search_tag=None):
     # 构造前端返回数组
     tags_list = [t.strip() for t in tags_str.split(",") if t.strip()]
 
-    # 构造完整信息 dict
     full_info = {
         "image_name": image_name,
         "image_path": image_path,
-        "tags": tags_list,  # 返回数组
+        "tags": tags_list,  # 返回数组，保留原始标签
         "language": language.upper() if language in ('en', 'cn') else language
     }
 
@@ -65,13 +60,18 @@ def build_full_image_url(request, uid, room_id, search_tag=None):
     if not search_tag or str(search_tag).strip() == "":
         return full_info
 
-    # 模糊匹配
-    search_tag = search_tag.strip().lower()
-    if search_tag in ("en", "cn"):
-        match = (language.lower() == search_tag)
+    # 处理 URL 编码，例如 Multiple+Characters → Multiple Characters
+    search_tag = unquote_plus(search_tag.strip())
+
+    # 模糊匹配时，去掉非字母数字字符并转小写
+    clean_search = re.sub(r'[^a-zA-Z0-9]', '', search_tag).lower()
+    clean_tags = re.sub(r'[^a-zA-Z0-9]', '', tags_str).lower()
+
+    # 匹配英文或中文标签特殊处理
+    if clean_search in ("en", "cn"):
+        match = (language.lower() == clean_search)
     else:
-        # 用列表匹配，避免前后空格影响
-        match = any(search_tag in t.lower() for t in tags_list)
+        match = clean_search in clean_tags
 
     # 不匹配 → 返回空图
     if not match:
@@ -79,7 +79,7 @@ def build_full_image_url(request, uid, room_id, search_tag=None):
         empty_info = {
             "image_name": "",
             "image_path": empty_path,
-            "tags": [],
+            "tags": [],  # 空数组
             "language": "en"
         }
         return empty_info
