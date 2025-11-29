@@ -6,7 +6,7 @@ from django.conf import settings
 import json
 from django.shortcuts import redirect, render
 from chatApp.models import ChatUserChatHistory, UserBalance, RoomInfo, AnchorBalance, PaymentLiveroomEntryRecord, \
-    ChatUser, CharacterCard,UserFollowRelation
+    ChatUser, CharacterCard,UserFollowRelation,RoomImageBinding
 from django.utils import timezone
 from datetime import datetime
 from django.db.models import Subquery, OuterRef
@@ -15,7 +15,6 @@ from decimal import Decimal
 from django.db import transaction
 from django.contrib.auth import get_user
 from django.http import JsonResponse
-import chatProject.settings as setting
 from chatApp.consumers import ChatConsumer
 from django.utils.dateparse import parse_datetime
 from chatApp.api.common.common import  build_full_image_url, IDCursorPagination
@@ -48,35 +47,19 @@ def parse_send_date(send_date_str):
         except ValueError:
             return None
 
-
-
-
 @api_view(['GET'])
 def get_all_lives(request):
     """
     获取正在直播的直播间列表，支持 tags 搜索 + CursorPagination
-    GET /api/live/get_all_lives?tags=<tag>
+    GET /api/live/get_all_lives?tags=萝莉&cursor=xxx
     """
-    search_tag = request.GET.get("tags", "").strip()
+    raw_tag = request.GET.get("tags", "").strip()
+    search_tag = raw_tag.lower() if raw_tag else None  # 统一转小写用于匹配
 
-    # 1️⃣ 查询 RoomInfo，只查公开房间
+    # 1. 查询公开房间
     room_infos = RoomInfo.objects.filter(is_show=0, file_branch='main')
 
-    # 2️⃣ 处理 tags 过滤
-    if search_tag:
-        filtered_ids = []
-        for room in room_infos:
-            card = CharacterCard.objects.filter(room_id=room.room_id).order_by(
-                '-create_date').first()
-            if not card:
-                continue
-            if search_tag in ['en', 'cn'] and card.language == search_tag:
-                filtered_ids.append(room.room_id)
-            elif card.tags and search_tag in card.tags.split(','):
-                filtered_ids.append(room.room_id)
-        room_infos = room_infos.filter(room_id__in=filtered_ids)
-
-    # 3️⃣ 更新每个 room 的 last_ai_reply_timestamp
+    # 2. 更新每个 room 的 last_ai_reply_timestamp（你原来的逻辑保留）
     for room in room_infos:
         collection = db[room.room_id]
         last_ai_doc = collection.find_one(
@@ -91,18 +74,22 @@ def get_all_lives(request):
                 if room.last_ai_reply_timestamp != timestamp:
                     RoomInfo.objects.filter(pk=room.pk).update(last_ai_reply_timestamp=timestamp)
 
-    # ✅ 直接调用你封装好的 IDCursorPagination（带无域名 next/previous）
+    # 3. 分页（你原来的分页方式完全保留）
     paginator = IDCursorPagination()
-    paginator.ordering = '-last_ai_reply_timestamp'
+    paginator.ordering = ['-weight', '-last_ai_reply_timestamp']
     paginated_rooms = paginator.paginate_queryset(room_infos, request)
 
-    # 5️⃣ 构建返回数据（去除 nickname）
+    # 4. 构建返回数据（超级简洁！所有复杂逻辑都在 build_full_image_url 里）
     lives_info = []
-
     for room in paginated_rooms:
-        image_info = build_full_image_url(request, uid=room.uid, room_id=room.room_id)
+        image_info = build_full_image_url(
+            request, room.uid, room.room_id, search_tag
+        )
 
-        # 删除了获取 nickname 的部分
+        # 判断是否被过滤：超级容易！
+        if not image_info["image_name"]:  # 没名字 = 被过滤了
+            continue
+
         lives_info.append({
             "room_id": room.room_id,
             "room_name": room.room_name,
@@ -120,22 +107,20 @@ def get_all_lives(request):
                 "coin_num": room.coin_num if room.coin_num is not None else 0,
                 "room_type": room.room_type or 0
             },
-            "last_ai_reply_timestamp": room.last_ai_reply_timestamp
+            "last_ai_reply_timestamp": room.last_ai_reply_timestamp,
+            "weight": room.weight
         })
 
-    # ✅ 使用你封装好的分页响应结构
-    # 获取分页后的 URL，并确保它们是完整的 URL
+    # 5. 分页链接（你原来的写法完全保留）
     next_link = paginator.get_next_link()
     previous_link = paginator.get_previous_link()
 
-    # 如果分页链接存在，转化为完整的 URL
     if next_link:
         next_link = request.build_absolute_uri(next_link)
-
     if previous_link:
         previous_link = request.build_absolute_uri(previous_link)
 
-    # 返回分页后的响应
+    # 6. 返回
     return Response({
         "code": 0,
         "message": "Success",

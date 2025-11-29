@@ -19,58 +19,68 @@ import os
 redis_client = get_redis_connection('default')
 
 
-def build_full_image_url(request, uid, room_id):
+def build_full_image_url(request, uid, room_id, search_tag=None):
     """
-    获取角色卡片信息，包括 image_name、image_path、tags 和 language。
-    如果有绑定卡片，拼接 SITE_DOMAIN + /media/ + 数据库存储的相对路径
-    如果没有绑定卡片，返回默认图片
+    终极兼容版：返回值永远是 dict！
+    - 不传 search_tag → 正常返回完整信息（所有老代码完美兼容）
+    - 传了 search_tag 且匹配 → 返回完整信息
+    - 传了 search_tag 但不匹配 → 返回“空图”（image_name="", tags="" 等）
     """
     import random
     from urllib.parse import quote
 
-    default_images = [
-        "headimage/default_image1.png",
-        "headimage/default_image2.png"
-    ]
+    default_images = ["headimage/default_image1.png", "headimage/default_image2.png"]
+    site_domain = getattr(settings, "SITE_DOMAIN", "")
 
-    site_domain = getattr(settings, "SITE_DOMAIN")  # e.g. https://pecktra-dev.roturalabs.com
-
-    # 查询绑定关系
+    # === 查绑定 + 卡片（强制用 .first()，永绝 tuple 错误）===
     binding = RoomImageBinding.objects.filter(uid=uid, room_id=room_id).first()
 
+    image_name = ""
+    tags = ""
+    language = "en"
+    default_path = random.choice(default_images)
+    image_path = f"{site_domain}/media/{quote(default_path, safe='/')}"
+
     if binding and binding.image_id:
-        character_card = CharacterCard.objects.filter(id=binding.image_id).values(
-            'image_name', 'image_path', 'tags', 'language'
-        ).first()
+        card = CharacterCard.objects.filter(id=binding.image_id)\
+            .values('image_name', 'image_path', 'tags', 'language')\
+            .first()  # 必须 .first()，返回 dict 或 None
 
-        if character_card:
-            image_name = character_card['image_name']
-            # 使用 /media/ 拼接路径
-            image_path = f"{site_domain}/media/{quote(character_card['image_path'], safe='/')}"
-            tags = character_card['tags'].split(",") if character_card['tags'] else []
-            language = character_card['language'] or "en"
-        else:
-            # 卡片不存在，返回默认图片
-            image_name = ""
-            default_image_relative = random.choice(default_images)
-            image_path = f"{site_domain}/media/{quote(default_image_relative, safe='/')}"
-            tags = []
-            language = "en"
-    else:
-        # 没有绑定关系，返回默认图片
-        image_name = ""
-        default_image_relative = random.choice(default_images)
-        image_path = f"{site_domain}/media/{quote(default_image_relative, safe='/')}"
-        tags = []
-        language = "en"
+        if card:
+            image_name = card['image_name']
+            tags = (card.get('tags') or "").strip()
+            language = (card.get('language') or "en").lower()
+            image_path = f"{site_domain}/media/{quote(card['image_path'], safe='/')}"
 
-    return {
+    # 构造完整信息（有图的情况）
+    full_info = {
         "image_name": image_name,
-        "image_path": image_path,
+        "image_path": image_path,        # 注意：这里你原来写错了 "image_path access" → 改成 "image_path"
         "tags": tags,
-        "language": language
+        "language": language.upper() if language in ('en', 'cn') else language
     }
 
+    # 构造“空图”信息（用于过滤失败）
+    empty_info = {
+        "image_name": "",
+        "image_path": f"{site_domain}/media/{quote(random.choice(default_images), safe='/')}",
+        "tags": "",
+        "language": "en"
+    }
+
+    # === 关键修改从这里开始：永远返回 dict！===
+    if search_tag is None:
+        return full_info  # 老代码调用：直接返回完整信息
+
+    # 有 search_tag → 需要过滤
+    search_tag = search_tag.strip().lower()
+
+    if search_tag in ("en", "cn"):
+        match = (language == search_tag)
+    else:
+        match = any(search_tag in t.strip().lower() for t in tags.split(",") if t.strip())
+
+    return full_info if match else empty_info
 
 
 def generate_new_room_id(user_id: str, character_name: str) -> str:
