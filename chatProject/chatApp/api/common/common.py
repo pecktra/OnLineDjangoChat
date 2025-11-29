@@ -22,8 +22,23 @@ redis_client = get_redis_connection('default')
 def build_full_image_url(request, uid, room_id, search_tag=None):
     """
     返回值永远是 dict
-    - 匹配用字符串，返回给前端用数组
+    - 匹配用字符串（中文、英文大小写忽略，去掉特殊字符，保留中文）
+    - 返回给前端保留原始标签数组
     """
+
+    def normalize_tag(s: str) -> str:
+        """
+        去掉特殊字符，保留中文、英文、数字
+        并将英文转小写
+        """
+        if not s:
+            return ""
+        # URL 解码
+        s = unquote_plus(s)
+        # 去掉非中文、英文、数字字符
+        s = re.sub(r'[^a-zA-Z0-9\u4e00-\u9fa5]', '', s)
+        return s.lower()
+
     default_images = ["headimage/default_image1.png", "headimage/default_image2.png"]
     site_domain = getattr(settings, "SITE_DOMAIN", "")
 
@@ -37,12 +52,12 @@ def build_full_image_url(request, uid, room_id, search_tag=None):
     image_path = f"{site_domain}/media/{quote(default_path, safe='/')}"
 
     if binding and binding.image_id:
-        card = CharacterCard.objects.filter(id=binding.image_id) \
-            .values('image_name', 'image_path', 'tags', 'language') \
+        card = CharacterCard.objects.filter(id=binding.image_id)\
+            .values('image_name', 'image_path', 'tags', 'language')\
             .first()
         if card:
             image_name = card['image_name']
-            tags_str = card['tags'] or ""  # 用于匹配
+            tags_str = card['tags'] or ""  # 原始标签字符串
             language = card['language']
             image_path = f"{site_domain}/media/{quote(card['image_path'], safe='/')}"
 
@@ -52,7 +67,7 @@ def build_full_image_url(request, uid, room_id, search_tag=None):
     full_info = {
         "image_name": image_name,
         "image_path": image_path,
-        "tags": tags_list,  # 返回数组，保留原始标签
+        "tags": tags_list,  # 返回数组
         "language": language.upper() if language in ('en', 'cn') else language
     }
 
@@ -60,18 +75,14 @@ def build_full_image_url(request, uid, room_id, search_tag=None):
     if not search_tag or str(search_tag).strip() == "":
         return full_info
 
-    # 处理 URL 编码，例如 Multiple+Characters → Multiple Characters
-    search_tag = unquote_plus(search_tag.strip())
+    # 清理搜索标签
+    clean_search = normalize_tag(search_tag.strip())
 
-    # 模糊匹配时，去掉非字母数字字符并转小写
-    clean_search = re.sub(r'[^a-zA-Z0-9]', '', search_tag).lower()
-    clean_tags = re.sub(r'[^a-zA-Z0-9]', '', tags_str).lower()
-
-    # 匹配英文或中文标签特殊处理
+    # 匹配英文/中文标签或 language
     if clean_search in ("en", "cn"):
         match = (language.lower() == clean_search)
     else:
-        match = clean_search in clean_tags
+        match = any(clean_search in normalize_tag(t) for t in tags_list)
 
     # 不匹配 → 返回空图
     if not match:
