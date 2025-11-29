@@ -25,6 +25,10 @@ def build_full_image_url(request, uid, room_id, search_tag=None):
     - 匹配用字符串，返回给前端用数组
     """
 
+    import random
+    from urllib.parse import quote
+    from django.conf import settings
+
     default_images = ["headimage/default_image1.png", "headimage/default_image2.png"]
     site_domain = getattr(settings, "SITE_DOMAIN", "")
 
@@ -49,6 +53,7 @@ def build_full_image_url(request, uid, room_id, search_tag=None):
     # 构造前端返回数组
     tags_list = [t.strip() for t in tags_str.split(",") if t.strip()]
 
+    # 构造完整信息 dict
     full_info = {
         "image_name": image_name,
         "image_path": image_path,
@@ -63,9 +68,10 @@ def build_full_image_url(request, uid, room_id, search_tag=None):
     # 模糊匹配
     search_tag = search_tag.strip().lower()
     if search_tag in ("en", "cn"):
-        match = (language == search_tag)
+        match = (language.lower() == search_tag)
     else:
-        match = search_tag in tags_str.lower()  # 匹配用原始字符串
+        # 用列表匹配，避免前后空格影响
+        match = any(search_tag in t.lower() for t in tags_list)
 
     # 不匹配 → 返回空图
     if not match:
@@ -73,7 +79,7 @@ def build_full_image_url(request, uid, room_id, search_tag=None):
         empty_info = {
             "image_name": "",
             "image_path": empty_path,
-            "tags": [],  # 空数组
+            "tags": [],
             "language": "en"
         }
         return empty_info
