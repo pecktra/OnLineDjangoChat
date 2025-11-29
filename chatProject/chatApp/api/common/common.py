@@ -21,23 +21,17 @@ redis_client = get_redis_connection('default')
 
 def build_full_image_url(request, uid, room_id, search_tag=None):
     """
-    终极兼容版：返回值永远是 dict！
-    - 不传 search_tag → 正常返回完整信息（所有老代码完美兼容）
-    - 传了 search_tag 且匹配 → 返回完整信息
-    - 传了 search_tag 但不匹配 → 返回“空图”（image_name="", tags=[] 等）
+    返回值永远是 dict
+    - 匹配用字符串，返回给前端用数组
     """
-    import random
-    from urllib.parse import quote
-    from django.conf import settings
 
     default_images = ["headimage/default_image1.png", "headimage/default_image2.png"]
     site_domain = getattr(settings, "SITE_DOMAIN", "")
 
-    # 查绑定 + 卡片
     binding = RoomImageBinding.objects.filter(uid=uid, room_id=room_id).first()
 
     image_name = ""
-    tags = ""
+    tags_str = ""
     language = "en"
     default_path = random.choice(default_images)
     image_path = f"{site_domain}/media/{quote(default_path, safe='/')}"
@@ -48,33 +42,32 @@ def build_full_image_url(request, uid, room_id, search_tag=None):
             .first()
         if card:
             image_name = card['image_name']
-            tags = card['tags'] or ""
+            tags_str = card['tags'] or ""  # 用于匹配
             language = card['language']
             image_path = f"{site_domain}/media/{quote(card['image_path'], safe='/')}"
 
-    # 构造标签数组
-    tags_list = [t.strip() for t in tags.split(",") if t.strip()]
+    # 构造前端返回数组
+    tags_list = [t.strip() for t in tags_str.split(",") if t.strip()]
 
-    # 构造完整信息
     full_info = {
         "image_name": image_name,
         "image_path": image_path,
-        "tags": tags_list,  # 数组形式
+        "tags": tags_list,  # 返回数组
         "language": language.upper() if language in ('en', 'cn') else language
     }
 
-    # search_tag 为空或 None → 直接返回完整信息
+    # search_tag 为空 → 直接返回
     if not search_tag or str(search_tag).strip() == "":
         return full_info
 
-    # 模糊匹配整个 tags 字符串
+    # 模糊匹配
     search_tag = search_tag.strip().lower()
     if search_tag in ("en", "cn"):
         match = (language == search_tag)
     else:
-        match = search_tag in tags
+        match = search_tag in tags_str.lower()  # 匹配用原始字符串
 
-    # 不匹配 → 返回空图信息
+    # 不匹配 → 返回空图
     if not match:
         empty_path = f"{site_domain}/media/{quote(random.choice(default_images), safe='/')}"
         empty_info = {
