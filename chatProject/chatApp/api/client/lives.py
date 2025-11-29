@@ -99,7 +99,7 @@ def get_all_lives(request):
             "character_date": room.character_date,
             "image_name": image_info['image_name'],
             "image_path": image_info['image_path'],
-            "tags": image_info['tags'],
+            "tags": image_info['tags'],  # 原始字符串
             "language": image_info['language'],
             "room_info": {
                 "title": room.title or "",

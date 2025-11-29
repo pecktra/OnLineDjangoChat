@@ -24,15 +24,16 @@ def build_full_image_url(request, uid, room_id, search_tag=None):
     终极兼容版：返回值永远是 dict！
     - 不传 search_tag → 正常返回完整信息（所有老代码完美兼容）
     - 传了 search_tag 且匹配 → 返回完整信息
-    - 传了 search_tag 但不匹配 → 返回“空图”（image_name="", tags="" 等）
+    - 传了 search_tag 但不匹配 → 返回“空图”（image_name="", tags=[] 等）
     """
     import random
     from urllib.parse import quote
+    from django.conf import settings
 
     default_images = ["headimage/default_image1.png", "headimage/default_image2.png"]
     site_domain = getattr(settings, "SITE_DOMAIN", "")
 
-    # === 查绑定 + 卡片（强制用 .first()，永绝 tuple 错误）===
+    # 查绑定 + 卡片
     binding = RoomImageBinding.objects.filter(uid=uid, room_id=room_id).first()
 
     image_name = ""
@@ -44,44 +45,47 @@ def build_full_image_url(request, uid, room_id, search_tag=None):
     if binding and binding.image_id:
         card = CharacterCard.objects.filter(id=binding.image_id)\
             .values('image_name', 'image_path', 'tags', 'language')\
-            .first()  # 必须 .first()，返回 dict 或 None
-
+            .first()
         if card:
             image_name = card['image_name']
-            tags = (card.get('tags') or "").strip()
-            language = (card.get('language') or "en").lower()
+            tags = card['tags'] or ""
+            language = card['language']
             image_path = f"{site_domain}/media/{quote(card['image_path'], safe='/')}"
 
-    # 构造完整信息（有图的情况）
+    # 构造标签数组
+    tags_list = [t.strip() for t in tags.split(",") if t.strip()]
+
+    # 构造完整信息
     full_info = {
         "image_name": image_name,
-        "image_path": image_path,        # 注意：这里你原来写错了 "image_path access" → 改成 "image_path"
-        "tags": tags,
+        "image_path": image_path,
+        "tags": tags_list,  # 数组形式
         "language": language.upper() if language in ('en', 'cn') else language
     }
 
-    # 构造“空图”信息（用于过滤失败）
-    empty_info = {
-        "image_name": "",
-        "image_path": f"{site_domain}/media/{quote(random.choice(default_images), safe='/')}",
-        "tags": "",
-        "language": "en"
-    }
+    # search_tag 为空或 None → 直接返回完整信息
+    if not search_tag or str(search_tag).strip() == "":
+        return full_info
 
-    # === 关键修改从这里开始：永远返回 dict！===
-    if search_tag is None:
-        return full_info  # 老代码调用：直接返回完整信息
-
-    # 有 search_tag → 需要过滤
+    # 模糊匹配整个 tags 字符串
     search_tag = search_tag.strip().lower()
-
     if search_tag in ("en", "cn"):
         match = (language == search_tag)
     else:
-        match = any(search_tag in t.strip().lower() for t in tags.split(",") if t.strip())
+        match = search_tag in tags
 
-    return full_info if match else empty_info
+    # 不匹配 → 返回空图信息
+    if not match:
+        empty_path = f"{site_domain}/media/{quote(random.choice(default_images), safe='/')}"
+        empty_info = {
+            "image_name": "",
+            "image_path": empty_path,
+            "tags": [],  # 空数组
+            "language": "en"
+        }
+        return empty_info
 
+    return full_info
 
 def generate_new_room_id(user_id: str, character_name: str) -> str:
     """
