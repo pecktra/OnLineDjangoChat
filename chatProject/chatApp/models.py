@@ -31,6 +31,10 @@ def character_image_upload_path(instance, filename):
     return os.path.join(instance.username, 'characters', filename)
 
 
+
+
+
+
 class CharacterCard(models.Model):
     uid = models.CharField(max_length=150, verbose_name="用户ID")  # 用户id
     username = models.CharField(max_length=150, verbose_name="用户名")  # 用户名
@@ -66,6 +70,46 @@ class CharacterCard(models.Model):
 
     class Meta:
         db_table = 'character_card'
+        verbose_name = "角色卡"
+        verbose_name_plural = "角色卡"
+
+
+
+class CreatorCharacterCard(models.Model):
+    uid = models.CharField(max_length=150, verbose_name="用户ID")  # 用户id
+    username = models.CharField(max_length=150, verbose_name="用户名")  # 用户名
+    room_name = models.CharField(max_length=255)
+    character_name = models.CharField(max_length=150, verbose_name="角色卡名称")  # 角色卡名称
+    image_path = models.ImageField(
+        upload_to=character_image_upload_path,  # 图片存储路径函数
+        max_length=255,
+        verbose_name="图片存储路径"
+    )
+    character_data = models.TextField(verbose_name="角色数据（JSON格式）")  # 角色数据
+    create_date = models.CharField(max_length=150, verbose_name="上传时间")  # 上传时间
+
+    # 新增字段
+    language = models.CharField(
+        max_length=2,
+        choices=[('en', 'English'), ('cn', '中文')],
+        default='en',
+        verbose_name="语言"
+    )
+    tags = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True,
+        verbose_name="标签（逗号分隔或JSON）"
+    )
+    source = models.CharField(
+        max_length=2,
+        choices=[('st', 'ST端'), ('pt', 'PT端')],
+        default='pt',
+        verbose_name="数据来源"
+    )
+
+    class Meta:
+        db_table = 'creator_character_card'
         verbose_name = "角色卡"
         verbose_name_plural = "角色卡"
 
@@ -490,3 +534,71 @@ class Preset(models.Model):
 
     class Meta:
         db_table = "preset"
+
+
+class CreatorPreset(models.Model):
+    preset_settings_openai = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True,
+        help_text="OpenAI 预设名称"
+    )
+    temp_openai = models.FloatField(
+        null=True,
+        blank=True,
+        help_text="OpenAI 温度"
+    )
+    top_k_openai = models.IntegerField(
+        null=True,
+        blank=True,
+        help_text="OpenAI Top K"
+    )
+    top_p_openai = models.FloatField(
+        null=True,
+        blank=True,
+        help_text="OpenAI Top P"
+    )
+    openai_max_context = models.IntegerField(
+        null=True,
+        blank=True,
+        help_text="OpenAI 最大上下文长度"
+    )
+    openai_max_tokens = models.IntegerField(
+        null=True,
+        blank=True,
+        help_text="OpenAI 最大输出 Token"
+    )
+    google_model = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True,
+        help_text="谷歌模型"
+    )
+    model_n = models.IntegerField(
+        null=True,
+        blank=True,
+        help_text="模型数量"
+    )
+    preset_json = models.TextField(
+        null=True,
+        blank=True,
+        help_text="预设 JSON 配置"
+    )
+    image = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True,
+        help_text="图片地址"
+    )
+
+    class Meta:
+        db_table = 'creator_preset'
+        verbose_name = '创作者中心模型预设'
+        verbose_name_plural = '创作者中心模型预设'
+        indexes = [
+            models.Index(fields=['preset_settings_openai'], name='idx_preset_settings_openai'),
+            models.Index(fields=['google_model'], name='idx_google_model'),
+        ]
+
+    def __str__(self):
+        return f"{self.preset_settings_openai} ({self.id})"
