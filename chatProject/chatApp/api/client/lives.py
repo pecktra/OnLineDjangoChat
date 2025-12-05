@@ -6,7 +6,7 @@ from django.conf import settings
 import json
 from django.shortcuts import redirect, render
 from chatApp.models import ChatUserChatHistory, UserBalance, RoomInfo, AnchorBalance, PaymentLiveroomEntryRecord, \
-    ChatUser, CharacterCard,UserFollowRelation,RoomImageBinding
+    ChatUser, CharacterCard,UserFollowRelation,RoomImageBinding,Favorite
 from django.utils import timezone
 from datetime import datetime
 from django.db.models import Subquery, OuterRef
@@ -153,14 +153,21 @@ def to_naive_datetime(send_date_str):
 
 
 @api_view(['GET'])
-@permission_classes([IsAuthenticated])  # 确保只有认证用户可以访问
 def get_live_info(request):
     """
-    获取单个直播间信息
+    获取单个直播间信息（可未登录访问）
     GET /api/live/get_live_info?room_id=<room_id>
     """
+
     room_id = request.GET.get("room_id")
-    user = get_user(request)
+
+    # 尝试获取用户，但不强制要求
+    try:
+        user = get_user(request)
+        is_authenticated = True
+    except:
+        user = None
+        is_authenticated = False
 
     if not room_id:
         return Response({"code": 1, "message": "Missing room_id parameter"}, status=400)
@@ -172,13 +179,14 @@ def get_live_info(request):
 
         username = room_info.user_name
 
-        # VIP 信息
+        # VIP 信息（未登录：全部返回默认值）
         vip_info = {
             "room_type": room_info.room_type,
             "vip_status": False,
             "amount": room_info.coin_num or 0
         }
-        if vip_info["room_type"] != 0:
+
+        if is_authenticated and room_info.room_type != 0:
             vip_subscription = PaymentLiveroomEntryRecord.objects.filter(
                 user_id=user.id,
                 room_name=room_info.room_name
@@ -186,68 +194,62 @@ def get_live_info(request):
             if vip_subscription:
                 vip_info["vip_status"] = True
 
-        # 订阅信息
+        # 订阅信息（未登录：默认 0）
         subscription_info = {"subscription_status": False, "amount": 0}
-        redis_client_subscribe = get_redis_connection('subscribe')
-        subscription_key = f"subscription:{user.id}:{room_info.uid}"
-        subscription_data = redis_client_subscribe.get(subscription_key)
-        if subscription_data:
-            try:
-                subscription_data = json.loads(subscription_data.decode('utf-8'))
-                subscription_info["subscription_status"] = True
-                subscription_info["amount"] = int(subscription_data.get("diamonds_paid", 0))
-            except json.JSONDecodeError:
-                print("Error decoding subscription data:", subscription_data)
+
+        if is_authenticated:
+            redis_client_subscribe = get_redis_connection('subscribe')
+            subscription_key = f"subscription:{user.id}:{room_info.uid}"
+            subscription_data = redis_client_subscribe.get(subscription_key)
+            if subscription_data:
+                try:
+                    subscription_data = json.loads(subscription_data.decode('utf-8'))
+                    subscription_info["subscription_status"] = True
+                    subscription_info["amount"] = int(subscription_data.get("diamonds_paid", 0))
+                except json.JSONDecodeError:
+                    pass  # 忽略解析错误
 
         image_info = build_full_image_url(request, uid=room_info.uid, room_id=room_info.room_id)
 
-        # ✅ 使用 RoomInfo 的 last_ai_reply_timestamp 判断最近一小时 AI 是否有回复
+        # AI 最近一小时是否回复
         one_hour_ago = timezone.now() - timezone.timedelta(hours=1)
         ai_replied_recently = False
         if room_info.last_ai_reply_timestamp:
-            last_ai_time = datetime.fromtimestamp(room_info.last_ai_reply_timestamp, tz=timezone.get_current_timezone())
+            last_ai_time = datetime.fromtimestamp(
+                room_info.last_ai_reply_timestamp,
+                tz=timezone.get_current_timezone()
+            )
             if last_ai_time >= one_hour_ago:
                 ai_replied_recently = True
 
-        # 收藏状态
+        # 收藏状态（未登录：返回 0）
         favorite_status = 0
-        try:
+        if is_authenticated:
             favorite = Favorite.objects.filter(uid=user.id, room_id=room_id, status=1).first()
             if favorite:
                 favorite_status = 1
-        except:
-            favorite_status = 0
 
-        favorite_info = {
-            "favorite_status": favorite_status
-        }
+        favorite_info = {"favorite_status": favorite_status}
 
+        # 关注状态（未登录：False）
         follow_status = False
-        try:
+        if is_authenticated:
             follow_relation = UserFollowRelation.objects.filter(
                 follower_id=str(user.id),
                 followed_id=str(room_info.uid),
-                status=True  # 只算有效关注
+                status=True
             ).first()
             if follow_relation:
                 follow_status = True
-        except Exception as e:
-            print("Error fetching follow status:", e)
-            follow_status = False
 
-        follow_info = {
-            "follow_status": follow_status
-        }
+        follow_info = {"follow_status": follow_status}
 
         nickname = ""
-        try:
+        if is_authenticated:
             chat_user = ChatUser.objects.filter(id=user.id).first()
             if chat_user and chat_user.nickname:
                 nickname = chat_user.nickname
-        except:
-            nickname = ""
 
-        # 返回数据
         live_info = {
             "room_id": room_info.room_id,
             "room_name": room_info.room_name,
@@ -278,6 +280,7 @@ def get_live_info(request):
 
     except Exception as e:
         return Response({"code": 1, "message": f"Internal server error: {str(e)}"}, status=500)
+
 
 class ChatHistoryPagination(PageNumberPagination):
     page_size = 10  # 每页返回的条目数
