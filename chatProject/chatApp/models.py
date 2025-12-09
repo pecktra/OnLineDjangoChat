@@ -625,6 +625,7 @@ class LicenseKey(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="生成时间")
 
     class Meta:
+        db_table = 'license_keys'
         verbose_name = "激活码"
         verbose_name_plural = "激活码管理"
 
@@ -646,6 +647,7 @@ class UserLicense(models.Model):
     is_active = models.BooleanField(default=True, verbose_name="是否当前有效")
 
     class Meta:
+        db_table = 'user_licenses'
         verbose_name = "用户授权"
         verbose_name_plural = "用户授权列表"
 
