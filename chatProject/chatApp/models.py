@@ -32,7 +32,12 @@ def character_image_upload_path(instance, filename):
 
 
 
-
+def creator_character_image_upload_path(instance, filename):
+    """
+    动态生成图片上传路径，例如：
+    <username>/characters/<filename>
+    """
+    return os.path.join('creator',instance.username, "aaaaa",'characters', filename)
 
 
 class CharacterCard(models.Model):
@@ -78,40 +83,31 @@ class CharacterCard(models.Model):
 class CreatorCharacterCard(models.Model):
     uid = models.CharField(max_length=150, verbose_name="用户ID")  # 用户id
     username = models.CharField(max_length=150, verbose_name="用户名")  # 用户名
-    room_name = models.CharField(max_length=255)
+    room_id = models.CharField(max_length=255)
     character_name = models.CharField(max_length=150, verbose_name="角色卡名称")  # 角色卡名称
-    image_path = models.ImageField(
-        upload_to=character_image_upload_path,  # 图片存储路径函数
+    image_path = models.CharField(
         max_length=255,
         verbose_name="图片存储路径"
     )
-    character_data = models.TextField(verbose_name="角色数据（JSON格式）")  # 角色数据
+
+    is_public = models.IntegerField(max_length=150, verbose_name="是否公开，0不公开，1公开")  # 上传时间
+    preset_id = models.IntegerField(max_length=150, verbose_name="预设id")  # 上传时间
+    character_data = models.TextField(default=dict)  # 角色数据
     create_date = models.CharField(max_length=150, verbose_name="上传时间")  # 上传时间
 
-    # 新增字段
-    language = models.CharField(
-        max_length=2,
-        choices=[('en', 'English'), ('cn', '中文')],
-        default='en',
-        verbose_name="语言"
-    )
+
     tags = models.CharField(
         max_length=255,
         null=True,
         blank=True,
         verbose_name="标签（逗号分隔或JSON）"
     )
-    source = models.CharField(
-        max_length=2,
-        choices=[('st', 'ST端'), ('pt', 'PT端')],
-        default='pt',
-        verbose_name="数据来源"
-    )
+
 
     class Meta:
         db_table = 'creator_character_card'
-        verbose_name = "角色卡"
-        verbose_name_plural = "角色卡"
+        verbose_name = "创作者角色卡"
+        verbose_name_plural = "创作者角色卡"
 
 
 class RoomImageBinding(models.Model):
@@ -579,10 +575,11 @@ class CreatorPreset(models.Model):
         blank=True,
         help_text="模型数量"
     )
-    preset_json = models.TextField(
+    preset_json = models.JSONField(
         null=True,
         blank=True,
-        help_text="预设 JSON 配置"
+        default=dict,  # 新增记录时默认空字典
+        help_text="预设 JSON 配置（支持超大内容，已改为 MySQL JSON 类型）"
     )
     image = models.CharField(
         max_length=255,
@@ -602,3 +599,62 @@ class CreatorPreset(models.Model):
 
     def __str__(self):
         return f"{self.preset_settings_openai} ({self.id})"
+
+
+class LicenseKey(models.Model):
+    """激活码池，由管理员批量生成"""
+    code = models.CharField(max_length=40, unique=True, db_index=True, verbose_name="激活码")
+    batch_name = models.CharField(max_length=100, blank=True, verbose_name="批次名称")  # 如：双11活动、2025年会员
+    days = models.IntegerField(verbose_name="有效天数", help_text="0 = 永久有效，30 = 30天，365 = 1年")
+
+    status = models.SmallIntegerField(
+        default=0,
+        choices=((0, '未使用'), (1, '已绑定'), (2, '已过期'), (3, '已禁用')),
+        verbose_name="状态"
+    )
+    bound_user = models.ForeignKey(
+        'ChatUser',
+        null=True, blank=True,
+        on_delete=models.SET_NULL,
+        related_name='bound_licenses',
+        verbose_name="绑定用户"
+    )
+    bound_at = models.DateTimeField(null=True, blank=True, verbose_name="绑定时间")
+    expire_at = models.DateTimeField(null=True, blank=True, verbose_name="绝对过期时间")  # 绑定后计算出来
+
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="生成时间")
+    created_by = models.ForeignKey(
+        'ChatUser',
+        null=True, blank=True,
+        on_delete=models.SET_NULL,
+        related_name='created_licenses',
+        verbose_name="生成人"
+    )
+
+    class Meta:
+        verbose_name = "激活码"
+        verbose_name_plural = "激活码管理"
+
+    def __str__(self):
+        return self.code
+
+
+class UserLicense(models.Model):
+    """用户实际拥有的授权（业务代码只查这张表）"""
+    user = models.OneToOneField(  # 改成 ForeignKey + unique=True 就支持一个用户多个码
+        'ChatUser',
+        on_delete=models.CASCADE,
+        related_name='active_license',
+        verbose_name="用户"
+    )
+    license_key = models.ForeignKey(LicenseKey, on_delete=models.CASCADE, verbose_name="来源激活码")
+    start_at = models.DateTimeField(auto_now_add=True, verbose_name="开始时间")
+    expire_at = models.DateTimeField(verbose_name="过期时间", help_text="为空表示永久有效")
+    is_active = models.BooleanField(default=True, verbose_name="是否当前有效")
+
+    class Meta:
+        verbose_name = "用户授权"
+        verbose_name_plural = "用户授权列表"
+
+    def __str__(self):
+        return f"{self.user.username} → {self.license_key.code}"
