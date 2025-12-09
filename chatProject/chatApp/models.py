@@ -623,13 +623,6 @@ class LicenseKey(models.Model):
     expire_at = models.DateTimeField(null=True, blank=True, verbose_name="绝对过期时间")  # 绑定后计算出来
 
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="生成时间")
-    created_by = models.ForeignKey(
-        'ChatUser',
-        null=True, blank=True,
-        on_delete=models.SET_NULL,
-        related_name='created_licenses',
-        verbose_name="生成人"
-    )
 
     class Meta:
         verbose_name = "激活码"
